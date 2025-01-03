@@ -21,7 +21,7 @@ from config_routeur import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('config_routeur01/', views.index),
-    path('configuration/', views.configuration),
+    path('configuration/', views.configuration, name='configuration'),
     path('configuration/routeur/<int:id>/', views.configuration_routeur_detail, name='configuration_routeur_detail'),
     path('configuration/seuil/<int:id>/', views.configuration_seuil_detail, name='configuration_seuil_detail'),
 ]

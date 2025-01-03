@@ -58,3 +58,28 @@ body {
 .routeur-detail ul li span {
     color: #0073e6;
 }
+
+/* Style pour le bouton de retour en arrière */
+.btn-back {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff; /* Couleur bleue */
+    padding: 10px 20px;
+    border-radius: 5px; /* Coins arrondis */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Légère ombre */
+    transition: all 0.3s ease; /* Animation pour les interactions */
+}
+
+.btn-back:hover {
+    background-color: #0056b3; /* Couleur plus sombre lors du survol */
+    transform: scale(1.05); /* Léger agrandissement au survol */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Renforce l'ombre */
+}
+
+.btn-back:active {
+    transform: scale(0.95); /* Écrasement sur clic */
+    background-color: #003f77; /* Couleur plus foncée */
+}

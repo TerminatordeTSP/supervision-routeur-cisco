@@ -1,0 +1,47 @@
+/* fichier : seuil_detail.css */
+
+.seuil-detail {
+    font-family: Arial, sans-serif;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 700px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.seuil-detail h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.seuil-detail h2 span {
+    color: #007BFF;
+    font-weight: bold;
+}
+
+.seuil-detail ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.seuil-detail li {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.seuil-detail li:last-child {
+    border-bottom: none;
+}
+
+.seuil-detail li strong {
+    font-weight: bold;
+    color: #555;
+}

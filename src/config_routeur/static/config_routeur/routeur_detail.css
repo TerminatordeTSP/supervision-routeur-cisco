@@ -1,0 +1,60 @@
+/* Styles spécifiques à routeur_detail.html */
+body {
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: #f4f4f9;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.routeur-detail {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.routeur-detail h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.routeur-detail h2 span {
+    color: #2980b9;
+}
+
+.routeur-detail ul {
+    list-style-type: none; /* Supprimer les puces */
+    padding: 0;
+    margin: 0;
+}
+
+.routeur-detail ul li {
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
+    color: #555;
+}
+
+.routeur-detail ul li:last-child {
+    border-bottom: none;
+}
+
+.routeur-detail ul li strong {
+    display: inline-block;
+    width: 220px;
+    font-weight: bold;
+    color: #34495e;
+}
+
+.routeur-detail ul li span {
+    color: #0073e6;
+}

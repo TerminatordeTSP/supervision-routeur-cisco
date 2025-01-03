@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Seuil : {{ routeur.nom }}{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'config_routeur/seuil_detail.css' %}">
+<div class="seuil-detail">
+    <h2>Configuration du seuil : <span>{{ seuil.nom }}</span></h2>
+    <ul>
+        <li>
+            <strong>RAM en Mo : </strong> {{ seuil.ram }}
+        </li>
+        <li>
+            <strong>CPU utilisé en % : </strong> {{ seuil.CPU }}
+        </li>
+        <li>
+            <strong>Bande passante en Mo/s : </strong> {{ seuil.trafic }}
+        </li>
+    </ul>
+</div>
+{% endblock %}

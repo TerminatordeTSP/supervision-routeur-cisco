@@ -20,5 +20,6 @@ from config_routeur import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('config_routeur01/', views.index)
+    path('config_routeur01/', views.index),
+    path('configuration/',views.configuration)
 ]

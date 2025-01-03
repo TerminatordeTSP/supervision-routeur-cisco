@@ -1,0 +1,65 @@
+/* Styles principaux pour la page */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1d1d82;
+    color: #331010;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header - titre principal */
+.page-header .title {
+    font-size: 28px;
+    text-align: center;
+    color: #444;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* Sous-sections (routeurs et seuils) */
+.section {
+    margin-bottom: 30px;
+}
+
+.subtitle {
+    font-size: 22px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* Liste des items */
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item {
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.list-item:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.item-text {
+    font-size: 18px;
+    color: #333;
+}

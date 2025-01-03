@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Page de configuration{% endblock title%}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <h1 class="title">Page de configuration</h1>
+        <link rel="stylesheet" href="{% static 'config_routeur/styles.css' %}" />
+    </header>
+
+    <section class="section">
+        <h2 class="subtitle">Liste des routeurs disponibles</h2>
+        <ul class="list">
+            {% for routeur in routeurs %}
+                <li class="list-item">
+                    <span class="item-text">{{ routeur.nom }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="section">
+        <h2 class="subtitle">Liste des seuils configurés</h2>
+        <ul class="list">
+            {% for seuil in seuils %}
+                <li class="list-item">
+                    <span class="item-text">{{ seuil.nom }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+
+{% endblock content %}

@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from config_routeur.models import Routeur
 from config_routeur.models import Seuil
+from config_routeur.forms import enter_seuil
+
+
 
 def index(request):
     return render(request, 'routeur01.html')
@@ -21,3 +24,9 @@ def configuration_seuil_detail(request, id):  # notez le paramètre id suppléme
    return render(request,
           'seuil_detail.html',
                  {'seuil': seuil}) # nous passons l'id au modèle
+
+def seuils(request):
+  form = enter_seuil()
+  return render(request,
+          'seuil.html',
+          {'form': form})

@@ -2,5 +2,5 @@ from django.urls import path
 from .views import index
 
 urlpatterns = [
-    path('', index, name="settings_index"),
+    path('settings/', index, name="settings_index"),
 ]

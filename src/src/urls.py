@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from alerts.views import show_alerts
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('alerts/', show_alerts, name='show_alerts'),
 ]

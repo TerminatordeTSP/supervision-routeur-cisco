@@ -1,3 +1,4 @@
 /env_ryan
 /venv
 /.env
+/src/__pycache__

@@ -1,4 +1,6 @@
 /env_ryan
 /venv
-.idea/
+/.idea
 /.env
+*.pyc
+__pycache__/

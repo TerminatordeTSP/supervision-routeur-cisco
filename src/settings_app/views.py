@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 
-def index(request):
+def index(request, name):
     return render(request,"settings/index.html")
 
 def user_info(request):

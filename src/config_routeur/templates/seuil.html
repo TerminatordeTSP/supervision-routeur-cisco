@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Page de configuration{% endblock title%}
+{% block title %}Page de configuration{% endblock title %}
 {% block content %}
-<p>Configurez un nouveau seuil.</p>
-
-<form action="" method="post" novalidate>
-{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Enregistrer">
-</form>
+<link rel="stylesheet" href="{% static 'config_routeur/seuil.css' %}">
+<div class="config-container">
+    <h1>Configurer un nouveau seuil</h1>
+    <p class="config-description">Veuillez remplir les informations ci-dessous pour enregistrer un nouveau seuil.</p>
+    <form action="" method="post" novalidate class="config-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-button">Enregistrer</button>
+    </form>
+</div>
 {% endblock content %}

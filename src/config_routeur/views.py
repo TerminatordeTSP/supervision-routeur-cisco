@@ -1,3 +1,5 @@
+from sqlite3 import IntegrityError
+from django.shortcuts import redirect
 from django.shortcuts import render
 from config_routeur.models import Routeur
 from config_routeur.models import Seuil
@@ -26,7 +28,28 @@ def configuration_seuil_detail(request, id):  # notez le paramètre id suppléme
                  {'seuil': seuil}) # nous passons l'id au modèle
 
 def seuils(request):
-  form = enter_seuil()
-  return render(request,
+    if request.method == 'POST':
+        # créer une instance de notre formulaire et le remplir avec les données POST
+        form = enter_seuil(request.POST)
+        #print("recup : ",form)
+    else:
+        # ceci doit être une requête GET, donc créer un formulaire vide
+        form = enter_seuil()
+    if form.is_valid():
+        CPU=form.cleaned_data['CPU']
+        ram=form.cleaned_data['ram']
+        trafic=form.cleaned_data['trafic']
+        nom=form.cleaned_data['nom']
+        try:
+            if Seuil.objects.filter(nom=nom).exists():
+                form.add_error(None,f"Erreur : un seuil avec le nom '{nom}' existe déjà.")
+            else:
+                seuil = Seuil(CPU=CPU, ram=ram, trafic=trafic, nom=nom)
+                seuil.save()
+                return configuration(request)
+        except IntegrityError as e:
+            form.add_error(None, f"Erreur : un seuil avec le nom '{nom}' existe déjà.")
+
+    return render(request,
           'seuil.html',
           {'form': form})

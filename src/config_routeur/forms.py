@@ -1,9 +1,9 @@
 from django import forms
 from django.db import models
-
+from config_routeur.models import Seuil
 from django.core.validators import MinValueValidator
 
-
+"""
 class enter_seuil(forms.Form):
     ram = forms.FloatField(
         min_value=0.1,  # minimum 0.1
@@ -48,3 +48,10 @@ class enter_seuil(forms.Form):
         if len(nom.strip()) < 5:  # Exemple : validation du nom
             raise forms.ValidationError("Le nom doit contenir au moins 5 caractères.")
         return nom
+
+"""
+
+class enter_seuil(forms.ModelForm):
+    class Meta :
+        model = Seuil
+        fields = '__all__'

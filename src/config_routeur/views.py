@@ -53,3 +53,27 @@ def seuils(request):
     return render(request,
           'seuil.html',
           {'form': form})
+"""
+def seuil_update(request, id):
+    seuil = Seuil.objects.get(id=id)
+    form = enter_seuil(instance=seuil)  # on pré-remplir le formulaire avec un groupe existant
+    return render(request,
+                  'seuil-update.html',
+                  {'form': form})
+"""
+def seuil_update(request, id):
+    seuil = Seuil.objects.get(id=id)
+
+    if request.method == 'POST':
+        form = enter_seuil(request.POST, instance=seuil)
+        if form.is_valid():
+            # mettre à jour le groupe existant dans la base de données
+            form.save()
+            # rediriger vers la page détaillée du groupe que nous venons de mettre à jour
+            return configuration(request)
+    else:
+        form = enter_seuil(instance=seuil)
+
+    return render(request,
+                  'seuil-update.html',
+                  {'form': form})

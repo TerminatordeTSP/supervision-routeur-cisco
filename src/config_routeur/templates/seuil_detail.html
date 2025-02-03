@@ -22,5 +22,8 @@
     <div class="back-button">
         <a href="{% url 'configuration' %}" class="btn-back">Retour en arrière</a>
     </div>
+    <div class="edit-button">
+        <a href="{% url 'seuil_update' id=seuil.id %}"  class="btn-edit">Modifier le seuil</a>
+    </div>
 </div>
 {% endblock %}

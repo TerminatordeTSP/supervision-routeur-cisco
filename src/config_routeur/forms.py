@@ -50,8 +50,50 @@ class enter_seuil(forms.Form):
         return nom
 
 """
-
+"""
 class enter_seuil(forms.ModelForm):
     class Meta :
         model = Seuil
         fields = '__all__'
+"""
+
+from django import forms
+from config_routeur.models import Seuil
+
+class enter_seuil(forms.ModelForm):
+    ram = forms.FloatField(
+        min_value=0.1,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez la valeur RAM',
+            'step': '0.1'
+        })
+    )
+    CPU = forms.FloatField(
+        min_value=1,
+        max_value=100,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez la valeur CPU',
+            'step': '0.1'
+        })
+    )
+    trafic = forms.FloatField(
+        min_value=0.001,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez la valeur du trafic',
+            'step': '0.1'
+        })
+    )
+    nom = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez le nom du seuil'
+        })
+    )
+
+    class Meta:
+        model = Seuil
+        fields = ['ram', 'CPU', 'trafic', 'nom']

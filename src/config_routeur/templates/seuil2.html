@@ -5,76 +5,54 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'config_routeur/style2.css' %}">
-<div class="config-container">
-    <div class="header">
-        <h1>Modification du seuil</h1>
-    </div>
+<link href="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/css/boosted.min.css" rel="stylesheet">
 
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-            {{ message }}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-dark">
+            <h2 class="text-orange text-center mb-0">Modification du seuil</h2>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
-    <div class="seuil-detail">
-        <form action="" method="post" novalidate class="config-form">
-            {% csrf_token %}
+        <div class="card-body bg-dark-subtle">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
 
-            {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
+                <div class="mb-4">
+                    <label for="id_ram" class="form-label">RAM en Mo</label>
+                    <input type="number" step="0.1" name="ram" value="{{ form.ram.value }}"
+                           class="form-control" id="id_ram" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="{{ form.ram.id_for_label }}" class="form-label">RAM en Mo</label>
-                {{ form.ram }}
-                {% if form.ram.errors %}
-                <div class="errorlist">{{ form.ram.errors }}</div>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="id_cpu" class="form-label">CPU utilisÃ© en %</label>
+                    <input type="number" step="0.1" name="CPU" value="{{ form.CPU.value }}"
+                           class="form-control" id="id_cpu" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="{{ form.CPU.id_for_label }}" class="form-label">CPU utilisé en %</label>
-                {{ form.CPU }}
-                {% if form.CPU.errors %}
-                <div class="errorlist">{{ form.CPU.errors }}</div>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="id_trafic" class="form-label">Bande passante en Mo/s</label>
+                    <input type="number" step="0.1" name="trafic" value="{{ form.trafic.value }}"
+                           class="form-control" id="id_trafic" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="{{ form.trafic.id_for_label }}" class="form-label">Bande passante en Mo/s</label>
-                {{ form.trafic }}
-                {% if form.trafic.errors %}
-                <div class="errorlist">{{ form.trafic.errors }}</div>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="id_nom" class="form-label">Nom du seuil</label>
+                    <input type="text" name="nom" value="{{ form.nom.value }}"
+                           class="form-control" id="id_nom" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="{{ form.nom.id_for_label }}" class="form-label">Nom du seuil</label>
-                {{ form.nom }}
-                {% if form.nom.errors %}
-                <div class="errorlist">{{ form.nom.errors }}</div>
-                {% endif %}
-            </div>
-
-            <div class="button-group">
-                <button type="submit" class="btn-back">
-                    <i class="bi bi-save"></i>
-                    Enregistrer les modifications
-                </button>
-                <a href="{% url 'configuration' %}" class="btn-back">
-                    <i class="bi bi-arrow-left"></i>
-                    Retour
-                </a>
-            </div>
-        </form>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Enregistrer les modifications
+                    </button>
+                    <a href="{% url 'configuration' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-{% endblock content %}
+
+<script src="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/js/boosted.bundle.min.js"></script>
+{% endblock %}

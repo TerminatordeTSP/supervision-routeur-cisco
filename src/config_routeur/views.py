@@ -61,6 +61,7 @@ def seuil_update(request, id):
                   'seuil-update.html',
                   {'form': form})
 """
+"""
 def seuil_update(request, id):
     seuil = Seuil.objects.get(id=id)
 
@@ -79,6 +80,7 @@ def seuil_update(request, id):
                   {'form': form})
 
 """
+"""
 def seuil_update(request, id):
     seuil = Seuil.objects.get(id=id)
 
@@ -96,3 +98,27 @@ def seuil_update(request, id):
                   'seuil-update.html',
                   {'form': form})
 """
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from config_routeur.models import Seuil
+from config_routeur.forms import enter_seuil
+
+def seuil_update(request, id):
+    seuil = get_object_or_404(Seuil, id=id)
+
+    if request.method == 'POST':
+        form = enter_seuil(request.POST, instance=seuil)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, 'Seuil modifié avec succès.')
+                return redirect('configuration')
+            except Exception as e:
+                messages.error(request, f'Erreur lors de la modification: {str(e)}')
+    else:
+        form = enter_seuil(instance=seuil)
+
+    return render(request,
+                 'seuil2.html',
+                 {'form': form, 'seuil': seuil})

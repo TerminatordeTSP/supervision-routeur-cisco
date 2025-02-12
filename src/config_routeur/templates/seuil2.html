@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuration des seuils{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'config_routeur/style2.css' %}">
+<div class="config-container">
+    <div class="header">
+        <h1>Configuration des seuils</h1>
+    </div>
+
+    <div class="seuil-detail">
+        <form action="" method="post" novalidate class="config-form">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="ram" class="form-label">Nom du seuil</label>
+                {{ form.ram }}
+            </div>
+
+            <div class="mb-3">
+                <label for="cpu" class="form-label">Valeur du seuil</label>
+                {{ form.cpu }}
+            </div>
+
+            <div class="mb-3">
+                <label for="trafic" class="form-label">Description</label>
+                {{ form.trafic }}
+            </div>
+
+            <div class="mb-3">
+                <label for="nom" class="form-label">Type de seuil</label>
+                {{ form.nom }}
+            </div>
+
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn-back">
+                    <i class="bi bi-save"></i> Enregistrer
+                </button>
+                <a href="{% url 'configuration' %}" class="btn-back ms-3">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

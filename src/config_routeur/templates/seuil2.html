@@ -1,46 +1,77 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Configuration des seuils{% endblock title %}
+{% block title %}Modification du seuil{% endblock title %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'config_routeur/style2.css' %}">
 <div class="config-container">
     <div class="header">
-        <h1>Configuration des seuils</h1>
+        <h1>Modification du seuil</h1>
     </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="seuil-detail">
         <form action="" method="post" novalidate class="config-form">
             {% csrf_token %}
 
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="mb-3">
-                <label for="ram" class="form-label">Nom du seuil</label>
+                <label for="{{ form.ram.id_for_label }}" class="form-label">RAM en Mo</label>
                 {{ form.ram }}
+                {% if form.ram.errors %}
+                <div class="errorlist">{{ form.ram.errors }}</div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
-                <label for="cpu" class="form-label">Valeur du seuil</label>
-                {{ form.cpu }}
+                <label for="{{ form.CPU.id_for_label }}" class="form-label">CPU utilisé en %</label>
+                {{ form.CPU }}
+                {% if form.CPU.errors %}
+                <div class="errorlist">{{ form.CPU.errors }}</div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
-                <label for="trafic" class="form-label">Description</label>
+                <label for="{{ form.trafic.id_for_label }}" class="form-label">Bande passante en Mo/s</label>
                 {{ form.trafic }}
+                {% if form.trafic.errors %}
+                <div class="errorlist">{{ form.trafic.errors }}</div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
-                <label for="nom" class="form-label">Type de seuil</label>
+                <label for="{{ form.nom.id_for_label }}" class="form-label">Nom du seuil</label>
                 {{ form.nom }}
+                {% if form.nom.errors %}
+                <div class="errorlist">{{ form.nom.errors }}</div>
+                {% endif %}
             </div>
 
-
-            <div class="text-center mt-4">
+            <div class="button-group">
                 <button type="submit" class="btn-back">
-                    <i class="bi bi-save"></i> Enregistrer
+                    <i class="bi bi-save"></i>
+                    Enregistrer les modifications
                 </button>
-                <a href="{% url 'configuration' %}" class="btn-back ms-3">
-                    <i class="bi bi-arrow-left"></i> Retour
+                <a href="{% url 'configuration' %}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Retour
                 </a>
             </div>
         </form>

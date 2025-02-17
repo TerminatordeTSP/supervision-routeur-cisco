@@ -1,89 +1,70 @@
+/* Style général */
 body {
-    background-color: #1a0f0f !important;
-    color: #ff6b35 !important;
+    background-color: #3b1f14;
+    color: #950431;
+    font-family: Arial, sans-serif;
 }
 
-.dashboard-container {
-    padding: 20px !important;
+/* Conteneur principal */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 10px 20px !important;
-    background-color: #2d1810 !important;
-    border-radius: 5px !important;
-    margin-bottom: 20px !important;
+.card {
+    background-color: #3b1f14;
+    border: 2px solid #ff8c32;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
 }
 
-.header h1 {
-    color: #ff6b35 !important;
-    margin: 0 !important;
-    font-size: 24px !important;
+.card-header {
+    background: none;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff8c32;
+    border-bottom: none;
 }
 
-.metrics-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 15px !important;
-    margin-bottom: 30px !important;
+.card-body {
+    background: none;
+    padding-top: 10px;
 }
 
-.metric-card {
-    background-color: #2d1810 !important;
-    border-radius: 5px !important;
-    padding: 20px !important;
-    text-align: center !important;
+/* Champs de formulaire */
+.form-control {
+    background-color: #ffffff;
+    border: 1px solid #ff8c32;
+    color: #000;
 }
 
-.metric-title {
-    color: #ff6b35 !important;
-    font-size: 16px !important;
-    margin-bottom: 10px !important;
-    text-transform: uppercase !important;
+.form-label {
+    font-weight: bold;
+    color: #ff8c32;
 }
 
-/* Style pour les inputs */
-input, select, textarea {
-    width: 100% !important;
-    padding: 8px 12px !important;
-    background-color: #3d2218 !important;
-    border: 1px solid #ff6b35 !important;
-    color: #ffffff !important;
-    border-radius: 4px !important;
-    font-size: 32px !important;
-    text-align: center !important;
+/* Boutons */
+.btn {
+    border: 1px solid #ff8c32;
+    color: #ff8c32;
+    background: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-input:focus, select:focus, textarea:focus {
-    outline: none !important;
-    border-color: #ff6b35 !important;
-    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.25) !important;
+.btn:hover {
+    background-color: #ff8c32;
+    color: #3b1f14;
 }
 
-/* Style des boutons */
-.header-button {
-    background-color: #3d2218 !important;
-    border: 1px solid #ff6b35 !important;
-    color: #ff6b35 !important;
-    padding: 8px 15px !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    transition: all 0.3s ease !important;
-}
-
-.header-button:hover {
-    background-color: #ff6b35 !important;
-    color: #1a0f0f !important;
-}
-
-.button-group {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 15px !important;
-    margin-top: 20px !important;
+/* Alignement des boutons */
+.d-flex {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }

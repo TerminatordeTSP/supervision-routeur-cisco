@@ -1,26 +1,26 @@
-/* Style général pour le corps */
+
 body {
     font-family: 'Arial', sans-serif;
     font-size: 16px;
     line-height: 1.6;
-    background-color: #f9f9f9; /* Fond clair */
+    background-color: #f9f9f9;
     color: #333;
     margin: 0;
     padding: 0;
 }
 
-/* Conteneur principal de la page */
+
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
-    background-color: #ffffff; /* Fond blanc du conteneur */
+    background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre douce */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* En-tête de la page */
+
 .page-header {
     text-align: center;
     margin-bottom: 40px;
@@ -33,7 +33,7 @@ body {
     margin: 0;
 }
 
-/* Sections de la page */
+
 .section {
     margin-bottom: 30px;
 }
@@ -46,83 +46,83 @@ body {
     text-align: center;
 }
 
-/* Liste des items */
+
 .list {
-    list-style: none; /* Supprime les puces */
+    list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    flex-wrap: wrap; /* Permet un affichage responsive */
-    gap: 20px; /* Espacement entre les items */
-    justify-content: center; /* Centre les boutons */
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
 }
 
-/* Chaque item de la liste */
+
 .list-item {
-    flex: 1 1 calc(33.333% - 20px); /* Chaque bouton occupe 1/3 d'une ligne */
+    flex: 1 1 calc(33.333% - 20px);
     display: flex;
     justify-content: center;
     max-width: 300px;
 }
 
 .list-item a {
-    text-decoration: none; /* Pas de soulignement par défaut */
+    text-decoration: none;
 }
 
-/* Boutons génériques */
+
 .button {
     display: inline-block;
     padding: 15px 20px;
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
-    border-radius: 8px; /* Coins arrondis */
+    border-radius: 8px;
     text-align: center;
     transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Boutons spécifiques pour les routeurs */
+
 .btn-routeur {
-    background-color: #007bff; /* Bleu par défaut */
+    background-color: #007bff;
 }
 
 .btn-routeur:hover {
-    background-color: #0056b3; /* Bleu plus foncé */
-    transform: scale(1.05); /* Agrandissement au survol */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Ombre renforcée */
+    background-color: #0056b3;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-routeur:active {
-    background-color: #003f77; /* Bleu très foncé */
-    transform: scale(0.95); /* Réduction lors du clic */
+    background-color: #003f77;
+    transform: scale(0.95);
 }
 
-/* Boutons spécifiques pour les seuils */
+
 .btn-seuil {
-    background-color: #d9534f; /* Rouge par défaut */
+    background-color: #d9534f;
 }
 
 .btn-seuil:hover {
-    background-color: #c9302c; /* Rouge plus foncé */
-    transform: scale(1.05); /* Agrandissement au survol */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Ombre renforcée */
+    background-color: #c9302c;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-seuil:active {
-    background-color: #ac2925; /* Rouge très foncé */
-    transform: scale(0.95); /* Réduction lors du clic */
+    background-color: #ac2925;
+    transform: scale(0.95);
 }
 
-/* Responsive - Adaptation pour les petits écrans */
+
 @media (max-width: 768px) {
     .list-item {
-        flex: 1 1 calc(50% - 20px); /* Chaque bouton occupe 1/2 d'une ligne */
+        flex: 1 1 calc(50% - 20px);
     }
 }
 
 @media (max-width: 500px) {
     .list-item {
-        flex: 1 1 100%; /* Chaque bouton occupe 100% de la largeur */
+        flex: 1 1 100%;
     }
 }

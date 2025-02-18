@@ -1,7 +1,7 @@
 /* Style général */
 body {
-    background-color: #3b1f14;
-    color: #950431;
+    background-color: #3b1f14; /* Un rouge foncé mais pas noir */
+    color: #ff8c32; /* Une couleur orange-ambre chaleureuse */
     font-family: Arial, sans-serif;
 }
 
@@ -13,9 +13,10 @@ body {
     height: 100vh;
 }
 
+/* Carte principale */
 .card {
-    background-color: #3b1f14;
-    border: 2px solid #ff8c32;
+    background-color: #4b2a1e; /* Rouge/brun chaud pour éviter le noir */
+    border: 2px solid #ff8c32; /* Bordure orange-ambre */
     padding: 20px;
     border-radius: 5px;
     width: 400px;
@@ -37,9 +38,9 @@ body {
 
 /* Champs de formulaire */
 .form-control {
-    background-color: #ffffff;
-    border: 1px solid #ff8c32;
-    color: #000;
+    background-color: #ffffff; /* Fond blanc clair pour les champs */
+    border: 1px solid #ff8c32; /* Bordure orange-ambre pour uniformité */
+    color: #3b1f14; /* Texte de couleur claire (couleur de fond du body) */
 }
 
 .form-label {
@@ -54,12 +55,13 @@ body {
     background: none;
     padding: 8px 12px;
     cursor: pointer;
+    border-radius: 4px;
     transition: 0.3s;
 }
 
 .btn:hover {
     background-color: #ff8c32;
-    color: #3b1f14;
+    color: #3b1f14; /* Retour à la couleur de fond pour contraste */
 }
 
 /* Alignement des boutons */
@@ -67,4 +69,38 @@ body {
     display: flex;
     justify-content: center;
     gap: 10px;
+}
+
+/* Cartes avec des données spécifiques */
+.custom-bg-cpu,
+.custom-bg-ram,
+.custom-bg-battery {
+    background-color: #9b4d20; /* Une couleur plus chaude, sans noir */
+}
+
+/* Cartes métriques */
+.metric-card {
+    background-color: #7a3c2d; /* Fond de carte chaud et sans noir */
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+}
+
+.metric-title {
+    color: #ff8c32;
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+.metric-unit {
+    font-size: 14px;
+    color: #ff8c32;
 }

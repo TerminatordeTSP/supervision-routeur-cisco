@@ -1,4 +1,8 @@
 /env_ryan
 /venv
 .idea/
-/.env
+/.en
+src/db.sqlite3
+src/*.sqlite3
+src/influxdata-archive_compat.key
+src/*.key

@@ -33,9 +33,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'config_routeur',  # App pour la configuration du routeur
-    'parametres',       # App pour la gestion des paramètres
-    'dashboard',        # App pour l'affichage du tableau de bord
+    'settings_app',  # Depuis settings_dev
+    'config_routeur',  # Depuis main
+    'parametres',       # Depuis main
+    'dashboard',        # Depuis main
 ]
 
 MIDDLEWARE = [

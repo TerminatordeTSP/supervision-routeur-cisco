@@ -1,0 +1,88 @@
+body {
+    background-color: #1a1111;
+}
+
+.dashboard-container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #3d2218;  / Marron foncé de l'en-tête /
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    color: #3d2218;  / Orange utilisé pour les titres /
+    margin: 0;
+    font-size: 24px;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background-color: #231310;  / Marron foncé des cartes /
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+}
+
+.metric-title {
+    color: #3d2218;  / Orange pour les titres des métriques /
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+/ Style pour les inputs /
+input, select, textarea {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #231310;  / Même marron que les cartes /
+    border: 1px solid #ff5722;  / Bordure orange /
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 32px;
+    text-align: center;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3d2218;
+    box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.25);
+}
+
+/ Style des boutons /
+.header-button {
+    background-color: transparent;
+    border: 1px solid #3d2218;  / Bordure orange /
+    color: #ff5722;  / Texte orange */
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.header-button:hover {
+    background-color: #3d2218;
+    color: #231310;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}

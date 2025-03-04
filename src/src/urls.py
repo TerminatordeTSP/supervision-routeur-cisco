@@ -26,5 +26,6 @@ urlpatterns = [
     path('configuration/seuil/<int:id>/', views.configuration_seuil_detail, name='configuration_seuil_detail'),
     path('configuration/seuil/', views.seuils, name='seuil'),
     path('configuration/seuil_update/<int:id>/', views.seuil_update, name='seuil_update'),
+    path('configuration/seuil_delate/<int:id>/', views.band_delete, name='seuil_delate'),
 ]
 

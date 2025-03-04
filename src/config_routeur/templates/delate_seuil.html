@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Seuil : {{ routeur.nom }}{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'config_routeur/seuil_detail.css' %}">
+
+<div class="seuil-detail">
+    <h2>Etes vous sûr de vouloir supprimer le seuil ? <span>{{ seuil.nom }}</span></h2>
+    <!-- Bouton de retour ajouté ici -->
+    <div class="back-button">
+        <form action="" method="post" >
+            {% csrf_token %}
+            <input class="btn-back" type="submit" value="Supprimer">
+        </form>
+    </div>
+    </div>
+{% endblock %}

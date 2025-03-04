@@ -122,3 +122,17 @@ def seuil_update(request, id):
     return render(request,
                  'seuil2.html',
                  {'form': form, 'seuil': seuil})
+
+
+def band_delete(request, id):
+    seuil = Seuil.objects.get(id=id)  # nécessaire pour GET et pour POST
+
+    if request.method == 'POST':
+        # supprimer le groupe de la base de données
+        seuil.delete()
+        # rediriger vers la liste des groupes
+        return redirect('configuration')
+
+    return render(request,
+                    'delate_seuil.html',
+                    {'seuil': seuil})

@@ -11,5 +11,8 @@
         {{ form.as_p }}
         <button type="submit" class="submit-button">Enregistrer</button>
     </form>
+    <div class="back-button">
+        <a href="{% url 'configuration' %}" class="btn-back">Retour en arrière</a>
+    </div>
 </div>
 {% endblock content %}

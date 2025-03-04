@@ -1,0 +1,101 @@
+/* Règles globales */
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: #f8f9fa; /* Fond gris clair pour toute la page */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Conteneur principal */
+.seuil-detail {
+    max-width: 800px;
+    margin: 40px auto; /* Centré horizontalement et espacé verticalement */
+    padding: 20px 30px;
+    background-color: #ffffff; /* Fond blanc pour contraste */
+    border-radius: 8px; /* Coins arrondis */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre simple, moderne */
+    text-align: left; /* Alignement du texte par défaut à gauche */
+}
+
+/* Titre principal */
+.seuil-detail h2 {
+    font-size: 28px; /* Taille augmentée pour le titre */
+    color: #7c0a02; /* Rouge foncé pour le texte principal */
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.seuil-detail h2 span {
+    color: #d9534f; /* Rouge vif pour souligner le nom dynamique */
+}
+
+/* Liste des détails (ul) */
+.seuil-detail ul {
+    list-style: none; /* Retirer les puces */
+    padding: 0;
+    margin: 0;
+}
+
+.seuil-detail ul li {
+    border-left: 4px solid #d9534f; /* Ligne rouge à gauche de chaque item */
+    margin: 15px 0;
+    padding: 10px 15px;
+    background-color: #f9f9f9; /* Fond léger pour distinguer les items */
+    border-radius: 5px; /* Arrondi pour les items */
+    font-size: 16px;
+    color: #555;
+}
+
+.seuil-detail ul li strong {
+    color: #990000; /* Texte important en rouge foncé */
+}
+
+/* Bouton "Retour en arrière" */
+.back-button {
+    margin-top: 30px; /* Espacement avec le contenu supérieur */
+    text-align: center; /* Bouton centré */
+}
+
+.btn-back {
+    display: inline-block;
+    padding: 12px 25px; /* Confort d’interaction avec plus de padding */
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff; /* Texte blanc */
+    background-color: #d9534f; /* Rouge vif pour le fond */
+    text-decoration: none; /* Supprimer tout soulignement */
+    border-radius: 6px; /* Coins légèrement arrondis */
+    transition: all 0.3s ease; /* Animation fluide */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Petite ombre propre */
+}
+
+.btn-back:hover {
+    background-color: #c9302c; /* Rouge foncé pour le survol */
+    transform: scale(1.05); /* Légère agrandissement au survol */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Plus d'ombre pour survol */
+}
+
+.btn-back:active {
+    transform: scale(0.95); /* Légère réduction au clic */
+    background-color: #ac2925; /* Rouge encore plus foncé au clic */
+}
+
+/* Responsive settings */
+@media (max-width: 768px) {
+    .seuil-detail {
+        padding: 15px 20px; /* Adapte les marges pour petits écrans */
+    }
+
+    .seuil-detail h2 {
+        font-size: 24px; /* Titre légèrement plus petit */
+    }
+
+    .btn-back {
+        padding: 10px 20px; /* Boutons plus petits pour mobiles */
+        font-size: 14px;
+    }
+}

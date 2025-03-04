@@ -54,7 +54,10 @@ ROOT_URLCONF = 'src.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'dashboard/templates'],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),  # Depuis feature-alerts
+            BASE_DIR / 'dashboard/templates'  # Depuis main
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -116,3 +119,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuration pour InfluxDB (issue de feature-alerts)
+INFLUXDB_SETTINGS = {
+    'url': 'http://172.16.10.40:8086',
+    'token': 'gSTSmKrP5RImMoYLS2w4fTFfi3WOCzRRP63R_AcVYnzAsqnA6uOo1i0ec63jG0wd3tX6qpC00g7b0D0k34RBfg==',
+    'org': 'TSP',
+    # 'bucket': 'your-bucket'
+}

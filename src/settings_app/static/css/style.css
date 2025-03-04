@@ -1,0 +1,70 @@
+/* Style pour le corps de la page */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: black; /* Couleur de fond */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Style pour le conteneur global */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  padding: 20px;
+}
+
+/* Style pour le titre */
+.title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+  padding: 10px 20px; /* Espace autour du titre */
+  border: 2px solid #333; /* Bordure autour du titre */
+  border-radius: 8px; /* Coins arrondis */
+  background-color: #ffffff; /* Couleur de fond blanche */
+}
+
+/* Section contenant les options */
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 300px;
+}
+
+
+.information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+}
+
+/* Style des boutons */
+.option-button {
+  font-size: 18px;
+  margin: 10px 0;
+  padding: 12px 20px;
+  border: 2px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s, transform 0.2s;
+  display: inline-block; /* Pour que les liens ressemblent à des boutons */
+}
+
+.option-button:hover {
+  background-color: #0056b3; /* Couleur lors du survol */
+  transform: scale(1.05); /* Légère animation lors du survol */
+}

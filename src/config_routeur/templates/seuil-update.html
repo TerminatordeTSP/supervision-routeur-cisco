@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Page de configuration{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'config_routeur/style.css' %}">
+<div class="config-container">
+    <h1>Modifier un seuil</h1>
+    <p class="config-description">Veuillez modifier les informations ci-dessous pour modifier le seuil.</p>
+    <form action="" method="post" novalidate class="config-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-button">Enregistrer</button>
+    </form>
+</div>
+{% endblock content %}

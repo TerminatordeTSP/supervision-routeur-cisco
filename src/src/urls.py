@@ -15,6 +15,6 @@ urlpatterns = [
     path('configuration/seuil/', views.seuils, name='seuil'),
     path('configuration/seuil_update/<int:id>/', views.seuil_update, name='seuil_update'),
     path('settings/', include('settings_app.urls')),  
-    path('settings/', include('parametres.urls')),  
+    #path('settings/', include('parametres.urls')),  à supprimer
     path('dashboard/', include('dashboard.urls')),
 ]

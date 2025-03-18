@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Seuil : {{ routeur.nom }}{% endblock title %}
+{% block title %}threshold : {{ routeur.nom }}{% endblock title %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'config_routeur/seuil_detail.css' %}">
+<link rel="stylesheet" href="{% static 'config_routeur/threshold_detail.css' %}">
 
-<div class="seuil-detail">
-    <h2>Configuration du seuil : <span>{{ seuil.nom }}</span></h2>
+<div class="threshold-detail">
+    <h2>Configuration du threshold : <span>{{ threshold.nom }}</span></h2>
     <ul>
         <li>
-            <strong>RAM en Mo : </strong> {{ seuil.ram }}
+            <strong>RAM en Mo : </strong> {{ threshold.ram }}
         </li>
         <li>
-            <strong>CPU utilisé en % : </strong> {{ seuil.CPU }}
+            <strong>CPU utilisé en % : </strong> {{ threshold.cpu }}
         </li>
         <li>
-            <strong>Bande passante en Mo/s : </strong> {{ seuil.trafic }}
+            <strong>Bande passante en Mo/s : </strong> {{ threshold.trafic }}
         </li>
     </ul>
 
@@ -23,7 +23,7 @@
         <a href="{% url 'configuration' %}" class="btn-back">Retour en arrière</a>
     </div>
     <div class="edit-button">
-        <a href="{% url 'seuil_update' id=seuil.id %}"  class="btn-edit">Modifier le seuil</a>
+        <a href="{% url 'threshold_update' id=threshold.id %}"  class="btn-edit">Modifier le threshold</a>
     </div>
 </div>
 {% endblock %}

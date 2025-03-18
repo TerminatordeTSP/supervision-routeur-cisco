@@ -2,8 +2,8 @@ from sqlite3 import IntegrityError
 from django.shortcuts import redirect
 from django.shortcuts import render
 from config_routeur.models import Routeur
-from config_routeur.models import Seuil
-from config_routeur.forms import enter_seuil
+from config_routeur.models import threshold
+from config_routeur.forms import enter_threshold
 
 
 
@@ -12,8 +12,8 @@ def index(request):
 
 def configuration(request):
     routeurs = Routeur.objects.all()
-    seuils = Seuil.objects.all()
-    return render(request, 'Page de configuration.html',{'routeurs': routeurs,'seuils':seuils})
+    thresholds = Threshold.objects.all()
+    return render(request, 'Page de configuration.html',{'routeurs': routeurs,'seuils':thresholds})
 
 def configuration_routeur_detail(request, id):  # notez le paramètre id supplémentaire
    routeur = Routeur.objects.get(id=id)
@@ -21,37 +21,37 @@ def configuration_routeur_detail(request, id):  # notez le paramètre id supplé
           'routeur_detail.html',
                  {'routeur': routeur}) # nous passons l'id au modèle
 
-def configuration_seuil_detail(request, id):  # notez le paramètre id supplémentaire
-   seuil = Seuil.objects.get(id=id)
+def configuration_threshold_detail(request, id):  # notez le paramètre id supplémentaire
+   threshold = Threshold.objects.get(id=id)
    return render(request,
           'seuil_detail.html',
-                 {'seuil': seuil}) # nous passons l'id au modèle
+                 {'threshold': threshold}) # nous passons l'id au modèle
 
-def seuils(request):
+def thresholds(request):
     if request.method == 'POST':
         # créer une instance de notre formulaire et le remplir avec les données POST
-        form = enter_seuil(request.POST)
+        form = enter_threshold(request.POST)
         #print("recup : ",form)
     else:
         # ceci doit être une requête GET, donc créer un formulaire vide
-        form = enter_seuil()
+        form = enter_threshold()
     if form.is_valid():
-        CPU=form.cleaned_data['CPU']
+        cpu=form.cleaned_data['cpu']
         ram=form.cleaned_data['ram']
         trafic=form.cleaned_data['trafic']
         nom=form.cleaned_data['nom']
         try:
-            if Seuil.objects.filter(nom=nom).exists():
-                form.add_error(None,f"Erreur : un seuil avec le nom '{nom}' existe déjà.")
+            if Threshold.objects.filter(nom=nom).exists():
+                form.add_error(None,f"Erreur : un threshold avec le nom '{nom}' existe déjà.")
             else:
-                seuil = Seuil(CPU=CPU, ram=ram, trafic=trafic, nom=nom)
-                seuil.save()
+                threshold = Threshold(cpu=cpu, ram=ram, trafic=trafic, nom=nom)
+                threshold.save()
                 return configuration(request)
         except IntegrityError as e:
             form.add_error(None, f"Erreur : un seuil avec le nom '{nom}' existe déjà.")
 
     return render(request,
-          'seuil.html',
+          'threshold.html',
           {'form': form})
 """
 def seuil_update(request, id):
@@ -101,14 +101,14 @@ def seuil_update(request, id):
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from config_routeur.models import Seuil
-from config_routeur.forms import enter_seuil
+from config_routeur.models import Threshold
+from config_routeur.forms import enter_threshold
 
-def seuil_update(request, id):
-    seuil = get_object_or_404(Seuil, id=id)
+def threshold_update(request, id):
+    threshold = get_object_or_404(threshold, id=id)
 
     if request.method == 'POST':
-        form = enter_seuil(request.POST, instance=seuil)
+        form = enter_threshold(request.POST, instance=threshold)
         if form.is_valid():
             try:
                 form.save()
@@ -117,8 +117,8 @@ def seuil_update(request, id):
             except Exception as e:
                 messages.error(request, f'Erreur lors de la modification: {str(e)}')
     else:
-        form = enter_seuil(instance=seuil)
+        form = enter_threshold(instance=threshold)
 
     return render(request,
-                 'seuil2.html',
-                 {'form': form, 'seuil': seuil})
+                 'threshold2.html',
+                 {'form': form, 'threshold': threshold})

@@ -1,14 +1,14 @@
 from django.contrib import admin
-from config_routeur.models import Seuil
+from config_routeur.models import threshold
 from config_routeur.models import Routeur
 
 
-class SeuilAdmin(admin.ModelAdmin):
+class ThresholdAdmin(admin.ModelAdmin):
     list_display = ('nom','ram', 'CPU', 'trafic') # liste les champs que nous voulons sur l'affichage de la liste sur le site admin
 class RouteurAdmin(admin.ModelAdmin):
-    list_display = ('nom','ip', 'user', 'password','secret','seuil')
+    list_display = ('nom','ip', 'user', 'password','secret','threshold')
 
-admin.site.register(Seuil, SeuilAdmin)
+admin.site.register(threshold, ThresholdAdmin)
 admin.site.register(Routeur, RouteurAdmin)
 """
 Cela signifie que dans l'interface Django Admin, une fois que le modèle **Seuil** est enregistrée avec cette classe `SeuilAdmin`, vous verrez une liste des instances du modèle **Seuil** où 

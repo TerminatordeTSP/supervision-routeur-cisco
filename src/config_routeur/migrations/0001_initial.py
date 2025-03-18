@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Seuils',
+            name='thresholds',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('ram', models.FloatField(validators=[django.core.validators.MinValueValidator(0.1)], verbose_name='RAM en Mo')),
-                ('CPU', models.FloatField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='CPU utilisé en %')),
+                ('cpu', models.FloatField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='CPU utilisé en %')),
             ],
         ),
     ]

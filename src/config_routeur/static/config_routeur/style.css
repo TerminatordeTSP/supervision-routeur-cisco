@@ -99,17 +99,17 @@ body {
 }
 
 
-.btn-seuil {
+.btn-threshold {
     background-color: #d9534f;
 }
 
-.btn-seuil:hover {
+.btn-threshold:hover {
     background-color: #c9302c;
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.btn-seuil:active {
+.btn-threshold:active {
     background-color: #ac2925;
     transform: scale(0.95);
 }

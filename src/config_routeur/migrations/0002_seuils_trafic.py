@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='seuils',
+            model_name='thresholds',
             name='trafic',
             field=models.FloatField(default=0.001, validators=[django.core.validators.MinValueValidator(0.001)], verbose_name='Bande passante en Mo/s'),
             preserve_default=False,

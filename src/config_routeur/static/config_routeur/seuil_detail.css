@@ -10,7 +10,7 @@ body {
 }
 
 /* Conteneur principal */
-.seuil-detail {
+.threshold-detail {
     max-width: 800px;
     margin: 40px auto; /* Centré horizontalement et espacé verticalement */
     padding: 20px 30px;
@@ -21,7 +21,7 @@ body {
 }
 
 /* Titre principal */
-.seuil-detail h2 {
+.threshold-detail h2 {
     font-size: 28px; /* Taille augmentée pour le titre */
     color: #7c0a02; /* Rouge foncé pour le texte principal */
     text-align: center;
@@ -29,18 +29,18 @@ body {
     margin-bottom: 25px;
 }
 
-.seuil-detail h2 span {
+.threshold-detail h2 span {
     color: #d9534f; /* Rouge vif pour souligner le nom dynamique */
 }
 
 /* Liste des détails (ul) */
-.seuil-detail ul {
+.threshold-detail ul {
     list-style: none; /* Retirer les puces */
     padding: 0;
     margin: 0;
 }
 
-.seuil-detail ul li {
+.threshold-detail ul li {
     border-left: 4px solid #d9534f; /* Ligne rouge à gauche de chaque item */
     margin: 15px 0;
     padding: 10px 15px;
@@ -50,7 +50,7 @@ body {
     color: #555;
 }
 
-.seuil-detail ul li strong {
+.threshold-detail ul li strong {
     color: #990000; /* Texte important en rouge foncé */
 }
 
@@ -86,11 +86,11 @@ body {
 
 /* Responsive settings */
 @media (max-width: 768px) {
-    .seuil-detail {
+    .threshold-detail {
         padding: 15px 20px; /* Adapte les marges pour petits écrans */
     }
 
-    .seuil-detail h2 {
+    .threshold-detail h2 {
         font-size: 24px; /* Titre légèrement plus petit */
     }
 

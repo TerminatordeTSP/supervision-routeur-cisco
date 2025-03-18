@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from config_routeur.models import Seuil
+from config_routeur.models import threshold
 from django.core.validators import MinValueValidator
 
 """
@@ -10,9 +10,9 @@ class enter_seuil(forms.Form):
         label="RAM en Mo",
         initial=300,  # valeur par défaut
     )
-    CPU = forms.FloatField(
+    cpu = forms.FloatField(
         min_value=1,  # minimum 1
-        label="CPU utilisé en %",
+        label="cpu utilisé en %",
         initial=50,  # valeur par défaut
     )
     trafic = forms.FloatField(
@@ -31,11 +31,11 @@ class enter_seuil(forms.Form):
             raise forms.ValidationError("La valeur de la RAM doit dépasser 0.1 Mo.")
         return ram
 
-    def clean_CPU(self):
-        CPU = self.cleaned_data.get('CPU')
-        if CPU > 100:  # CPU ne peut pas dépasser 100%
-            raise forms.ValidationError("L'utilisation du CPU doit exceder 1%.")
-        return CPU
+    def clean_cpu(self):
+        cpu = self.cleaned_data.get('cpu')
+        if cpu > 100:  # cpu ne peut pas dépasser 100%
+            raise forms.ValidationError("L'utilisation du cpu doit exceder 1%.")
+        return cpu
 
     def clean_trafic(self):
         trafic = self.cleaned_data.get('trafic')
@@ -58,9 +58,9 @@ class enter_seuil(forms.ModelForm):
 """
 
 from django import forms
-from config_routeur.models import Seuil
+from config_routeur.models import threshold
 
-class enter_seuil(forms.ModelForm):
+class enter_threshold(forms.ModelForm):
     ram = forms.FloatField(
         min_value=0.1,
         widget=forms.NumberInput(attrs={
@@ -69,12 +69,12 @@ class enter_seuil(forms.ModelForm):
             'step': '0.1'
         })
     )
-    CPU = forms.FloatField(
+    cpu = forms.FloatField(
         min_value=1,
         max_value=100,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Entrez la valeur CPU',
+            'placeholder': 'Entrez la valeur cpu',
             'step': '0.1'
         })
     )
@@ -90,10 +90,10 @@ class enter_seuil(forms.ModelForm):
         max_length=50,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Entrez le nom du seuil'
+            'placeholder': 'Entrez le nom du threshold'
         })
     )
 
     class Meta:
-        model = Seuil
-        fields = ['ram', 'CPU', 'trafic', 'nom']
+        model = threshold
+        fields = ['ram', 'cpu', 'trafic', 'nom']

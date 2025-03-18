@@ -4,8 +4,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'config_routeur/style.css' %}">
 <div class="config-container">
-    <h1>Modifier un seuil</h1>
-    <p class="config-description">Veuillez modifier les informations ci-dessous pour modifier le seuil.</p>
+    <h1>Modifier un threshold</h1>
+    <p class="config-description">Veuillez modifier les informations ci-dessous pour modifier le threshold.</p>
     <form action="" method="post" novalidate class="config-form">
         {% csrf_token %}
         {{ form.as_p }}

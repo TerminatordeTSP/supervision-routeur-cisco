@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config_routeur', '0002_seuils_trafic'),
+        ('config_routeur', '0002_thresholds_trafic'),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Seuils',
-            new_name='Seuil',
+            old_name='thresholds',
+            new_name='threshold',
         ),
     ]

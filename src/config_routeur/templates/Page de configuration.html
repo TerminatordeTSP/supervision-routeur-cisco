@@ -22,13 +22,13 @@
         </ul>
     </section>
     <section class="section">
-        <h2 class="subtitle">Liste des seuils configurés</h2>
+        <h2 class="subtitle">Liste des thresholds configurés</h2>
         <ul class="list">
-            {% for seuil in seuils %}
+            {% for threshold in thresholds %}
                 <li class="list-item">
-                    <!-- Lien stylé pour chaque seuil -->
-                    <a class="button btn-seuil" href="{% url 'configuration_seuil_detail' seuil.id %}">
-                        {{ seuil.nom }}
+                    <!-- Lien stylé pour chaque threshold -->
+                    <a class="button btn-threshold" href="{% url 'configuration_threshold_detail' threshold.id %}">
+                        {{ threshold.nom }}
                     </a>
                 </li>
             {% endfor %}
@@ -36,8 +36,8 @@
     </section>
 </div>
 <div class="section" style="text-align: center;">
-    <a class="button btn-seuil" href="{% url 'seuil' %}">
-        Configurer un nouveau seuil
+    <a class="button btn-threshold" href="{% url 'threshold' %}">
+        Configurer un nouveau threshold
     </a>
 </div>
 

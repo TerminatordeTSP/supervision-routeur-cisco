@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config_routeur', 'migration_seuil_default'),
+        ('config_routeur', 'migration_threshold_default'),
     ]
 
     operations = [
@@ -23,22 +23,22 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AlterField(
-            model_name='seuil',
-            name='CPU',
+            model_name='threshold',
+            name='cpu',
             field=models.FloatField(default=50, validators=[django.core.validators.MinValueValidator(1)], verbose_name='CPU utilisé en %'),
         ),
         migrations.AlterField(
-            model_name='seuil',
+            model_name='threshold',
             name='nom',
-            field=models.CharField(default='seuil', max_length=50, unique=True, verbose_name='Nom du seuil'),
+            field=models.CharField(default='threshold', max_length=50, unique=True, verbose_name='Nom du threshold'),
         ),
         migrations.AlterField(
-            model_name='seuil',
+            model_name='threshold',
             name='ram',
             field=models.FloatField(default=300, validators=[django.core.validators.MinValueValidator(0.1)], verbose_name='RAM en Mo'),
         ),
         migrations.AlterField(
-            model_name='seuil',
+            model_name='threshold',
             name='trafic',
             field=models.FloatField(default=100, validators=[django.core.validators.MinValueValidator(0.001)], verbose_name='Bande passante en Mo/s'),
         ),

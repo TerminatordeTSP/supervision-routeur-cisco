@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config_routeur', '0003_rename_seuils_seuil'),
+        ('config_routeur', '0003_rename_thresholds_threshold'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='seuil',
+            model_name='threshold',
             name='nom',
-            field=models.CharField(default='seuil 1', editable=False, max_length=50, unique=True, verbose_name='Nom du seuil'),
+            field=models.CharField(default='threshold 1', editable=False, max_length=50, unique=True, verbose_name='Nom du threshold'),
             preserve_default=False,
         ),
     ]

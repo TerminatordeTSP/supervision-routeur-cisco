@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('config_routeur', '0002_create_default_seuil'),
+        ('config_routeur', '0002_create_default_threshold'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='routeur',
-            name='seuil',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.SET_DEFAULT, to='config_routeur.seuil'),
+            name='threshold',
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.SET_DEFAULT, to='config_routeur.threshold'),
         ),
     ]

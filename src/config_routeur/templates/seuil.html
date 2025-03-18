@@ -2,10 +2,10 @@
 {% load static %}
 {% block title %}Page de configuration{% endblock title %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'config_routeur/seuil.css' %}">
+<link rel="stylesheet" href="{% static 'config_routeur/threshold.css' %}">
 <div class="config-container">
-    <h1>Configurer un nouveau seuil</h1>
-    <p class="config-description">Veuillez remplir les informations ci-dessous pour enregistrer un nouveau seuil.</p>
+    <h1>Configurer un nouveau threshold</h1>
+    <p class="config-description">Veuillez remplir les informations ci-dessous pour enregistrer un nouveau threshold.</p>
     <form action="" method="post" novalidate class="config-form">
         {% csrf_token %}
         {{ form.as_p }}

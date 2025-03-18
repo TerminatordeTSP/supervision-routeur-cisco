@@ -155,8 +155,8 @@
                 <button class="header-button" data-bs-toggle="modal" data-bs-target="#alertesModal">
                     <i class="bi bi-bell"></i> Alertes
                 </button>
-                <button class="header-button" data-bs-toggle="modal" data-bs-target="#seuilsModal">
-                    <i class="bi bi-gear"></i> Seuil routeur
+                <button class="header-button" data-bs-toggle="modal" data-bs-target="#thresholdsModal">
+                    <i class="bi bi-gear"></i> threshold routeur
                 </button>
                 <button class="header-button">
                     <i class="bi bi-tools"></i> Paramètres
@@ -179,13 +179,13 @@
             </div>
 
             <div class="metric-card">
-                <div class="metric-title">CPU</div>
+                <div class="metric-title">cpu</div>
                 <div class="metric-value">4</div>
                 <div class="metric-unit">%</div>
             </div>
 
             <div class="metric-card">
-                <div class="metric-title">CPU</div>
+                <div class="metric-title">cpu</div>
                 <div class="metric-value">43</div>
                 <div class="metric-unit">°C</div>
             </div>
@@ -268,11 +268,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="seuilsModal" tabindex="-1" aria-labelledby="seuilsModalLabel" aria-hidden="true">
+    <div class="modal fade" id="thresholdsModal" tabindex="-1" aria-labelledby="thresholdsModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="seuilsModalLabel">Configuration des seuils</h5>
+                    <h5 class="modal-title" id="thresholdsModalLabel">Configuration des thresholds</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

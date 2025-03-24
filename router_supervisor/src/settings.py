@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'router_supervisor.wsgi.application'
+WSGI_APPLICATION = 'src.wsgi.application'
 
 
 # Database

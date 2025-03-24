@@ -28,6 +28,7 @@ class Threshold(models.Model):
     def __str__(self):
         return f'{self.nom}'
 
+
 class Routeur(models.Model):
     nom = models.CharField(
         max_length=50,
@@ -50,7 +51,7 @@ class Routeur(models.Model):
         max_length=100,
         verbose_name="Mot de passe pour enable"
     )
-    threshold = models.ForeignKey(threshold, on_delete=models.SET_DEFAULT, default=1) #ICI on configure la clé étrangère associée a Seuil, si Seuil est supprimé, seuil= Valueur-par-défaut
+    Threshold = models.ForeignKey(Threshold, on_delete=models.SET_DEFAULT, default=1) #ICI on configure la clé étrangère associée a Seuil, si Seuil est supprimé, seuil= Valueur-par-défaut
 
     def __str__(self):
         return f'{self.nom}'

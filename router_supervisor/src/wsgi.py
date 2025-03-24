@@ -1,5 +1,5 @@
 """
-WSGI config for src project.
+WSGI config for router_supervisor project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

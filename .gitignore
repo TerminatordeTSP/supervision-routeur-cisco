@@ -4,3 +4,5 @@
 /.env
 *.pyc
 __pycache__/
+router_supervisor/db.sqlite3
+router_supervisor/influxdata-archive_compat.key

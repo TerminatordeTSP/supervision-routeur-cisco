@@ -1,16 +1,16 @@
-/* Style pour le corps de la page */
+/* Style for the body of the page */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #151515; /* Couleur de fond */
+  background-color: #151515;
   color: white;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-/* Style pour le conteneur global */
+/* Style for the main container */
 .container {
   display: flex;
   flex-direction: column;
@@ -20,19 +20,19 @@ body {
   padding: 20px;
 }
 
-/* Style pour le titre */
+/* Style for the title */
 .title {
   text-align: center;
   font-size: 36px;
   font-weight: bold;
   color: #333;
-  padding: 10px 20px; /* Espace autour du titre */
-  border: 2px solid #333; /* Bordure autour du titre */
-  border-radius: 8px; /* Coins arrondis */
-  background-color: #ffffff; /* Couleur de fond blanche */
+  padding: 10px 20px; /* Spacing around the title */
+  border: 2px solid #333; /* Border around the title */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #ffffff; /* White background color */
 }
 
-/* Section contenant les options */
+/* Section containing the options */
 .options {
   display: flex;
   flex-direction: column;
@@ -41,7 +41,6 @@ body {
   margin-bottom: 300px;
 }
 
-
 .information {
   display: flex;
   flex-direction: column;
@@ -49,7 +48,7 @@ body {
   margin-top: 100px;
 }
 
-/* Style des boutons */
+/* Style for the buttons */
 .option-button {
   font-size: 18px;
   margin: 10px 0;
@@ -61,10 +60,9 @@ body {
   text-decoration: none;
   border-radius: 8px;
   transition: background-color 0.3s, transform 0.2s;
-  display: inline-block; /* Pour que les liens ressemblent à des boutons */
+  display: inline-block; /* Makes links look like buttons */
 }
 
 .option-button:hover {
-  background-color: #0056b3; /* Couleur lors du survol */
-  transform: scale(1.05); /* Légère animation lors du survol */
-}
+  background-color: #0056b3; /* Color on hover */
+  transform: scale(1.05); /* Slight animation*

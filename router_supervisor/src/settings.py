@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'settings_app'
+    'settings_app',
+    'dashboard_app',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'router_supervisor.wsgi.application'
+WSGI_APPLICATION = 'src.wsgi.application'
 
 
 # Database

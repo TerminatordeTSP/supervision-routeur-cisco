@@ -122,7 +122,7 @@ STATIC_URL = '/static/'
 # STATICFILES_DIRS = [
 #     BASE_DIR / "router_supervisor/thresholds_app/static",
 # ]
-
+LOGIN_URL = '/login/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

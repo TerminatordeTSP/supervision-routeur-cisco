@@ -2,7 +2,7 @@
 
 # Telegraf Commands
 ```
-sudo nano /etc/telegraf/telegraf.conf
+sudo vim /etc/telegraf/telegraf.conf
 sudo systemctl status telegraf
 sudo systemctl start telegraf
 sudo systemctl stop telegraf

@@ -22,6 +22,6 @@ from django.urls import path, include # type: ignore
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
-    path('dashboard/', include("dashboard_app.urls")),
-    path('thresholds/', views.configuration, name='configuration')
+    path('', include("dashboard_app.urls")),
+    path('thresholds/', include("thresholds_app.urls"), name='configuration')
 ]

@@ -22,7 +22,7 @@ from django.urls import path, include # type: ignore
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
-    path('dashboard/', include("dashboard_app.urls")),
+    path('', include("dashboard_app.urls")),
     path('thresholds/', views.configuration, name='configuration'),
     path('thesholds/router/<int:id>/', views.configuration_router_config, name='configuration_router_config'),
     path('thesholds/threshold/<int:id>/', views.configuration_threshold_detail, name='configuration_threshold_detail'),

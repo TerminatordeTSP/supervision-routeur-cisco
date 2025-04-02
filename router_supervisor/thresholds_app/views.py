@@ -32,20 +32,20 @@ def thresholds(request):
     if form.is_valid():
         cpu = form.cleaned_data['cpu']
         ram = form.cleaned_data['ram']
-        traffic = form.cleaned_data['traffic']
+        trafic = form.cleaned_data['trafic']
         name = form.cleaned_data['name']
         try:
             if Threshold.objects.filter(name=name).exists():
                 form.add_error(None, f"Error: A threshold with the name '{name}' already exists.")
             else:
-                threshold = Threshold(cpu=cpu, ram=ram, traffic=traffic, name=name)
+                threshold = Threshold(cpu=cpu, ram=ram, trafic=trafic, name=name)
                 threshold.save()
                 return configuration(request)
         except IntegrityError as e:
             form.add_error(None, f"Error: A threshold with the name '{name}' already exists.")
 
     return render(request,
-                  'threshold_detail.html',
+                  'threshold_update.html',
                   {'form': form})
 
 def threshold_update(request, id):

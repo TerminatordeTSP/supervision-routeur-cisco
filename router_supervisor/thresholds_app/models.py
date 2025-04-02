@@ -28,6 +28,24 @@ class Threshold(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+
+
+# ----------------------------
+# Utilisateurs
+# ----------------------------
+class Utilisateur(models.Model):
+    mail = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    role = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.prenom} {self.nom}"
+
+# ----------------------------
+# Routeur
+# ----------------------------
 class Router(models.Model):
     name = models.CharField(
         max_length=50,
@@ -50,12 +68,64 @@ class Router(models.Model):
         max_length=100,
         verbose_name="Enable password"
     )
-    threshold = models.ForeignKey(
-        Threshold, 
-        on_delete=models.SET_DEFAULT, 
-        default=1, 
-        verbose_name="Associated threshold"
-    )
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
+
+# ----------------------------
+# Lien Utilisateur <-> Routeur (ManyToMany avec table personnalisée)
+# ----------------------------
+class UtilisateurRouteur(models.Model):
+    utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
+    routeur = models.ForeignKey(Router, on_delete=models.CASCADE)
+
+# ----------------------------
+# Interface
+# ----------------------------
+class Interface(models.Model):
+    interface_id = models.AutoField(primary_key=True)
+    trafic = models.FloatField()
+    routeur = models.ForeignKey(Router, on_delete=models.CASCADE, related_name="interfaces")
+
+    def __str__(self):
+        return f"Interface {self.interface_id} - {self.trafic} Mbps"
+
+# ----------------------------
+# Seuil
+# ----------------------------
+class Seuil(models.Model):
+    ram = models.FloatField()
+    cpu = models.FloatField()
+    trafic = models.FloatField()
+    nom = models.CharField(max_length=100)
+    routeur = models.OneToOneField(Router, on_delete=models.CASCADE, related_name="seuil")
+
+    def __str__(self):
+        return self.nom
+
+# ----------------------------
+# KPI
+# ----------------------------
+class KPI(models.Model):
+    nom = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nom
+
+# ----------------------------
+# Seuil <-> KPI (ManyToMany)
+# ----------------------------
+class SeuilKPI(models.Model):
+    seuil = models.ForeignKey(Seuil, on_delete=models.CASCADE)
+    kpi = models.ForeignKey(KPI, on_delete=models.CASCADE)
+
+# ----------------------------
+# Alertes
+# ----------------------------
+class Alerte(models.Model):
+    date_log = models.DateTimeField()
+    interface = models.ForeignKey(Interface, on_delete=models.CASCADE)
+    kpi = models.ForeignKey(KPI, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Alerte {self.id} - {self.date_log}"

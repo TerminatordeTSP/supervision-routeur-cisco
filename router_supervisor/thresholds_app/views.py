@@ -64,5 +64,5 @@ def threshold_update(request, id):
         form = threshold_insert(instance=threshold)
 
     return render(request,
-                  'threshold.html',
+                  'threshold_update.html',
                   {'form': form, 'threshold': threshold})

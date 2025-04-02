@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Router {{ router.name }}{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'router_config/router_details.css' %}">
+<div class="router-details">
+    <h2>Router Configuration: <span>{{ router.name }}</span></h2>
+    <ul>
+        <li>
+            <strong>Router IP Address:</strong> {{ router.ip }}
+        </li>
+        <li>
+            <strong>SSH Username:</strong> {{ router.user }}
+        </li>
+        <li>
+            <strong>SSH Password:</strong> {{ router.password }}
+        </li>
+        <li>
+            <strong>Enable Password:</strong> {{ router.secret }}
+        </li>
+        <li>
+            <strong>Applied Threshold:</strong> {{ router.threshold }}
+        </li>
+    </ul>
+    <a href="{% url 'configuration' %}" class="btn-back">Go Back</a>
+</div>
+{% endblock %}

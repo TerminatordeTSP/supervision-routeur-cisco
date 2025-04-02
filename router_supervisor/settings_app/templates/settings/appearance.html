@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>APPEARANCE</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-  <h1>APPEARANCE</h1>
+{% extends "settings_app/templates/index.html" %}
 
-</body>
-</html>
+{% block title %}Appearance Settings{% endblock %}
+
+{% block header %}Appearance{% endblock %}
+
+{% block content %}
+    <h1>Change the appearance of your application</h1>
+{% endblock %}

@@ -4,19 +4,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings</title>
+  <title>{% block title %}Settings{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
   <div class="container">
     <!-- Titre en haut -->
-    <div class="title">Settings</div>
+    <div class="title">{% block header %}Settings{% endblock %}</div>
 
     <!-- Conteneur pour les options -->
     <div class="options">
       <a href="/settings/user_info/" class="option-button">Personal information</a>
       <a href="/settings/appearance/" class="option-button">Appearance</a>
       <a href="/settings/language" class="option-button">Language</a>
+    </div>
+
+    <!-- Contenu dynamique -->
+    <div class="page-content">
+      {% block content %}{% endblock %}
     </div>
   </div>
 </body>

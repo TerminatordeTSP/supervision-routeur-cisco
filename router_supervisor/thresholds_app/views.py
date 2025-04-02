@@ -5,7 +5,7 @@ from thresholds_app.models import Router, Threshold
 from thresholds_app.forms import threshold_insert
 
 def index(request):
-    return render(request, 'router01.html')
+    return render(request, 'config.html')
 
 def configuration(request):
     routers = Router.objects.all()

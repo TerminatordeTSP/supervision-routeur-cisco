@@ -23,5 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
     path('', include("dashboard_app.urls")),
-    path('thresholds/', include("thresholds_app.urls"), name='configuration')
+    path('thresholds/', views.configuration, name='configuration')
 ]

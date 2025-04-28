@@ -45,7 +45,9 @@ echo "DJANGO_SETTINGS_MODULE: $DJANGO_SETTINGS_MODULE"
 mkdir -p /code/static /code/media
 chmod -R 755 /code/static /code/media
 
-# Exécuter les migrations Django automatiquement
+echo "Checking for missing migrations..."
+python3 manage.py makemigrations --check || echo "Missing migrations detected!"
+
 echo "Applying migrations..."
 python3 manage.py migrate --noinput || echo "Migration failed but continuing..."
 
@@ -53,21 +55,18 @@ python3 manage.py migrate --noinput || echo "Migration failed but continuing..."
 echo "Collecting static files..."
 python3 manage.py collectstatic --noinput || echo "Collectstatic failed but continuing..."
 
-# Exécution des vérifications du système
+# system errors check
 echo "Running system checks..."
-python3 manage.py check || echo "System check failed but continuing..."
+python3 manage.py check --deploy || echo "System check failed but continuing..."
 
-# Démarrer Telegraf en arrière-plan
 echo "Starting Telegraf..."
-telegraf --config /etc/telegraf/telegraf.conf &
+telegraf --config /etc/telegraf/telegraf.conf & # start as a background process
 
-# Après le démarrage de Telegraf
 echo "Current directory: $(pwd)"
 echo "Directory contents: $(ls -la)"
 echo "Python path: $(python3 -c 'import sys; print(sys.path)')"
 echo "Django settings: $DJANGO_SETTINGS_MODULE"
 
-# Afficher la commande qui va être exécutée
 echo "Launching: $@"
 exec "$@"
 

@@ -32,7 +32,7 @@ RUN chmod +x /start /entrypoint.sh
 # Exposer le port et définir le healthcheck
 EXPOSE 8080/tcp
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/ || exit 1
+  CMD curl -f http://localhost:8080/health/ || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn", "src.wsgi:application", "--bind", "0.0.0.0:8080", "--timeout", "120"]

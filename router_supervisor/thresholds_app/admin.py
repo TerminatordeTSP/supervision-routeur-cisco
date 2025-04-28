@@ -1,17 +1,63 @@
 from django.contrib import admin
-from thresholds_app.models import Threshold, Router
+from .models import (
+    User,
+    Threshold,
+    KPI,
+    Router,
+    Interface,
+    Alert,
+    User_Router,
+    Router_Interface_Log,
+    Threshold_KPI,
+    KPI_Interface_Log
+)
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'email', 'last_name', 'first_name', 'role')
+    search_fields = ('email', 'last_name', 'first_name', 'role')
+
+@admin.register(Threshold)
 class ThresholdAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ram', 'cpu', 'trafic')
+    list_display = ('threshold_id', 'ram', 'cpu', 'traffic', 'name')
+    search_fields = ('name',)
 
+@admin.register(KPI)
+class KPIAdmin(admin.ModelAdmin):
+    list_display = ('kpi_id', 'name')
+    search_fields = ('name',)
+
+@admin.register(Router)
 class RouterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ip', 'user', 'password', 'secret', 'get_threshold_name')
+    list_display = ('router_id', 'name', 'ip_address', 'username', 'threshold')
+    search_fields = ('name', 'ip_address', 'username')
 
-    def get_threshold_name(self, obj):
-        # Accède au seuil via le related_name du OneToOneField
-        return obj.seuil.name if hasattr(obj, 'seuil') else 'Aucun seuil'
+@admin.register(Interface)
+class InterfaceAdmin(admin.ModelAdmin):
+    list_display = ('interface_id', 'traffic', 'router')
+    search_fields = ('interface_id',)
 
-    get_threshold_name.short_description = 'Seuil associé'
+@admin.register(Alert)
+class AlertAdmin(admin.ModelAdmin):
+    list_display = ('interface', 'log_id', 'log_date')
+    search_fields = ('interface__router__name',)
 
-admin.site.register(Threshold, ThresholdAdmin)
-admin.site.register(Router, RouterAdmin)
+@admin.register(User_Router)
+class UserRouterAdmin(admin.ModelAdmin):
+    list_display = ('user', 'router')
+    search_fields = ('user__email', 'router__name')
+
+@admin.register(Router_Interface_Log)
+class RouterInterfaceLogAdmin(admin.ModelAdmin):
+    list_display = ('router', 'interface', 'log_id')
+    search_fields = ('router__name',)
+
+@admin.register(Threshold_KPI)
+class ThresholdKPIAdmin(admin.ModelAdmin):
+    list_display = ('threshold', 'kpi')
+    search_fields = ('threshold__name', 'kpi__name')
+
+@admin.register(KPI_Interface_Log)
+class KPIInterfaceLogAdmin(admin.ModelAdmin):
+    list_display = ('interface', 'log_id', 'kpi')
+    search_fields = ('interface__router__name',)

@@ -20,8 +20,8 @@ from django.contrib import admin # type: ignore
 from django.urls import path, include # type: ignore
 
 urlpatterns = [
+    path('', include("dashboard_app.urls")),
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
-    path('', include("dashboard_app.urls")),
-    path('thresholds/', views.configuration, name='configuration')
+    path('thresholds/', include('thresholds_app.urls')),
 ]

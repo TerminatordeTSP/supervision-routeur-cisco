@@ -15,11 +15,11 @@ class threshold_insert(forms.ModelForm):
         max_value=100,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter cpu value',
+            'placeholder': 'Enter CPU value',
             'step': '0.1'
         })
     )
-    trafic = forms.FloatField(
+    traffic = forms.FloatField(  # ici corrigé
         min_value=0.001,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
@@ -37,4 +37,4 @@ class threshold_insert(forms.ModelForm):
 
     class Meta:
         model = Threshold
-        fields = ['ram', 'cpu', 'trafic', 'name']
+        fields = ['ram', 'cpu', 'traffic', 'name']

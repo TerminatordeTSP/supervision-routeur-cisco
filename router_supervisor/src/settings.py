@@ -78,8 +78,14 @@ WSGI_APPLICATION = 'src.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  # Utiliser le moteur MySQL
+        'NAME': 'Supervision_Routeur_Cisco',  # Le nom de ta base de données
+        'USER': 'root',  # Utilisateur root pour MAMP
+        'PASSWORD': 'root',  # Assure-toi que c'est bien le mot de passe de MAMP
+        'HOST': '172.16.10.40',  # Utiliser 127.0.0.1 (localhost aussi valide)
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 

@@ -38,7 +38,7 @@ def thresholds(request):
             if Threshold.objects.filter(name=name).exists():
                 form.add_error(None, f"Error: A threshold with the name '{name}' already exists.")
             else:
-                threshold = Threshold(cpu=cpu, ram=ram, trafic=trafic, name=name)
+                threshold = Threshold(cpu=cpu, ram=ram, traffic=trafic, name=name)
                 threshold.save()
                 return configuration(request)
         except IntegrityError as e:

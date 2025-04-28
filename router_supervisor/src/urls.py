@@ -1,4 +1,5 @@
 from thresholds_app import views
+from django.http import HttpResponse
 
 """
 URL configuration for router_supervisor project.
@@ -19,9 +20,13 @@ Including another URLconf
 from django.contrib import admin # type: ignore
 from django.urls import path, include # type: ignore
 
+def health_check(request):
+    return HttpResponse("Alive and well")
+
 urlpatterns = [
     path('', include("dashboard_app.urls")),
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
     path('thresholds/', include('thresholds_app.urls')),
+    path('health/', health_check, name='health_check'),
 ]

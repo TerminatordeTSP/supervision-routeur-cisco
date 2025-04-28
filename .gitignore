@@ -1,5 +1,6 @@
 /env_ryan
 /venv
+/env
 .idea/
 /.env
 *.pyc

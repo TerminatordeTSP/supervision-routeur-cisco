@@ -11,6 +11,9 @@ class User(models.Model):
     def __str__(self):
         return self.email
 
+    class Meta:
+        db_table = 'user'
+
 class Threshold(models.Model):
     threshold_id = models.CharField(max_length=50, primary_key=True)
     ram = models.IntegerField()
@@ -21,12 +24,18 @@ class Threshold(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = 'threshold'
+
 class KPI(models.Model):
     kpi_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = 'kpi'
 
 class Router(models.Model):
     router_id = models.AutoField(primary_key=True)
@@ -40,6 +49,9 @@ class Router(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = 'router'
+
 class Interface(models.Model):
     interface_id = models.AutoField(primary_key=True)
     traffic = models.DecimalField(max_digits=15, decimal_places=2)
@@ -48,6 +60,9 @@ class Interface(models.Model):
     def __str__(self):
         return f"Interface {self.interface_id}"
 
+    class Meta:
+        db_table = 'interface'
+
 class Alert(models.Model):
     interface = models.ForeignKey(Interface, on_delete=models.CASCADE)
     log_id = models.IntegerField()
@@ -55,6 +70,7 @@ class Alert(models.Model):
 
     class Meta:
         unique_together = (('interface', 'log_id'),)
+        db_table = 'alert'
 
     def __str__(self):
         return f"Alert {self.interface_id} - {self.log_id}"
@@ -65,6 +81,7 @@ class User_Router(models.Model):
 
     class Meta:
         unique_together = (('user', 'router'),)
+        db_table = 'user_router'
 
     def __str__(self):
         return f"{self.user} <-> {self.router}"
@@ -76,6 +93,7 @@ class Router_Interface_Log(models.Model):
 
     class Meta:
         unique_together = (('router', 'interface', 'log_id'),)
+        db_table = 'router_interface_log'
 
     def __str__(self):
         return f"Router {self.router} - Interface {self.interface} - Log {self.log_id}"
@@ -86,6 +104,7 @@ class Threshold_KPI(models.Model):
 
     class Meta:
         unique_together = (('threshold', 'kpi'),)
+        db_table = 'threshold_kpi'
 
     def __str__(self):
         return f"Threshold {self.threshold} - KPI {self.kpi}"
@@ -97,6 +116,7 @@ class KPI_Interface_Log(models.Model):
 
     class Meta:
         unique_together = (('interface', 'log_id', 'kpi'),)
+        db_table = 'kpi_interface_log'
 
     def __str__(self):
         return f"Interface {self.interface} - Log {self.log_id} - KPI {self.kpi}"

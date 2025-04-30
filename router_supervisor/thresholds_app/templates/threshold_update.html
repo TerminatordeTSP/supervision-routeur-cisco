@@ -1,15 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Configuration Page{% endblock title %}
+{% block title %}Edit Threshold{% endblock title %}
+
 {% block content %}
 <link rel="stylesheet" href="{% static 'router_config/config_style.css' %}">
-<div class="config-container">
-    <h1>Edit a Threshold</h1>
-    <p class="config-description">Please modify the information below to update the threshold.</p>
-    <form action="" method="post" novalidate class="config-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-button">Save</button>
-    </form>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Edit Threshold</h1>
+    </div>
+
+    <!-- Form Container -->
+    <div class="config-container">
+        <p class="config-description">
+            Modify the threshold parameters below.
+        </p>
+
+        <form action="" method="post" novalidate class="config-form">
+            {% csrf_token %}
+            <div class="form-fields">
+                {{ form.as_p }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="header-button">Save Changes</button>
+                <a href="/" class="header-button">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock content %}

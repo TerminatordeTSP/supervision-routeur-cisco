@@ -15,7 +15,7 @@ class User(models.Model):
         db_table = 'user'
 
 class Threshold(models.Model):
-    threshold_id = models.CharField(max_length=50, primary_key=True)
+    threshold_id = models.AutoField(primary_key=True)
     ram = models.IntegerField()
     cpu = models.IntegerField()
     traffic = models.IntegerField()

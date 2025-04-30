@@ -1,28 +1,47 @@
+
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
+{% load static %}
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Settings{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{% static 'style_settings.css' %}">
 </head>
+
 <body>
-  <div class="container">
-    <!-- Titre en haut -->
-    <div class="title">{% block header %}Settings{% endblock %}</div>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Settings</h1>
+            <div class="header-buttons">
+                <button class="header-button">Save Changes</button>
+                <a href="/">
+                <button class="header-button">Cancel</button>
+                </a>
+            </div>
+        </div>
 
-    <!-- Conteneur pour les options -->
-    <div class="options">
-      <a href="/settings/user_info/" class="option-button">Personal information</a>
-      <a href="/settings/appearance/" class="option-button">Appearance</a>
-      <a href="/settings/language" class="option-button">Language</a>
-    </div>
+        <!-- Settings Options -->
+        <div class="metrics-grid">
+            <!-- Personal Information -->
+            <div class="metric-card">
+                <div class="metric-title">Personal Information</div>
+                <div class="metric-value">Update your name, email, and contact details.</div>
+            </div>
 
-    <!-- Contenu dynamique -->
-    <div class="page-content">
-      {% block content %}{% endblock %}
+            <!-- Appearance -->
+            <div class="metric-card">
+                <div class="metric-title">Appearance</div>
+                <div class="metric-value">Customize your theme and dashboard colors.</div>
+            </div>
+
+            <!-- Language -->
+            <div class="metric-card">
+                <div class="metric-title">Language</div>
+                <div class="metric-value">Select your preferred language.</div>
+            </div>
+        </div>
     </div>
-  </div>
 </body>
 </html>

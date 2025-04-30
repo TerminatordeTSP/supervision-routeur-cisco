@@ -24,7 +24,7 @@
         <ul class="list">
             {% for threshold in thresholds %}
                 <li class="list-item">
-                    <a class="button btn-threshold" href="{% url 'configuration_threshold_detail' threshold.id %}">
+                    <a class="button btn-threshold" href="{% url 'configuration_threshold_detail' threshold.threshold_id %}">
                         {{ threshold.name }}
                     </a>
                 </li>

@@ -14,12 +14,12 @@ from .models import (
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'email', 'last_name', 'first_name', 'role')
-    search_fields = ('email', 'last_name', 'first_name', 'role')
+    list_display = ('user_id', 'email', 'first_name', 'last_name', 'role')
+    search_fields = ('email', 'first_name', 'last_name')
 
 @admin.register(Threshold)
 class ThresholdAdmin(admin.ModelAdmin):
-    list_display = ('threshold_id', 'ram', 'cpu', 'traffic', 'name')
+    list_display = ('threshold_id', 'name', 'ram', 'cpu', 'traffic')
     search_fields = ('name',)
 
 @admin.register(KPI)
@@ -29,13 +29,13 @@ class KPIAdmin(admin.ModelAdmin):
 
 @admin.register(Router)
 class RouterAdmin(admin.ModelAdmin):
-    list_display = ('router_id', 'name', 'ip_address', 'username', 'threshold')
-    search_fields = ('name', 'ip_address', 'username')
+    list_display = ('router_id', 'name', 'ip_address', 'username')
+    search_fields = ('name', 'ip_address')
 
 @admin.register(Interface)
 class InterfaceAdmin(admin.ModelAdmin):
-    list_display = ('interface_id', 'traffic', 'router')
-    search_fields = ('interface_id',)
+    list_display = ('interface_id', 'router', 'traffic')
+    search_fields = ('router__name',)
 
 @admin.register(Alert)
 class AlertAdmin(admin.ModelAdmin):
@@ -50,7 +50,7 @@ class UserRouterAdmin(admin.ModelAdmin):
 @admin.register(Router_Interface_Log)
 class RouterInterfaceLogAdmin(admin.ModelAdmin):
     list_display = ('router', 'interface', 'log_id')
-    search_fields = ('router__name',)
+    search_fields = ('router__name', 'interface__router__name')
 
 @admin.register(Threshold_KPI)
 class ThresholdKPIAdmin(admin.ModelAdmin):
@@ -60,4 +60,4 @@ class ThresholdKPIAdmin(admin.ModelAdmin):
 @admin.register(KPI_Interface_Log)
 class KPIInterfaceLogAdmin(admin.ModelAdmin):
     list_display = ('interface', 'log_id', 'kpi')
-    search_fields = ('interface__router__name',)
+    search_fields = ('interface__router__name', 'kpi__name')

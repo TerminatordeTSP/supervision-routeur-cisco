@@ -3,7 +3,7 @@ from .forms import UserInfoForm
 from django.contrib.auth.decorators import login_required
 
 def index(request):
-    return render(request,"settings/index.html")
+    return render(request,"settings/base.html")
 
 @login_required
 def user_info(request):

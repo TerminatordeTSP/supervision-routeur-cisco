@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'settings_app',
     'dashboard_app',
     'thresholds_app',
+    'api_app',
 ]
 
 MIDDLEWARE = [

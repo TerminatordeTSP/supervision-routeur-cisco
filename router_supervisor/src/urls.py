@@ -17,6 +17,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("router_supervisor.settings_app.urls")),
     path('thresholds/', include('router_supervisor.thresholds_app.urls')),
+    path('api/', include('router_supervisor.api_app.urls')),
     path('health/', health_check, name='health_check'),
 ]
 

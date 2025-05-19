@@ -3,10 +3,13 @@
 import os
 import sys
 
+# Add the parent directory to sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'router_supervisor.prod_settings')
     try:
         from django.core.management import execute_from_command_line # type: ignore
     except ImportError as exc:

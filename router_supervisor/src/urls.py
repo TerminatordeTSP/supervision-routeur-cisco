@@ -1,4 +1,3 @@
-from thresholds_app import views
 from django.http import HttpResponse
 from django.contrib import admin # type: ignore
 from django.urls import path, include # type: ignore
@@ -12,6 +11,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def health_check(request):
     return HttpResponse("Alive and well")
 
+def test_static_direct(request):
+    return HttpResponse("Static endpoint test works!")
+
 urlpatterns = [
     path('', include("router_supervisor.dashboard_app.urls")),
     path('admin/', admin.site.urls),
@@ -19,8 +21,9 @@ urlpatterns = [
     path('thresholds/', include('router_supervisor.thresholds_app.urls')),
     path('api/', include('router_supervisor.api_app.urls')),
     path('health/', health_check, name='health_check'),
+    path('test-static-direct/', test_static_direct, name='test_static_direct'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve static files in production using Django's built-in helper
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -14,21 +14,12 @@ services:
       - SQL_USER=user
       - SQL_PASSWORD=password
       - SQL_DATABASE=routerdb
-      - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
     volumes:
-      # Ne montez pas le dossier router_supervisor qui écrase vos fichiers
-      # - ./router_supervisor:/code/router_supervisor
+      - ./router_supervisor:/code/router_supervisor  # Pour le développement
       - static_volume:/code/static
       - media_volume:/code/media
-      - ./telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - db
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   caddy:
     image: caddy:2
@@ -62,26 +53,6 @@ services:
       - "5050:80"
     depends_on:
       - db
-      
-  telegraf:
-    build:
-      context: ./telegraf/docker
-    container_name: telegraf
-    restart: always
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf/telegraf.d/processors.conf:ro
-      - ./telegraf/sample_metrics:/tmp/metrics:rw
-    depends_on:
-      - router_django
-    links:
-      - router_django
-    ports:
-      - "57500:57500"  # Port pour les connexions gRPC des routeurs
-    environment:
-      - HOST_PROC=/host/proc
-      - HOST_SYS=/host/sys
-      - HOST_ETC=/host/etc
 
 volumes:
   pgdata:

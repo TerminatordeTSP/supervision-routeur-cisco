@@ -1,11 +1,8 @@
 #!/bin/sh
 set -e
 
-# Se déplacer dans le répertoire du projet Django
-cd /code
-
 # Démarrer Gunicorn
-exec gunicorn router_supervisor.src.wsgi:application \
+exec gunicorn src.wsgi:application \
     --bind 0.0.0.0:8080 \
     --workers 3 \
     --log-level=info \

@@ -42,22 +42,41 @@ echo "SQL_PORT: $SQL_PORT"
 echo "DJANGO_SETTINGS_MODULE: $DJANGO_SETTINGS_MODULE"
 
 # S'assurer que les répertoires statiques et média existent
-mkdir -p /code/static /code/media
-chmod -R 755 /code/static /code/media
+mkdir -p /code/static /code/media /tmp/metrics
+chmod -R 755 /code/static /code/media /tmp/metrics
+
+# Créer un fichier init dans le dossier src pour qu'il soit reconnu comme un package Python
+touch /code/router_supervisor/src/__init__.py
 
 echo "Checking for missing migrations..."
-python3 manage.py makemigrations --check || echo "Missing migrations detected!"
+cd /code && python3 router_supervisor/manage.py makemigrations --check --no-input || echo "Missing migrations detected!"
 
 echo "Applying migrations..."
-python3 manage.py migrate --noinput || echo "Migration failed but continuing..."
+cd /code && python3 router_supervisor/manage.py migrate --noinput || echo "Migration failed but continuing..."
 
 # Collecte des fichiers statiques
 echo "Collecting static files..."
-python3 manage.py collectstatic --noinput || echo "Collectstatic failed but continuing..."
+cd /code && python3 router_supervisor/manage.py collectstatic --noinput || echo "Collectstatic failed but continuing..."
+
+# Debug: Show collected static files
+echo "Static files collected to:"
+ls -la /code/static/
+echo "CSS files found:"
+find /code/static -name "*.css" -type f | sort
 
 # system errors check
 echo "Running system checks..."
-python3 manage.py check --deploy || echo "System check failed but continuing..."
+cd /code && python3 router_supervisor/manage.py check --deploy || echo "System check failed but continuing..."
+
+echo "Configuring Telegraf..."
+# Check if a telegraf config exists in the mounted volume
+if [ -f /etc/telegraf/telegraf.conf.custom ]; then
+    echo "Using custom Telegraf config from volume"
+    cp /etc/telegraf/telegraf.conf.custom /etc/telegraf/telegraf.conf
+fi
+
+# Ensure the telegraf config has the right permissions
+chmod 644 /etc/telegraf/telegraf.conf
 
 echo "Starting Telegraf..."
 telegraf --config /etc/telegraf/telegraf.conf & # start as a background process
@@ -67,8 +86,11 @@ echo "Directory contents: $(ls -la)"
 echo "Python path: $(python3 -c 'import sys; print(sys.path)')"
 echo "Django settings: $DJANGO_SETTINGS_MODULE"
 
+# Create symlinks to simplify imports
+ln -sf /code/router_supervisor/src /code/src 2>/dev/null || echo "Symlink for src already exists"
+ln -sf /code/router_supervisor/dashboard_app /code/dashboard_app 2>/dev/null || echo "Symlink for dashboard_app already exists"
+ln -sf /code/router_supervisor/settings_app /code/settings_app 2>/dev/null || echo "Symlink for settings_app already exists"
+ln -sf /code/router_supervisor/thresholds_app /code/thresholds_app 2>/dev/null || echo "Symlink for thresholds_app already exists"
+
 echo "Launching: $@"
 exec "$@"
-
-mkdir -p /code/src
-mv /code/prod_settings.py /code/src/

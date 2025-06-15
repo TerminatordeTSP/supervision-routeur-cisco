@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'settings_app',
     'dashboard_app',
     'thresholds_app',
+    'api_app',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'src.urls'
+ROOT_URLCONF = 'router_supervisor.src.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'src.wsgi.application'
+WSGI_APPLICATION = 'router_supervisor.src.wsgi.application'
 
 
 # Database
@@ -78,14 +80,12 @@ WSGI_APPLICATION = 'src.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Utiliser le moteur MySQL
-        'NAME': 'Supervision_Routeur_Cisco',  # Le nom de ta base de données
-        'USER': 'root',  # Utilisateur root pour MAMP
-        'PASSWORD': 'root',  # Assure-toi que c'est bien le mot de passe de MAMP
-        'HOST': '172.16.10.40',  # Utiliser 127.0.0.1 (localhost aussi valide)
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('SQL_DATABASE', 'routerdb'),
+        'USER': os.environ.get('SQL_USER', 'user'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+        'HOST': os.environ.get('SQL_HOST', 'db'),
+        'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
 
@@ -125,9 +125,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = [
-#     BASE_DIR / "router_supervisor/thresholds_app/static",
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'dashboard_app/static'),
+    os.path.join(BASE_DIR, 'settings_app/static'),
+    os.path.join(BASE_DIR, 'thresholds_app/static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 LOGIN_URL = '/login/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

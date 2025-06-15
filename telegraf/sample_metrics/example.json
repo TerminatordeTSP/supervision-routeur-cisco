@@ -1,0 +1,48 @@
+[
+  {
+    "router_name": "Router_Core_01",
+    "timestamp": "1649854200",
+    "router_metrics": {
+      "cpu_usage": 37.5,
+      "memory_usage": 64.2,
+      "traffic_mbps": 145.8,
+      "interfaces": [
+        {
+          "name": "GigabitEthernet0/0",
+          "status": "up",
+          "bandwidth": 1000,
+          "input_rate": 450.6,
+          "output_rate": 380.2,
+          "errors": 0
+        },
+        {
+          "name": "GigabitEthernet0/1",
+          "status": "up",
+          "bandwidth": 1000,
+          "input_rate": 220.1,
+          "output_rate": 198.5,
+          "errors": 2
+        }
+      ]
+    }
+  },
+  {
+    "router_name": "Router_Edge_02",
+    "timestamp": "1649854200",
+    "router_metrics": {
+      "cpu_usage": 42.3,
+      "memory_usage": 72.8,
+      "traffic_mbps": 198.6,
+      "interfaces": [
+        {
+          "name": "GigabitEthernet0/0",
+          "status": "up",
+          "bandwidth": 1000,
+          "input_rate": 650.2,
+          "output_rate": 580.7,
+          "errors": 0
+        }
+      ]
+    }
+  }
+]

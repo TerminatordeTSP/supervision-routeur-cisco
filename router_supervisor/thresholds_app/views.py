@@ -19,7 +19,7 @@ def configuration_router_config(request, id):
                   {'router': router})
 
 def configuration_threshold_detail(request, id):
-    threshold = Threshold.objects.get(id=id)
+    threshold = Threshold.objects.get(threshold_id=id)
     return render(request,
                   'threshold_detail.html',
                   {'threshold': threshold})

@@ -1,0 +1,60 @@
+version: '3.9'
+
+services:
+  router_django:
+    build:
+      context: .
+    container_name: router_django
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE=postgres
+      - SQL_HOST=db
+      - SQL_PORT=5432
+      - SQL_USER=user
+      - SQL_PASSWORD=password
+      - SQL_DATABASE=routerdb
+    volumes:
+      - ./router_supervisor:/code/router_supervisor  # Pour le développement
+      - static_volume:/code/static
+      - media_volume:/code/media
+    depends_on:
+      - db
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - static_volume:/srv/static
+      - media_volume:/srv/media
+    depends_on:
+      - router_django
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: routerdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@telecom-sudparis.eu
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+  static_volume:
+  media_volume:

@@ -15,7 +15,7 @@ class User(models.Model):
         db_table = 'user'
 
 class Threshold(models.Model):
-    threshold_id = models.CharField(max_length=50, primary_key=True)
+    threshold_id = models.AutoField(primary_key=True)
     ram = models.IntegerField()
     cpu = models.IntegerField()
     traffic = models.IntegerField()
@@ -54,14 +54,21 @@ class Router(models.Model):
 
 class Interface(models.Model):
     interface_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, default="default")
     traffic = models.DecimalField(max_digits=15, decimal_places=2)
     router = models.ForeignKey(Router, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, default="unknown")
+    input_rate = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    output_rate = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    errors = models.IntegerField(default=0)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Interface {self.interface_id}"
+        return f"{self.name} on {self.router.name}"
 
     class Meta:
         db_table = 'interface'
+        unique_together = (('router', 'name'),)
 
 class Alert(models.Model):
     interface = models.ForeignKey(Interface, on_delete=models.CASCADE)
@@ -113,10 +120,16 @@ class KPI_Interface_Log(models.Model):
     interface = models.ForeignKey(Interface, on_delete=models.CASCADE)
     log_id = models.IntegerField()
     kpi = models.ForeignKey(KPI, on_delete=models.CASCADE)
+    value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = (('interface', 'log_id', 'kpi'),)
         db_table = 'kpi_interface_log'
+        indexes = [
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['interface', 'kpi']),
+        ]
 
     def __str__(self):
-        return f"Interface {self.interface} - Log {self.log_id} - KPI {self.kpi}"
+        return f"Interface {self.interface} - Log {self.log_id} - KPI {self.kpi}: {self.value}"

@@ -2,19 +2,19 @@
   {
     "measurement": "mem",
     "data": {
-      "used": 1094406144.0,
-      "free": 6098513920.0,
-      "used_percent": 13.392516122305974,
-      "timestamp": "1750424634000000000"
+      "used": 1121431552.0,
+      "free": 6006886400.0,
+      "used_percent": 13.723232661441099,
+      "timestamp": "1750430381000000000"
     }
   },
   {
     "measurement": "system",
     "data": {
       "n_users": 2.0,
-      "load1": 0.08,
+      "load1": 0.05,
       "uptime": null,
-      "timestamp": "1750424634000000000"
+      "timestamp": "1750430381000000000"
     }
   },
   {
@@ -22,8 +22,8 @@
     "data": {
       "n_users": null,
       "load1": null,
-      "uptime": 19687.0,
-      "timestamp": "1750424634000000000"
+      "uptime": 25478.0,
+      "timestamp": "1750430381000000000"
     }
   },
   {
@@ -32,20 +32,53 @@
       "cpu_5min": 0.0,
       "cpu_0_usage": 7.0,
       "cpu_0_index": 11.0,
-      "ram_used": 195339240.0,
-      "ram_free": 1882727856.0,
+      "ram_used": 195339224.0,
+      "ram_free": 1882727912.0,
       "timestamp": "IOS"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet1",
+    "data": {
+      "ifInOctets": 141462696.0,
+      "ifOutOctets": 70007208.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750430382000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet2",
+    "data": {
+      "ifInOctets": 53982.0,
+      "ifOutOctets": 27367608.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750430382000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet3",
+    "data": {
+      "ifInOctets": 11327175.0,
+      "ifOutOctets": 27358848.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750430382000000000"
     }
   },
   {
     "measurement": "interfaces",
     "interface": "GigabitEthernet4",
     "data": {
-      "ifInOctets": 11306642.0,
-      "ifOutOctets": 27253667.0,
+      "ifInOctets": 11354086.0,
+      "ifOutOctets": 27366389.0,
       "ifInErrors": 0.0,
       "ifOutErrors": 0.0,
-      "timestamp": "1750424635000000000"
+      "timestamp": "1750430382000000000"
     }
   },
   {
@@ -56,47 +89,14 @@
       "ifOutOctets": 0.0,
       "ifInErrors": 0.0,
       "ifOutErrors": 0.0,
-      "timestamp": "1750424635000000000"
-    }
-  },
-  {
-    "measurement": "interfaces",
-    "interface": "GigabitEthernet1",
-    "data": {
-      "ifInOctets": 140812246.0,
-      "ifOutOctets": 69516594.0,
-      "ifInErrors": 0.0,
-      "ifOutErrors": 0.0,
-      "timestamp": "1750424635000000000"
-    }
-  },
-  {
-    "measurement": "interfaces",
-    "interface": "GigabitEthernet2",
-    "data": {
-      "ifInOctets": 53772.0,
-      "ifOutOctets": 27254981.0,
-      "ifInErrors": 0.0,
-      "ifOutErrors": 0.0,
-      "timestamp": "1750424635000000000"
-    }
-  },
-  {
-    "measurement": "interfaces",
-    "interface": "GigabitEthernet3",
-    "data": {
-      "ifInOctets": 11281631.0,
-      "ifOutOctets": 27246221.0,
-      "ifInErrors": 0.0,
-      "ifOutErrors": 0.0,
-      "timestamp": "1750424635000000000"
+      "timestamp": "1750430382000000000"
     }
   },
   {
     "measurement": "ping_latency",
     "data": {
-      "latency_ms": 16.203,
-      "timestamp": "1750424636000000000"
+      "latency_ms": 15.603,
+      "timestamp": "1750430383000000000"
     }
   }
 ]

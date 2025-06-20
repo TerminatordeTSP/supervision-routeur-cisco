@@ -85,9 +85,7 @@ services:
       start_period: 30s
 
   telegraf:
-    build:
-      context: ./telegraf/docker
-      dockerfile: Dockerfile
+    image: telegraf:1.35        # ← l’image officielle multi-architecture
     container_name: telegraf
     restart: always
     volumes:

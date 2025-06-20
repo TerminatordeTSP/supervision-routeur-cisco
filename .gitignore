@@ -11,3 +11,11 @@ env/
 .env/
 venv/
 .venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+telegraf/sample_metrics/env/

@@ -1,0 +1,102 @@
+[
+  {
+    "measurement": "mem",
+    "data": {
+      "used": 1094406144.0,
+      "free": 6098513920.0,
+      "used_percent": 13.392516122305974,
+      "timestamp": "1750424634000000000"
+    }
+  },
+  {
+    "measurement": "system",
+    "data": {
+      "n_users": 2.0,
+      "load1": 0.08,
+      "uptime": null,
+      "timestamp": "1750424634000000000"
+    }
+  },
+  {
+    "measurement": "system",
+    "data": {
+      "n_users": null,
+      "load1": null,
+      "uptime": 19687.0,
+      "timestamp": "1750424634000000000"
+    }
+  },
+  {
+    "measurement": "snmp",
+    "data": {
+      "cpu_5min": 0.0,
+      "cpu_0_usage": 7.0,
+      "cpu_0_index": 11.0,
+      "ram_used": 195339240.0,
+      "ram_free": 1882727856.0,
+      "timestamp": "IOS"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet4",
+    "data": {
+      "ifInOctets": 11306642.0,
+      "ifOutOctets": 27253667.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750424635000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "Null0",
+    "data": {
+      "ifInOctets": 0.0,
+      "ifOutOctets": 0.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750424635000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet1",
+    "data": {
+      "ifInOctets": 140812246.0,
+      "ifOutOctets": 69516594.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750424635000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet2",
+    "data": {
+      "ifInOctets": 53772.0,
+      "ifOutOctets": 27254981.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750424635000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet3",
+    "data": {
+      "ifInOctets": 11281631.0,
+      "ifOutOctets": 27246221.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750424635000000000"
+    }
+  },
+  {
+    "measurement": "ping_latency",
+    "data": {
+      "latency_ms": 16.203,
+      "timestamp": "1750424636000000000"
+    }
+  }
+]

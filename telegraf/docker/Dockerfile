@@ -1,29 +1,47 @@
-FROM telegraf:1.30.0
+FROM almalinux:9
 
-# Installation des dépendances
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    netcat-openbsd \
-    curl \
-    vim \
-    jq \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Installer les dépendances
+RUN dnf install -y --allowerasing python3 python3-pip python3-devel nc curl
 
-# Répertoire de travail
-WORKDIR /etc/telegraf
+ENV PIP_ROOT_USER_ACTION=ignore
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE="router_supervisor.prod_settings"
 
-# Scripts personnalisés
-COPY init.sh /etc/telegraf/init.sh
-COPY generate_test_data.py /etc/telegraf/generate_test_data.py
-COPY send_test_data.py /etc/telegraf/send_test_data.py
+WORKDIR /code
 
-# Créer les répertoires nécessaires
-RUN mkdir -p /tmp/metrics /var/log/telegraf \
-    && chmod +x /etc/telegraf/init.sh \
-    && chmod +x /etc/telegraf/generate_test_data.py \
-    && chmod +x /etc/telegraf/send_test_data.py
+COPY requirements.txt /code/
+RUN pip3 install --upgrade 'setuptools' 'wheel' 'pip'
+RUN pip3 install --use-pep517 -r requirements.txt
+RUN pip3 install psycopg2-binary gunicorn
 
-# Utiliser le script d'initialisation comme point d'entrée
-ENTRYPOINT ["/etc/telegraf/init.sh"]
+# Installer Telegraf
+RUN dnf install -y git && \
+    dnf install -y https://dl.influxdata.com/telegraf/releases/telegraf-1.30.0-1.x86_64.rpm
+
+# Créer les répertoires
+RUN mkdir -p /code/static /code/media /code/src
+
+# Création des dossiers nécessaires pour la structure du projet
+RUN mkdir -p /code/router_supervisor /code/router_supervisor/dashboard_app /code/router_supervisor/settings_app /code/router_supervisor/thresholds_app
+
+# Créer les répertoires nécessaires pour les fichiers Python
+RUN mkdir -p /code/router_supervisor/src /code/router_supervisor/dashboard_app /code/router_supervisor/settings_app /code/router_supervisor/thresholds_app
+
+# Copier TOUTE l'application avec la bonne structure
+COPY router_supervisor/ /code/router_supervisor/
+
+# Exposer le port et définir le healthcheck
+EXPOSE 8080/tcp
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:8080/health/ || exit 1
+
+# Copier les scripts à la fin
+COPY entrypoint.sh /entrypoint.sh
+COPY start /start
+RUN chmod +x /start /entrypoint.sh
+
+# Définir le PYTHONPATH pour inclure le répertoire parent
+ENV PYTHONPATH=/code
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/start"]

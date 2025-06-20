@@ -4,6 +4,7 @@ services:
   router_django:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: router_django
     ports:
       - "8080:8080"
@@ -16,8 +17,6 @@ services:
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
     volumes:
-      # Ne montez pas le dossier router_supervisor qui écrase vos fichiers
-      # - ./router_supervisor:/code/router_supervisor
       - static_volume:/code/static
       - media_volume:/code/media
       - ./telegraf/sample_metrics:/tmp/metrics:rw
@@ -84,24 +83,22 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-      
+
   telegraf:
     build:
       context: ./telegraf/docker
+      dockerfile: Dockerfile
     container_name: telegraf
     restart: always
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf/telegraf.d/processors.conf:ro
+      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
       - ./telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - router_django
       - influxdb
-    links:
-      - router_django
-      - influxdb
     ports:
-      - "57500:57500"  # Port pour les connexions gRPC des routeurs
+      - "57500:57500"
     environment:
       - HOST_PROC=/host/proc
       - HOST_SYS=/host/sys

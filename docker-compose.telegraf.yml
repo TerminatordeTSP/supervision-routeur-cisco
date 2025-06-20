@@ -4,11 +4,12 @@ services:
   telegraf:
     build:
       context: ./telegraf/docker
+      dockerfile: Dockerfile
     container_name: telegraf
     restart: always
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf/telegraf.d/processors.conf:ro
+      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
       - ./telegraf/sample_metrics:/tmp/metrics:rw
     ports:
       - "57500:57500"  # Port pour les connexions gRPC des routeurs
@@ -19,6 +20,9 @@ services:
     networks:
       - telegraf_network
       - default
+    # Optionnel : décommente si tu veux forcer l'architecture pour un test local
+    # platform: linux/amd64
+    # platform: linux/arm64
 
 networks:
   telegraf_network:

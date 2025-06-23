@@ -1,46 +1,34 @@
-
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" href="{% static 'style_settings.css' %}">
+    <title>{% block title %}Settings{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'settings_app/style_settings.css' %}">
 </head>
-
 <body>
     <div class="dashboard-container">
         <!-- Header -->
         <div class="header">
-            <h1>Settings</h1>
+            <h1>{% block header %}Settings{% endblock %}</h1>
             <div class="header-buttons">
-                <button class="header-button">Save Changes</button>
                 <a href="/">
-                <button class="header-button">Cancel</button>
+                  <button class="header-button">Home</button>
                 </a>
             </div>
         </div>
-
-        <!-- Settings Options -->
-        <div class="metrics-grid">
-            <!-- Personal Information -->
-            <div class="metric-card">
-                <div class="metric-title">Personal Information</div>
-                <div class="metric-value">Update your name, email, and contact details.</div>
-            </div>
-
-            <!-- Appearance -->
-            <div class="metric-card">
-                <div class="metric-title">Appearance</div>
-                <div class="metric-value">Customize your theme and dashboard colors.</div>
-            </div>
-
-            <!-- Language -->
-            <div class="metric-card">
-                <div class="metric-title">Language</div>
-                <div class="metric-value">Select your preferred language.</div>
-            </div>
+        <!-- Navigation -->
+        <nav>
+            <ul>
+                <li><a href="/settings/user_info/">Personal Information</a></li>
+                <li><a href="/settings/appearance/">Appearance</a></li>
+                <li><a href="/settings/language/">Language</a></li>
+            </ul>
+        </nav>
+        <!-- Content -->
+        <div class="settings-content">
+            {% block content %}{% endblock %}
         </div>
     </div>
 </body>

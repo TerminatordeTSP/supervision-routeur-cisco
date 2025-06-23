@@ -5,5 +5,6 @@ urlpatterns = [
     path('', index, name="settings_index"),
     path('user_info/', user_info, name="user_info"),
     path('appearance/', appearance, name="appearance"),
-    path('language/', language, name="language")
+    path('language/', language, name="language"),
+    path('personal_info/', user_info, name="personal_info")
 ]

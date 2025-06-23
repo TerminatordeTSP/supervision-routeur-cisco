@@ -2,7 +2,7 @@
 InfluxDB visualization utilities for the Django dashboard
 """
 
-from influxdb_client import InfluxDBClient
+from my_influxdb_client import InfluxDBClient
 from django.conf import settings
 import json
 import os

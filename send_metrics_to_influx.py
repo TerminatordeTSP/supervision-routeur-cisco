@@ -1,7 +1,6 @@
 import json
-from influxdb_client import Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
-from influxdb_client import InfluxDBClient
+from my_influxdb_client import Point, WritePrecision
+from my_influxdb_client import InfluxDBClient
 
 INFLUX_URL = "http://localhost:8086"
 INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="

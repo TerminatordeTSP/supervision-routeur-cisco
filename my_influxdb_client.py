@@ -1,3 +1,8 @@
+# Ce fichier a été renommé pour éviter les conflits avec le package officiel influxdb-client.
+# Placez ici vos fonctions utilitaires ou classes personnalisées pour InfluxDB si besoin.
+
+
+
 #!/usr/bin/env python3
 """
 InfluxDB Client for Router Metrics

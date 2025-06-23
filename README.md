@@ -44,3 +44,22 @@ Pour accéder à la page de configuration des routeurs et des seuils :
 http://127.0.0.1:8000/dashboard
 
 A ce jour les opérations CRUD sont disponibles pour les seuils, pour les routeurs il manque que "suppression" et "mis à jour". 
+
+
+## Lancement de la collecte des métriques :
+
+1. créer le fichier `run.flag`
+
+Ce fichier sert à **activer ou désactiver la collecte**.  
+Tant qu’il est présent, le script continue de collecter les métriques toutes les **5 secondes**.
+
+2. les commandes à taper pour le lancement 
+
+touch run.flag  # 
+python collect_metrics.py # pour lancer le script qui va lancer la collecte
+
+3. Visualisation en temps réel dans le supervision-routeur-cisco/fichier metric_filtered.json
+
+4. Arreter la collecte 
+
+rm run.flag     # dans un autre terminal pour arrêter proprement la collecte (ou le supprimer manuellement)

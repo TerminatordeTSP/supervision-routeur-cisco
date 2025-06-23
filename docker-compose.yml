@@ -4,6 +4,7 @@ services:
   router_django:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: router_django
     ports:
       - "8080:8080"
@@ -16,8 +17,6 @@ services:
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
     volumes:
-      # Ne montez pas le dossier router_supervisor qui écrase vos fichiers
-      # - ./router_supervisor:/code/router_supervisor
       - static_volume:/code/static
       - media_volume:/code/media
       - ./telegraf/sample_metrics:/tmp/metrics:rw
@@ -62,22 +61,42 @@ services:
       - "5050:80"
     depends_on:
       - db
-      
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123456
+      - DOCKER_INFLUXDB_INIT_ORG=telecom-sudparis
+      - DOCKER_INFLUXDB_INIT_BUCKET=router-metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   telegraf:
-    build:
-      context: ./telegraf/docker
+    image: telegraf:1.35        # ← l’image officielle multi-architecture
     container_name: telegraf
     restart: always
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf/telegraf.d/processors.conf:ro
+      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
       - ./telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - router_django
-    links:
-      - router_django
+      - influxdb
     ports:
-      - "57500:57500"  # Port pour les connexions gRPC des routeurs
+      - "57500:57500"
     environment:
       - HOST_PROC=/host/proc
       - HOST_SYS=/host/sys
@@ -87,3 +106,5 @@ volumes:
   pgdata:
   static_volume:
   media_volume:
+  influxdb_data:
+  influxdb_config:

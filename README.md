@@ -16,6 +16,7 @@ configure terminal
 telemetry ietf subscription 1
 encoding encode-kvgpb
 filter xpath /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization
+
 stream yang-push
 update-policy periodic 60000
 receiver ip address 172.16.10.40 57500 protocol grpc-tcp

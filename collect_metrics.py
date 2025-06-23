@@ -3,6 +3,9 @@ import time
 import json
 import os
 import re
+import json
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 def parse_telegraf_output(output):
     results = []
@@ -137,3 +140,46 @@ while os.path.exists("run.flag"):
     time.sleep(5)
 
 print("🛑 Collecte arrêtée (run.flag supprimé).")
+
+
+
+
+INFLUX_URL = "http://localhost:8086"
+INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="
+INFLUX_ORG = "telecom-sudparis"
+INFLUX_BUCKET = "router-metrics"
+
+client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
+write_api = client.write_api(write_options=SYNCHRONOUS)
+
+while os.path.exists("run.flag"):
+    # ...collecte...
+    parsed = parse_telegraf_output(result.stdout)
+
+    with open("metrics_filtered.json", "w") as f:
+        json.dump(parsed, f, indent=2)
+
+    # Envoi en temps réel à InfluxDB
+    for entry in parsed:
+        measurement = entry["measurement"]
+        data = entry.get("data", {})
+        tags = {}
+        if "interface" in entry:
+            tags["interface_name"] = entry["interface"]
+            tags["type"] = "interface"
+        else:
+            tags["type"] = measurement
+
+        point = Point(measurement)
+        for k, v in data.items():
+            if k == "timestamp" or v is None:
+                continue
+            point = point.field(k, v)
+        for tag, value in tags.items():
+            point = point.tag(tag, value)
+        write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
+
+    print("📦 Données enregistrées et envoyées à InfluxDB")
+    time.sleep(5)
+
+client.close()

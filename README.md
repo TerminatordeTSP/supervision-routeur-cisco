@@ -57,7 +57,7 @@ Tant qu’il est présent, le script continue de collecter les métriques toutes
 touch run.flag  # 
 python collect_metrics.py # pour lancer le script qui va lancer la collecte
 
-3. Visualisation en temps réel dans le supervision-routeur-cisco/fichier metric_filtered.json
+3. Visualisation en temps réel dans le supervision-routeur-cisco/metric_filtered.json
 
 4. Arreter la collecte 
 

@@ -4,7 +4,11 @@ from django.views.decorators.http import require_POST
 import json
 import logging
 import time
+from datetime import datetime
 from .metrics_handlers import MetricsProcessor
+import os
+from django.conf import settings
+from influxdb_client import InfluxDBClient
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -149,3 +153,121 @@ def process_single_metric(metric):
             
     except Exception as e:
         logger.exception(f"Error processing single metric: {str(e)}")
+
+def get_latest_metrics(request):
+    """
+    API endpoint to get the latest router metrics for the dashboard
+    """
+    try:
+        # Connect to InfluxDB
+        influx_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086')
+        influx_token = os.environ.get('INFLUXDB_TOKEN', 'my-super-secret-auth-token')
+        influx_org = os.environ.get('INFLUXDB_ORG', 'telecom-sudparis')
+        influx_bucket = os.environ.get('INFLUXDB_BUCKET', 'router-metrics')
+        
+        client = InfluxDBClient(url=influx_url, token=influx_token, org=influx_org)
+        query_api = client.query_api()
+        
+        # Query for router_snmp metrics
+        router_query = f'''
+        from(bucket: "{influx_bucket}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "router_snmp")
+          |> sort(columns: ["_time"], desc: true)
+          |> limit(n: 1)
+        '''
+        
+        # Query for router_ping metrics
+        ping_query = f'''
+        from(bucket: "{influx_bucket}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "router_ping")
+          |> sort(columns: ["_time"], desc: true)
+          |> limit(n: 1)
+        '''
+        
+        # Query for local_mem metrics
+        mem_query = f'''
+        from(bucket: "{influx_bucket}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "local_mem")
+          |> sort(columns: ["_time"], desc: true)
+          |> limit(n: 1)
+        '''
+        
+        # Query for local_cpu metrics
+        cpu_query = f'''
+        from(bucket: "{influx_bucket}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "local_cpu")
+          |> sort(columns: ["_time"], desc: true)
+          |> limit(n: 1)
+        '''
+        
+        # Query for local_system metrics
+        system_query = f'''
+        from(bucket: "{influx_bucket}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "local_system")
+          |> sort(columns: ["_time"], desc: true)
+          |> limit(n: 1)
+        '''
+        
+        # Execute the queries
+        router_result = query_api.query(org=influx_org, query=router_query)
+        ping_result = query_api.query(org=influx_org, query=ping_query)
+        mem_result = query_api.query(org=influx_org, query=mem_query)
+        cpu_result = query_api.query(org=influx_org, query=cpu_query)
+        system_result = query_api.query(org=influx_org, query=system_query)
+        
+        # Process the results
+        metrics = {
+            'timestamp': datetime.now().isoformat(),
+        }
+        
+        # Process router SNMP data
+        for table in router_result:
+            for record in table.records:
+                if record.get_field() == "router_name":
+                    metrics["router_name"] = record.get_value()
+                elif record.get_field() == "cpu_5min":
+                    metrics["cpu_5min"] = record.get_value()
+                elif record.get_field() == "uptime":
+                    metrics["uptime"] = record.get_value()
+        
+        # Process ping data
+        for table in ping_result:
+            for record in table.records:
+                if record.get_field() == "latency_ms":
+                    metrics["latency_ms"] = record.get_value()
+                elif record.get_field() == "packet_loss":
+                    metrics["packet_loss"] = record.get_value()
+        
+        # Process memory data
+        for table in mem_result:
+            for record in table.records:
+                if record.get_field() == "used_percent":
+                    metrics["used_percent"] = record.get_value()
+                elif record.get_field() == "total":
+                    metrics["total_memory"] = record.get_value()
+        
+        # Process local CPU data
+        for table in cpu_result:
+            for record in table.records:
+                if record.get_field() == "usage_idle":
+                    metrics["system_cpu"] = 100 - record.get_value()
+        
+        # Process system data
+        for table in system_result:
+            for record in table.records:
+                if record.get_field() == "load1":
+                    metrics["load1"] = record.get_value()
+        
+        # Close the client
+        client.close()
+        
+        return JsonResponse(metrics)
+    
+    except Exception as e:
+        logger.exception(f"Error getting latest metrics: {str(e)}")
+        return JsonResponse({"error": str(e)}, status=500)

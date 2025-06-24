@@ -3,8 +3,27 @@ import time
 import json
 import os
 import re
-from my_influxdb_client import InfluxDBClient, Point, WritePrecision
+from my_influxdb_client import InfluxDBClient, Point, WritePrecision, RouterMetricsInfluxDB
 from influxdb_client.client.write_api import SYNCHRONOUS
+
+# Variables to track Django integration status
+USE_DJANGO = True
+DJANGO_INITIALIZED = False
+
+try:
+    import django
+    from datetime import datetime
+    # Setup Django environment to use models
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'router_supervisor.src.settings')
+    django.setup()
+    from router_supervisor.core_models.models import Routeur, Interface, KPI, Alertes, SeuilKPI
+    DJANGO_INITIALIZED = True
+except ImportError as e:
+    print(f"⚠️ Django integration disabled: {e}")
+    USE_DJANGO = False
+except Exception as e:
+    print(f"⚠️ Error initializing Django: {e}")
+    USE_DJANGO = False
 
 def parse_telegraf_output(output):
     results = []
@@ -113,13 +132,128 @@ def generate_test_data():
 """
     return test_data.strip()
 
+def save_to_postgresql(data_entries):
+    """
+    Sauvegarde les métriques dans la base de données PostgreSQL pour l'historique
+    
+    Args:
+        data_entries (list): Liste des entrées de métriques
+    """
+    # Vérifier si l'intégration Django est activée
+    if not USE_DJANGO or not DJANGO_INITIALIZED:
+        print("ℹ️ Sauvegarde PostgreSQL ignorée - Django n'est pas initialisé")
+        return
+        
+    try:
+        # Récupérer ou créer le routeur principal
+        router_name = None
+        for entry in data_entries:
+            if entry["measurement"] == "router_snmp" and "router_name" in entry["data"]:
+                router_name = entry["data"]["router_name"]
+                break
+        
+        if not router_name:
+            print("ℹ️ Aucun nom de routeur trouvé dans les données")
+            return
+            
+        # Rechercher le routeur dans la base de données
+        try:
+            router = Routeur.objects.get(nom=router_name)
+        except Routeur.DoesNotExist:
+            print(f"ℹ️ Routeur '{router_name}' non trouvé dans la base de données")
+            return
+        except Exception as db_error:
+            print(f"⚠️ Erreur lors de l'accès à la base de données: {db_error}")
+            return
+        
+        # Obtenir l'interface par défaut
+        try:
+            default_interface, _ = Interface.objects.get_or_create(
+                id_routeur=router,
+                nom='default',
+                defaults={'trafic': 0.0}
+            )
+        except Exception as e:
+            print(f"⚠️ Impossible de créer l'interface par défaut: {e}")
+            return
+        
+        # Créer ou récupérer les KPIs nécessaires
+        try:
+            cpu_kpi, _ = KPI.objects.get_or_create(nom='CPU')
+            ram_kpi, _ = KPI.objects.get_or_create(nom='RAM')
+            latency_kpi, _ = KPI.objects.get_or_create(nom='Latency')
+        except Exception as e:
+            print(f"⚠️ Impossible de créer les KPIs: {e}")
+            return
+        
+        # Traiter chaque entrée de métrique
+        for entry in data_entries:
+            measurement = entry["measurement"]
+            data = entry["data"]
+            
+            # Router CPU usage
+            if measurement == "router_snmp" and "cpu_5min" in data:
+                # Vérifier si la valeur est valide
+                if data["cpu_5min"] is not None:
+                    # Créer une alerte si nécessaire (au-dessus du seuil)
+                    if hasattr(router, 'id_seuil') and router.id_seuil and data["cpu_5min"] > router.id_seuil.cpu:
+                        try:
+                            alert = Alertes(
+                                interface=default_interface,
+                                message=f"CPU usage high: {data['cpu_5min']}% > {router.id_seuil.cpu}%",
+                                severity="high"
+                            )
+                            alert.save()
+                            alert.kpis.add(cpu_kpi)
+                        except Exception as e:
+                            print(f"⚠️ Impossible de créer une alerte CPU: {e}")
+            
+            # Memory usage - we don't have direct RAM metrics from the router, 
+            # so we'll use local_mem for demonstration
+            if measurement == "local_mem" and "used_percent" in data:
+                if data["used_percent"] is not None:
+                    # Créer une alerte si nécessaire (au-dessus du seuil)
+                    if hasattr(router, 'id_seuil') and router.id_seuil and data["used_percent"] > router.id_seuil.ram:
+                        try:
+                            alert = Alertes(
+                                interface=default_interface,
+                                message=f"Memory usage high: {data['used_percent']}% > {router.id_seuil.ram}%",
+                                severity="high"
+                            )
+                            alert.save()
+                            alert.kpis.add(ram_kpi)
+                        except Exception as e:
+                            print(f"⚠️ Impossible de créer une alerte RAM: {e}")
+            
+            # Latency metrics
+            if measurement == "router_ping" and "latency_ms" in data:
+                if data["latency_ms"] is not None and data["latency_ms"] > 100:  # Example threshold
+                    try:
+                        alert = Alertes(
+                            interface=default_interface,
+                            message=f"High latency: {data['latency_ms']}ms",
+                            severity="medium"
+                        )
+                        alert.save()
+                        alert.kpis.add(latency_kpi)
+                    except Exception as e:
+                        print(f"⚠️ Impossible de créer une alerte Latence: {e}")
+                    
+    except Exception as e:
+        print(f"❌ Erreur lors de la sauvegarde dans PostgreSQL : {e}")
+
 # === SCRIPT PRINCIPAL ===
 
 if not os.path.exists("run.flag"):
     print("❌ run.flag manquant. Créez-le avec : touch run.flag")
     exit()
 
-print("✅ Démarrage de la collecte... (supprimez run.flag pour arrêter)")
+# Afficher l'état de l'intégration Django
+if USE_DJANGO and DJANGO_INITIALIZED:
+    print("✅ Démarrage de la collecte avec intégration Django/PostgreSQL (supprimez run.flag pour arrêter)")
+else:
+    print("✅ Démarrage de la collecte en mode InfluxDB uniquement (supprimez run.flag pour arrêter)")
+    print("ℹ️ L'historique dans PostgreSQL ne sera pas disponible")
 
 INFLUX_URL = "http://localhost:8086"
 INFLUX_TOKEN = "my-super-secret-auth-token"
@@ -162,7 +296,58 @@ while os.path.exists("run.flag"):
 
     print("📦 Données enregistrées dans metrics_filtered.json")
 
-    # Envoi en temps réel à InfluxDB
+    # Initialiser le client RouterMetricsInfluxDB pour une meilleure gestion des données
+    router_metrics_client = RouterMetricsInfluxDB(
+        url=INFLUX_URL,
+        token=INFLUX_TOKEN,
+        org=INFLUX_ORG,
+        bucket=INFLUX_BUCKET
+    )
+
+    # Extraire les métriques du routeur
+    router_name = None
+    cpu_usage = None
+    memory_usage = None
+    uptime = None
+    latency = None
+
+    for entry in parsed:
+        if entry["measurement"] == "router_snmp":
+            router_name = entry["data"].get("router_name")
+            cpu_usage = entry["data"].get("cpu_5min")
+            uptime = entry["data"].get("uptime")
+        elif entry["measurement"] == "local_mem":
+            memory_usage = entry["data"].get("used_percent")
+        elif entry["measurement"] == "router_ping":
+            latency = entry["data"].get("latency_ms")
+
+    # Si nous avons les informations nécessaires, envoyer à InfluxDB avec notre client spécialisé
+    if router_name and (cpu_usage is not None or memory_usage is not None):
+        try:
+            # Utiliser les données locales pour le CPU si les données du routeur sont manquantes
+            if cpu_usage is None:
+                for entry in parsed:
+                    if entry["measurement"] == "local_cpu":
+                        cpu_usage = 100 - entry["data"].get("usage_idle", 0)
+                        break
+
+            # Calculer le trafic total (exemple)
+            traffic_mbps = 0  # Par défaut
+            
+            # Envoyer les données agrégées à InfluxDB
+            router_metrics_client.write_router_metric(
+                router_name=router_name,
+                cpu_usage=cpu_usage if cpu_usage is not None else 0,
+                memory_usage=memory_usage if memory_usage is not None else 0,
+                traffic_mbps=traffic_mbps,
+                interfaces=[]  # Pas d'interfaces spécifiques pour le moment
+            )
+            
+            print(f"✅ Données du routeur {router_name} envoyées à InfluxDB")
+        except Exception as e:
+            print(f"❌ Erreur lors de l'envoi des données agrégées à InfluxDB: {e}")
+    
+    # Envoi des points individuels à InfluxDB (pour compatibilité avec le code existant)
     for entry in parsed:
         try:
             measurement = entry["measurement"]
@@ -185,6 +370,19 @@ while os.path.exists("run.flag"):
             print(f"✅ Point envoyé à InfluxDB : {measurement} | tags={tags} | data={data}")
         except Exception as e:
             print(f"❌ Erreur lors de l'envoi à InfluxDB : {e}")
+            
+    # Fermer le client spécialisé
+    router_metrics_client.close()
+
+    # Sauvegarder l'historique dans PostgreSQL si Django est disponible
+    if USE_DJANGO and DJANGO_INITIALIZED:
+        try:
+            save_to_postgresql(parsed)
+            print("✅ Historique des données sauvegardé dans PostgreSQL")
+        except Exception as e:
+            print(f"❌ Erreur lors de la sauvegarde dans PostgreSQL : {e}")
+    else:
+        print("ℹ️ Sauvegarde PostgreSQL ignorée - utilisant uniquement InfluxDB")
 
     time.sleep(5)
 

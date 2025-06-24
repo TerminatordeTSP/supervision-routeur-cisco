@@ -1,65 +1,106 @@
+# Router Cisco Supervision - Guide d'installation et d'utilisation
 
+Ce projet permet de surveiller et d'afficher les métriques d'un routeur Cisco. Il collecte les données via Telegraf, les stocke dans InfluxDB (et optionnellement PostgreSQL), et les affiche sur un tableau de bord Django.
 
-# Telegraf Commands
+## Configuration système
+
+Deux modes de fonctionnement sont disponibles:
+1. **Mode complet** - Utilise Django + InfluxDB + PostgreSQL
+2. **Mode minimal** - Utilise uniquement InfluxDB (plus léger, sans nécessiter Django/PostgreSQL)
+
+## Prérequis
+
+- Python 3.7 ou supérieur (compatible avec Python 3.13)
+- Docker (pour exécuter Telegraf)
+- InfluxDB (installé localement ou via Docker)
+- PostgreSQL (optionnel, pour le mode complet)
+
+## Installation
+
+1. Cloner le dépôt:
+   ```bash
+   git clone https://github.com/votre-utilisateur/supervision-routeur-cisco.git
+   cd supervision-routeur-cisco
+   ```
+
+2. Créer un environnement virtuel:
+   ```bash
+   python -m venv .env
+   source .env/bin/activate
+   ```
+
+3. Installer les dépendances:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Choix du mode de fonctionnement
+
+### Mode minimal (InfluxDB uniquement)
+
+Utilisez ce mode si vous souhaitez uniquement collecter et stocker les métriques dans InfluxDB, sans PostgreSQL ni Django:
+
+```bash
+./start_collector_minimal.sh
 ```
-sudo vim /etc/telegraf/telegraf.conf
-sudo systemctl status telegraf
-sudo systemctl start telegraf
-sudo systemctl stop telegraf
+
+Ce mode est particulièrement utile:
+- Lors d'incompatibilités de version avec PostgreSQL/Django
+- Pour des machines avec des ressources limitées
+- Pour la collecte de données sans interface web
+
+### Mode complet (avec PostgreSQL et interface Django)
+
+Pour utiliser toutes les fonctionnalités (historique PostgreSQL, alertes, tableau de bord Django):
+
+1. Configurez PostgreSQL en suivant les instructions dans `DATABASE_SETUP_COMPLETE.md`
+2. Démarrez le collecteur complet:
+   ```bash
+   ./start_collector.sh
+   ```
+3. Dans un autre terminal, démarrez l'application Django:
+   ```bash
+   cd router_supervisor
+   python manage.py runserver
+   ```
+4. Accédez au tableau de bord à l'adresse http://localhost:8000
+
+## Configuration
+
+- **InfluxDB**: Modifiez les paramètres de connexion dans `collect_metrics.py`
+- **PostgreSQL**: Modifiez la connexion dans `router_supervisor/src/settings.py`
+- **Telegraf**: Configurez les fichiers dans le dossier `telegraf/`
+
+## Structure du projet
+
+- `collect_metrics.py` - Script principal de collecte des données
+- `my_influxdb_client.py` - Client InfluxDB personnalisé
+- `router_supervisor/` - Application Django pour le tableau de bord
+- `telegraf/` - Configuration Telegraf
+
+## Dépannage
+
+### Problèmes avec psycopg2-binary sur Python 3.13
+
+Si vous rencontrez des erreurs lors de l'installation de psycopg2-binary avec Python 3.13, utilisez le mode minimal:
+
+```bash
+./start_collector_minimal.sh
 ```
 
-# Configure a gRPC Telemetry Subscription
+### Erreurs de connexion à InfluxDB
 
-## CPU
-```
-configure terminal
-telemetry ietf subscription 1
-encoding encode-kvgpb
-filter xpath /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization
+Vérifiez que:
+1. InfluxDB est en cours d'exécution
+2. Les paramètres de connexion sont corrects dans `collect_metrics.py`
 
-stream yang-push
-update-policy periodic 60000
-receiver ip address 172.16.10.40 57500 protocol grpc-tcp
-```
+### Erreurs de connexion à PostgreSQL
 
-## MEMORY
-```
-configure terminal
-telemetry ietf subscription 2
- encoding encode-kvgpb
- filter xpath /memory-ios-xe-oper:memory-statistics
- stream yang-push
- update-policy periodic 60000
- receiver ip address 172.16.10.40 57500 protocol grpc-tcp
-```
+Vérifiez que:
+1. PostgreSQL est en cours d'exécution
+2. Les paramètres de connexion sont corrects dans `router_supervisor/src/settings.py`
+3. La base de données est créée avec les bonnes tables
 
-## Page de configuration :
-Pour accéder à la page de configuration des routeurs et des seuils :
-http://127.0.0.1:8000/configuration/
+## Licence
 
-A ce jour les opérations CRUD sont disponibles pour les seuils, pour les routeurs il manque que "suppression" et "mis à jour". 
-
-## Page principale (Dashboard):
-Pour accéder à la page de configuration des routeurs et des seuils :
-http://127.0.0.1:8000/dashboard
-
-A ce jour les opérations CRUD sont disponibles pour les seuils, pour les routeurs il manque que "suppression" et "mis à jour". 
-
-
-## Lancement de la collecte des métriques :
-
-1. créer le fichier `run.flag`
-
-Ce fichier sert à **activer ou désactiver la collecte**.  
-Tant qu’il est présent, le script continue de collecter les métriques toutes les **5 secondes**.
-
-2. les commandes à taper pour le lancement 
-
-touch run.flag  # 
-python collect_metrics.py # pour lancer le script qui va lancer la collecte
-
-3. Visualisation en temps réel dans le supervision-routeur-cisco/metric_filtered.json
-
-4. Arreter la collecte 
-
-rm run.flag     # dans un autre terminal pour arrêter proprement la collecte (ou le supprimer manuellement)
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.

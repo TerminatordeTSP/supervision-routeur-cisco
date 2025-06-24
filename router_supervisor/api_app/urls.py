@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import receive_metrics
+from .views import receive_metrics, get_latest_metrics
 
 urlpatterns = [
-    path('metrics/', receive_metrics, name='receive_metrics'),
+    path('receive-metrics/', receive_metrics, name='receive_metrics'),
+    path('latest-metrics/', get_latest_metrics, name='get_latest_metrics'),
 ]

@@ -6,3 +6,7 @@ sqlparse==0.5.3
 typing_extensions==4.12.2
 influxdb
 influxdb_client
+# Utiliser psycopg2-binary seulement si nécessaire et compatible avec Python 3.13
+# Si psycopg2-binary échoue, vous pouvez essayer la version source:
+# psycopg2==2.9.9
+# Ou simplement exécuter sans la fonctionnalité PostgreSQL

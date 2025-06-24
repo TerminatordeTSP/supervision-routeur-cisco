@@ -2,27 +2,27 @@
   {
     "measurement": "local_mem",
     "data": {
-      "used": 941813760.0,
-      "free": 5515522048.0,
-      "used_percent": 11.457445234124336,
-      "total": 8220102656.0,
-      "timestamp": "1750756791000000000"
+      "used": 5369319424.0,
+      "free": 357752832.0,
+      "used_percent": 32.54364287888335,
+      "total": 16498827264.0,
+      "timestamp": "1750759840000000000"
     }
   },
   {
     "measurement": "local_system",
     "data": {
-      "load1": 0.56,
+      "load1": 1.69,
       "uptime": null,
-      "timestamp": "1750756791000000000"
+      "timestamp": "1750759840000000000"
     }
   },
   {
     "measurement": "local_system",
     "data": {
       "load1": null,
-      "uptime": 5209.0,
-      "timestamp": "1750756791000000000"
+      "uptime": 2629.0,
+      "timestamp": "1750759840000000000"
     }
   },
   {
@@ -30,33 +30,33 @@
     "data": {
       "load1": null,
       "uptime": null,
-      "timestamp": "1:26\""
+      "timestamp": "0:43\""
     }
   },
   {
     "measurement": "router_ping",
     "data": {
-      "latency_ms": 38.121,
+      "latency_ms": 39.893,
       "packet_loss": 0.0,
-      "timestamp": "1750756791000000000"
+      "timestamp": "1750759840000000000"
     }
   },
   {
     "measurement": "router_snmp",
     "data": {
       "router_name": "pod4-cat8kv",
-      "uptime": 172235241.0,
+      "uptime": 172540195.0,
       "cpu_5min": 0.0,
-      "timestamp": "1750756791000000000"
+      "timestamp": "1750759840000000000"
     }
   },
   {
     "measurement": "local_cpu",
     "data": {
-      "usage_idle": 99.5012468828722,
-      "usage_user": 0.24937655860359026,
-      "usage_system": 0.24937655860359026,
-      "timestamp": "1750756791000000000"
+      "usage_idle": 76.30922693266223,
+      "usage_user": 15.960099750617827,
+      "usage_system": 4.2394014962561775,
+      "timestamp": "1750759840000000000"
     }
   }
 ]

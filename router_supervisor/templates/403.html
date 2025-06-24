@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur 403 - Accès interdit</title>
+    <link href="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/css/boosted.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #1a0f0f;
+            color: #ff6b35;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .error-container {
+            background-color: #1a0f0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .error-card {
+            background-color: #2d1810;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid #ffc107;
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.1);
+        }
+
+        .error-icon {
+            font-size: 120px;
+            color: #ffc107;
+            margin-bottom: 20px;
+            animation: shake 1s ease-in-out infinite;
+        }
+
+        .error-code {
+            font-size: 72px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .error-title {
+            font-size: 24px;
+            color: #ffc107;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-button {
+            background-color: #3d2218;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .error-button:hover {
+            background-color: #ff6b35;
+            color: #1a0f0f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .error-button.warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        .error-button.warning:hover {
+            background-color: #ffc107;
+            color: #1a0f0f;
+        }
+
+        .error-button i {
+            font-size: 18px;
+        }
+
+        .security-notice {
+            background-color: #3d2218;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .security-notice h4 {
+            color: #ffc107;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .security-item {
+            background-color: #2d1810;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .security-item i {
+            color: #ff6b35;
+            font-size: 16px;
+        }
+
+        .security-item span {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+
+        @media (max-width: 768px) {
+            .error-card {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .error-code {
+                font-size: 48px;
+            }
+            
+            .error-icon {
+                font-size: 80px;
+            }
+            
+            .error-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .error-button {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-icon">
+                <i class="bi bi-shield-exclamation"></i>
+            </div>
+            
+            <h1 class="error-code">403</h1>
+            <h2 class="error-title">Accès interdit</h2>
+            
+            <p class="error-message">
+                Vous n'avez pas les autorisations nécessaires pour accéder à cette ressource. 
+                Cette section du système de supervision est protégée et réservée aux administrateurs autorisés.
+            </p>
+            
+            <div class="error-buttons">
+                <a href="/" class="error-button">
+                    <i class="bi bi-house"></i>
+                    Retour au dashboard
+                </a>
+                <a href="javascript:history.back()" class="error-button">
+                    <i class="bi bi-arrow-left"></i>
+                    Page précédente
+                </a>
+                <a href="/admin/login/" class="error-button warning">
+                    <i class="bi bi-person-check"></i>
+                    Se connecter
+                </a>
+            </div>
+            
+            <div class="security-notice">
+                <h4>
+                    <i class="bi bi-shield-check"></i>
+                    Sécurité du système
+                </h4>
+                
+                <div class="security-item">
+                    <i class="bi bi-lock"></i>
+                    <span>Authentification requise pour cette section</span>
+                </div>
+                
+                <div class="security-item">
+                    <i class="bi bi-eye"></i>
+                    <span>Tentative d'accès enregistrée dans les logs de sécurité</span>
+                </div>
+                
+                <div class="security-item">
+                    <i class="bi bi-router"></i>
+                    <span>Configuration réseau protégée par authentification</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

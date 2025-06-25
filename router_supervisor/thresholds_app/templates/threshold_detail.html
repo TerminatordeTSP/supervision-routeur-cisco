@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+c{% extends 'base.html' %}
 {% load static %}
 {% block title %}Threshold: {{ threshold.name }}{% endblock title %}
 {% block content %}
@@ -14,12 +14,12 @@
             <strong>CPU Usage in %: </strong> {{ threshold.cpu }}
         </li>
         <li>
-            <strong>Bandwidth in MB/s: </strong> {{ threshold.trafic }}
+            <strong>Bandwidth in MB/s: </strong> {{ threshold.traffic }}
         </li>
     </ul>
 
     <div class="back-button">
-        <a href="{% url 'thresholds' %}" class="btn-back">Go Back</a>
+        <a href="{% url 'configuration' %}" class="btn-back">Go Back</a>
     </div>
     <div class="edit-button">
         <a href="{% url 'threshold_update' id=threshold_id %}" class="btn-edit">Edit Threshold</a>

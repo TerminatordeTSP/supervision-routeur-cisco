@@ -43,14 +43,16 @@ urlpatterns = [
     path('test-500/', test_500, name='test_500'),
     path('test-403/', test_403, name='test_403'),
 ]
-
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # Serve static files in production using Django's built-in helper
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Configuration des gestionnaires d'erreur
 handler404 = error_views.custom_404_view
-handler500 = error_views.custom_500_view
+#handler500 = error_views.custom_500_view
+handler500 = 'django.views.defaults.server_error'
 handler403 = error_views.custom_403_view
 
 # Vues de prévisualisation des pages d'erreur (seulement en mode DEBUG)

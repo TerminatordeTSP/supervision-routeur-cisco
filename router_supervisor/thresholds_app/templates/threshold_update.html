@@ -3,7 +3,7 @@
 {% block title %}Edit Threshold{% endblock title %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'router_config/config_style.css' %}">
+<link rel="stylesheet" href="{% static 'router_config/threshold_update.css' %}">
 
 <div class="dashboard-container">
     <!-- Header -->
@@ -25,7 +25,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="header-button">Save Changes</button>
-                <a href="/" class="header-button">Cancel</a>
+                <a href="{% url 'configuration' %}" class="header-button">Cancel</a>
             </div>
         </form>
     </div>

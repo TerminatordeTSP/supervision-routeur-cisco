@@ -29,5 +29,5 @@ MEDIA_ROOT = '/code/media'
 MEDIA_URL = '/media/'
 
 # Configuration de sécurité
-DEBUG = False  # Enable for direct access to port 8080
+DEBUG = True  # Enable for direct access to port 8080
 ALLOWED_HOSTS = ['*']  # À ajuster selon vos besoins de sécurité

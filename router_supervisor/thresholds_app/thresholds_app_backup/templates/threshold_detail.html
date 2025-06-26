@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Threshold: {{ threshold.name }}{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'router_config/threshold_details.css' %}">
+
+<div class="threshold-details">
+    <h2>Threshold Configuration: <span>{{ threshold.name }}</span></h2>
+    <ul>
+        <li>
+            <strong>RAM in MB: </strong> {{ threshold.ram }}
+        </li>
+        <li>
+            <strong>CPU Usage in %: </strong> {{ threshold.cpu }}
+        </li>
+        <li>
+            <strong>Bandwidth in MB/s: </strong> {{ threshold.trafic }}
+        </li>
+    </ul>
+
+    <div class="back-button">
+        <a href="{% url 'thresholds' %}" class="btn-back">Go Back</a>
+    </div>
+    <div class="edit-button">
+        <a href="{% url 'threshold_update' id=threshold_id %}" class="btn-edit">Edit Threshold</a>
+    </div>
+</div>
+{% endblock %}

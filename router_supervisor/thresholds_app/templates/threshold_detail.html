@@ -24,5 +24,8 @@ c{% extends 'base.html' %}
     <div class="edit-button">
         <a href="{% url 'threshold_update' id=threshold_id %}" class="btn-edit">Edit Threshold</a>
     </div>
+    <div class="delete-button">
+    <a href="{% url 'threshold_delete' threshold_id %}" class="btn-edit">Delete Threshold</a>
+    </div>
 </div>
 {% endblock %}

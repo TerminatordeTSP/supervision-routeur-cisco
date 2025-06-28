@@ -1,14 +1,113 @@
-{% extends "settings_app/templates/base.html" %}
+{% extends "settings/base.html" %}
 
 {% block title %}Appearance Settings{% endblock %}
-
-{% block header %}Appearance{% endblock %}
+{% block header %}Appearance Settings{% endblock %}
 
 {% block content %}
-    <h1>Change the appearance of your application</h1>
-    <form method="post">
+<div class="settings-form-container">
+    <div class="form-header">
+        <h2><i class="fas fa-palette"></i> Customize Your Interface</h2>
+        <p>Choose a color theme that suits your preference.</p>
+    </div>
+
+    <form method="post" class="settings-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Changes</button>
+        
+        <div class="theme-selection">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-paint-brush"></i> Select Theme
+                </label>
+                
+                <div class="theme-options">
+                    {% for choice in form.theme %}
+                        <div class="theme-option">
+                            <input type="radio" name="{{ form.theme.html_name }}" 
+                                   id="{{ choice.id_for_label }}" 
+                                   value="{{ choice.choice_value }}"
+                                   {% if choice.choice_value == preferences.theme %}checked{% endif %}>
+                            <label for="{{ choice.id_for_label }}" class="theme-card theme-{{ choice.choice_value }}">
+                                <div class="theme-preview">
+                                    <div class="theme-color-bars">
+                                        {% if choice.choice_value == 'orange' %}
+                                            <div class="color-bar" style="background: #ff6b35;"></div>
+                                            <div class="color-bar" style="background: #2d1810;"></div>
+                                            <div class="color-bar" style="background: #1a0f0f;"></div>
+                                        {% elif choice.choice_value == 'blue' %}
+                                            <div class="color-bar" style="background: #4a90e2;"></div>
+                                            <div class="color-bar" style="background: #2c3e50;"></div>
+                                            <div class="color-bar" style="background: #1e2832;"></div>
+                                        {% elif choice.choice_value == 'green' %}
+                                            <div class="color-bar" style="background: #27ae60;"></div>
+                                            <div class="color-bar" style="background: #1e3a2e;"></div>
+                                            <div class="color-bar" style="background: #0f1e16;"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="theme-info">
+                                    <h3>{{ choice.choice_label }}</h3>
+                                    <p>
+                                        {% if choice.choice_value == 'orange' %}
+                                            Warm and energetic orange theme
+                                        {% elif choice.choice_value == 'blue' %}
+                                            Cool and professional blue theme
+                                        {% elif choice.choice_value == 'green' %}
+                                            Natural and calming green theme
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="theme-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="current-theme-preview">
+            <h3><i class="fas fa-eye"></i> Current Theme Preview</h3>
+            <div class="preview-container theme-{{ preferences.theme }}">
+                <div class="preview-header">
+                    <div class="preview-title">Sample Interface</div>
+                    <div class="preview-buttons">
+                        <div class="preview-btn"></div>
+                        <div class="preview-btn"></div>
+                    </div>
+                </div>
+                <div class="preview-content">
+                    <div class="preview-sidebar">
+                        <div class="preview-nav-item"></div>
+                        <div class="preview-nav-item active"></div>
+                        <div class="preview-nav-item"></div>
+                    </div>
+                    <div class="preview-main">
+                        <div class="preview-card"></div>
+                        <div class="preview-card"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Apply Theme
+            </button>
+            <a href="/settings/" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
     </form>
+</div>
+
+<script>
+// Preview theme changes
+document.querySelectorAll('input[name="{{ form.theme.html_name }}"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const previewContainer = document.querySelector('.preview-container');
+        previewContainer.className = `preview-container theme-${this.value}`;
+    });
+});
+</script>
 {% endblock %}

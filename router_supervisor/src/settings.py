@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'router_supervisor.src.urls'
+ROOT_URLCONF = 'src.urls'
 
 TEMPLATES = [
     {
@@ -80,13 +80,18 @@ WSGI_APPLICATION = 'router_supervisor.src.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('SQL_DATABASE', 'routerdb'),
-        'USER': os.environ.get('SQL_USER', 'user'),
-        'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
-        'HOST': os.environ.get('SQL_HOST', 'db'),
-        'PORT': os.environ.get('SQL_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # PostgreSQL configuration (uncomment for production)
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.environ.get('SQL_DATABASE', 'routerdb'),
+    #     'USER': os.environ.get('SQL_USER', 'user'),
+    #     'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+    #     'HOST': os.environ.get('SQL_HOST', 'db'),
+    #     'PORT': os.environ.get('SQL_PORT', '5432'),
+    # }
 }
 
 

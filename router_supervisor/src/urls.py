@@ -15,11 +15,11 @@ def test_static_direct(request):
     return HttpResponse("Static endpoint test works!")
 
 urlpatterns = [
-    path('', include("router_supervisor.dashboard_app.urls")),
+    path('', include("dashboard_app.urls")),
     path('admin/', admin.site.urls),
-    path('settings/', include("router_supervisor.settings_app.urls")),
-    path('thresholds/', include('router_supervisor.thresholds_app.urls')),
-    path('api/', include('router_supervisor.api_app.urls')),
+    path('settings/', include("settings_app.urls")),
+    path('thresholds/', include('thresholds_app.urls')),
+    path('api/', include('api_app.urls')),
     path('health/', health_check, name='health_check'),
     path('test-static-direct/', test_static_direct, name='test_static_direct'),
 ]

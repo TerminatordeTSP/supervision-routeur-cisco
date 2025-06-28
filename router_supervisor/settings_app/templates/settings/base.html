@@ -6,30 +6,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Settings{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'settings_app/style_settings.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="dashboard-container">
-        <!-- Header -->
-        <div class="header">
-            <h1>{% block header %}Settings{% endblock %}</h1>
-            <div class="header-buttons">
-                <a href="/">
-                  <button class="header-button">Home</button>
-                </a>
+<body class="{% if preferences %}theme-{{ preferences.theme }}{% else %}theme-orange{% endif %}">
+    <div class="settings-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-cog"></i>
+                <h2>Settings</h2>
             </div>
-        </div>
-        <!-- Navigation -->
-        <nav>
-            <ul>
-                <li><a href="/settings/user_info/">Personal Information</a></li>
-                <li><a href="/settings/appearance/">Appearance</a></li>
-                <li><a href="/settings/language/">Language</a></li>
-            </ul>
-        </nav>
-        <!-- Content -->
-        <div class="settings-content">
-            {% block content %}{% endblock %}
-        </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="/settings/" class="nav-link {% if request.resolver_match.url_name == 'settings_index' %}active{% endif %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings/user_info/" class="nav-link {% if request.resolver_match.url_name == 'user_info' %}active{% endif %}">
+                            <i class="fas fa-user"></i>
+                            <span>Personal Information</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings/appearance/" class="nav-link {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">
+                            <i class="fas fa-palette"></i>
+                            <span>Appearance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/settings/language/" class="nav-link {% if request.resolver_match.url_name == 'language' %}active{% endif %}">
+                            <i class="fas fa-globe"></i>
+                            <span>Language</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-content">
+                    <h1>{% block header %}Settings{% endblock %}</h1>
+                    <div class="header-actions">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="fas fa-home"></i>
+                            Back to Home
+                        </a>
+                        {% if user %}
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ user.first_name }} {{ user.last_name }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Page Content -->
+            <div class="page-content">
+                {% block content %}
+                <div class="dashboard-overview">
+                    <div class="overview-cards">
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Personal Info</h3>
+                                <p>Manage your personal information and account details</p>
+                                <a href="/settings/user_info/" class="card-link">
+                                    Update Info <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Appearance</h3>
+                                <p>Customize the look and feel of your interface</p>
+                                <a href="/settings/appearance/" class="card-link">
+                                    Change Theme <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="card-content">
+                                <h3>Language</h3>
+                                <p>Set your preferred language for the interface</p>
+                                <a href="/settings/language/" class="card-link">
+                                    Change Language <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if preferences %}
+                    <div class="current-settings">
+                        <h2>Current Settings</h2>
+                        <div class="settings-summary">
+                            <div class="setting-item">
+                                <span class="setting-label">Theme:</span>
+                                <span class="setting-value">{{ preferences.get_theme_display }}</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Language:</span>
+                                <span class="setting-value">{{ preferences.get_language_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endblock %}
+            </div>
+        </main>
     </div>
 </body>
 </html>

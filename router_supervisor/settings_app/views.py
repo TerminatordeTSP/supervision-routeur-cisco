@@ -1,29 +1,100 @@
-from django.shortcuts import render, redirect # type: ignore
-from .forms import UserInfoForm
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from thresholds_app.models import User
+from .forms import UserInfoForm, AppearanceForm, LanguageForm
+from .models import UserPreferences
+
+def get_or_create_user():
+    """Get the first user or create a demo user"""
+    user = User.objects.first()
+    if not user:
+        user = User.objects.create(
+            email='admin@example.com',
+            first_name='Admin',
+            last_name='User',
+            password='admin',
+            role='admin'
+        )
+    return user
+
+def get_user_preferences(user):
+    """Get or create user preferences"""
+    preferences, created = UserPreferences.objects.get_or_create(user=user)
+    return preferences
 
 def index(request):
-    return render(request,"settings/base.html")
+    # Get or create demo user
+    user = get_or_create_user()
+    preferences = get_user_preferences(user)
+    
+    context = {
+        'user': user,
+        'preferences': preferences,
+    }
+    return render(request, "settings/base.html", context)
 
 def user_info(request):
+    # Get or create demo user
+    user = get_or_create_user()
+    
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            form = UserInfoForm(request.POST, instance=request.user)
-        else:
-            form = UserInfoForm(request.POST)
+        form = UserInfoForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
+            # Handle password change
+            if form.cleaned_data.get('password'):
+                user.password = form.cleaned_data['password']
+                user.save()
+            else:
+                form.save()
+            messages.success(request, "Your information has been updated successfully!")
             return redirect('/settings/user_info/')
     else:
-        if request.user.is_authenticated:
-            form = UserInfoForm(instance=request.user)
-        else:
-            form = UserInfoForm()
+        form = UserInfoForm(instance=user)
 
-    return render(request, "settings/info_user.html", {'form': form})
+    preferences = get_user_preferences(user)
+    context = {
+        'form': form, 
+        'user': user,
+        'preferences': preferences,
+    }
+    return render(request, "settings/info_user.html", context)
 
 def appearance(request):
-    return render(request,"settings/appearance.html")
+    user = get_or_create_user()
+    preferences = get_user_preferences(user)
+    
+    if request.method == 'POST':
+        form = AppearanceForm(request.POST, instance=preferences)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Appearance settings updated successfully!")
+            return redirect('/settings/appearance/')
+    else:
+        form = AppearanceForm(instance=preferences)
+    
+    context = {
+        'form': form,
+        'preferences': preferences,
+        'user': user,
+    }
+    return render(request, "settings/appearance.html", context)
 
 def language(request):
-    return render(request,"settings/language.html")
+    user = get_or_create_user()
+    preferences = get_user_preferences(user)
+    
+    if request.method == 'POST':
+        form = LanguageForm(request.POST, instance=preferences)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Language settings updated successfully!")
+            return redirect('/settings/language/')
+    else:
+        form = LanguageForm(instance=preferences)
+    
+    context = {
+        'form': form,
+        'preferences': preferences,
+        'user': user,
+    }
+    return render(request, "settings/language.html", context)

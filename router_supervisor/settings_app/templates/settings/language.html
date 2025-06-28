@@ -1,13 +1,106 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>LANGUAGE</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-  <h1>LANGUAGE</h1>
+{% extends 'settings/base.html' %}
 
-</body>
-</html>
+{% block title %}Language Settings{% endblock %}
+{% block header %}Language Settings{% endblock %}
+
+{% block content %}
+<div class="settings-form-container">
+    <div class="form-header">
+        <h2><i class="fas fa-globe"></i> Choose Your Language</h2>
+        <p>Select your preferred language for the interface.</p>
+    </div>
+
+    <form method="post" class="settings-form">
+        {% csrf_token %}
+        
+        <div class="language-selection">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-language"></i> Interface Language
+                </label>
+                
+                <div class="language-options">
+                    {% for choice in form.language %}
+                        <div class="language-option">
+                            <input type="radio" name="{{ form.language.html_name }}" 
+                                   id="{{ choice.id_for_label }}" 
+                                   value="{{ choice.choice_value }}"
+                                   {% if choice.choice_value == preferences.language %}checked{% endif %}>
+                            <label for="{{ choice.id_for_label }}" class="language-card">
+                                <div class="language-flag">
+                                    {% if choice.choice_value == 'en' %}
+                                        🇺🇸
+                                    {% elif choice.choice_value == 'fr' %}
+                                        🇫🇷
+                                    {% elif choice.choice_value == 'es' %}
+                                        🇪🇸
+                                    {% endif %}
+                                </div>
+                                <div class="language-info">
+                                    <h3>{{ choice.choice_label }}</h3>
+                                    <p>
+                                        {% if choice.choice_value == 'en' %}
+                                            English (United States)
+                                        {% elif choice.choice_value == 'fr' %}
+                                            Français (France)
+                                        {% elif choice.choice_value == 'es' %}
+                                            Español (España)
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="language-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="language-preview">
+            <h3><i class="fas fa-eye"></i> Language Preview</h3>
+            <div class="preview-text">
+                <div class="preview-item" data-lang="en" style="{% if preferences.language != 'en' %}display: none;{% endif %}">
+                    <strong>Navigation:</strong> Home, Settings, Profile, Logout<br>
+                    <strong>Common phrases:</strong> Welcome back, Save changes, Cancel
+                </div>
+                <div class="preview-item" data-lang="fr" style="{% if preferences.language != 'fr' %}display: none;{% endif %}">
+                    <strong>Navigation:</strong> Accueil, Paramètres, Profil, Déconnexion<br>
+                    <strong>Phrases courantes:</strong> Bon retour, Sauvegarder, Annuler
+                </div>
+                <div class="preview-item" data-lang="es" style="{% if preferences.language != 'es' %}display: none;{% endif %}">
+                    <strong>Navegación:</strong> Inicio, Configuración, Perfil, Cerrar sesión<br>
+                    <strong>Frases comunes:</strong> Bienvenido, Guardar cambios, Cancelar
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Apply Language
+            </button>
+            <a href="/settings/" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Preview language changes
+document.querySelectorAll('input[name="{{ form.language.html_name }}"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Hide all preview items
+        document.querySelectorAll('.preview-item').forEach(item => {
+            item.style.display = 'none';
+        });
+        // Show selected language preview
+        const selectedPreview = document.querySelector(`[data-lang="${this.value}"]`);
+        if (selectedPreview) {
+            selectedPreview.style.display = 'block';
+        }
+    });
+});
+</script>
+{% endblock %}

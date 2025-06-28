@@ -1,0 +1,105 @@
+body {
+    background-color: #f7f8fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+}
+
+.header h1 {
+    font-size: 28px;
+    color: #7a1414;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.config-container {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+.config-description {
+    font-size: 16px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #555;
+}
+
+.config-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.config-form p {
+    margin: 0;
+}
+
+.config-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #7a1414;
+    display: block;
+}
+
+.config-form input,
+.config-form select,
+.config-form textarea {
+    padding: 12px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+    font-size: 15px;
+}
+
+.config-form input:focus,
+.config-form select:focus,
+.config-form textarea:focus {
+    outline: none;
+    border-color: #dd3e3e;
+    box-shadow: 0 0 5px rgba(221, 62, 62, 0.3);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.header-button {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: #e95d5d;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.header-button:hover {
+    background-color: #d14343;
+}
+
+a.header-button {
+    background-color: #eee;
+    color: #7a1414;
+    border: 1px solid #ccc;
+}
+
+a.header-button:hover {
+    background-color: #ddd;
+}

@@ -51,22 +51,30 @@ body {
     color: #990000;
 }
 
-.back-button {
-    margin-top: 30px;
+/* Style des boutons */
+.back-button,
+.edit-button {
+    margin-top: 20px;
     text-align: center;
 }
 
-.btn-back {
+.btn-back,
+.btn-edit {
     display: inline-block;
     padding: 12px 25px;
     font-size: 16px;
     font-weight: bold;
-    color: #ffffff;
-    background-color: #d9534f;
     text-decoration: none;
     border-radius: 6px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 5px;
+}
+
+/* Go Back: bouton plein */
+.btn-back {
+    color: #ffffff;
+    background-color: #d9534f;
 }
 
 .btn-back:hover {
@@ -80,6 +88,27 @@ body {
     background-color: #ac2925;
 }
 
+/* Edit Threshold: bouton contour */
+.btn-edit {
+    color: #d9534f;
+    background-color: transparent;
+    border: 2px solid #d9534f;
+}
+
+.btn-edit:hover {
+    background-color: #d9534f;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-edit:active {
+    transform: scale(0.95);
+    background-color: #c9302c;
+    border-color: #c9302c;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .threshold-details {
         padding: 15px 20px;
@@ -89,8 +118,50 @@ body {
         font-size: 24px;
     }
 
-    .btn-back {
+    .btn-back,
+    .btn-edit {
         padding: 10px 20px;
         font-size: 14px;
     }
+}
+.delete-button {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-edit {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #6c757d;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-edit:active {
+    transform: scale(0.95);
+    background-color: #495057;
+}
+
+/* Spécial pour DELETE */
+.delete-button .btn-edit {
+    background-color: #dc3545;
+}
+
+.delete-button .btn-edit:hover {
+    background-color: #c82333;
+}
+
+.delete-button .btn-edit:active {
+    background-color: #bd2130;
 }

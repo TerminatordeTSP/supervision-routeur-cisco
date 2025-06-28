@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from thresholds_app.models import Router, Threshold
 from thresholds_app.forms import threshold_insert
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def index(request):
     return render(request, 'config.html')
@@ -18,12 +20,14 @@ def configuration_router_config(request, id):
                   'router_config.html',
                   {'router': router})
 
-def configuration_threshold_detail(request, id):
-    threshold = Threshold.objects.get(threshold_id=id)
+def configuration_threshold_detail(request, th_id):
+    threshold = Threshold.objects.get(threshold_id=th_id)
     return render(request,
                   'threshold_detail.html',
-                  {'threshold': threshold})
-
+                  {
+                      'threshold': threshold,
+                      'threshold_id': threshold.threshold_id  # 👈 Ajoute ça
+                  })
 def thresholds(request):
     if request.method == 'POST':
         form = threshold_insert(request.POST)
@@ -49,7 +53,7 @@ def thresholds(request):
                   {'form': form})
 
 def threshold_update(request, id):
-    threshold = get_object_or_404(Threshold, id=id)
+    threshold = get_object_or_404(Threshold, threshold_id=id)
 
     if request.method == 'POST':
         form = threshold_insert(request.POST, instance=threshold)
@@ -66,3 +70,15 @@ def threshold_update(request, id):
     return render(request,
                   'threshold_update.html',
                   {'form': form, 'threshold': threshold})
+
+def threshold_delete(request, id):
+    threshold = get_object_or_404(Threshold, threshold_id=id)
+
+    if request.method == 'POST':
+        threshold.delete()
+        messages.success(request, f"Threshold '{threshold.name}' successfully deleted.")
+        return redirect('configuration')
+
+    return render(request,
+                  'threshold_confirm_delete.html',
+                  {'threshold': threshold})

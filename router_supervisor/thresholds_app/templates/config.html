@@ -4,11 +4,12 @@
 {% block content %}
 <div class="container">
     <header class="page-header">
-        <h1 class="title" style="display: block">Configuration Page</h1>
-        <!-- <link rel="stylesheet" href="{% static 'router_config/config_style.css' %}" /> -->
+        <h1 class="title">Configuration Page</h1>
+        <link rel="stylesheet" href="{% static 'router_config/config_style.css' %}" />
     </header>
+
     <section class="section">
-        <h2 class="subtitle" style="display: block">List of Available Routers</h2>
+        <h2 class="subtitle">List of Available Routers</h2>
         <ul class="list">
             {% for router in routers %}
                 <li class="list-item">
@@ -19,8 +20,9 @@
             {% endfor %}
         </ul>
     </section>
+
     <section class="section">
-        <h2 class="subtitle" style="display: block">List of Configured Thresholds</h2>
+        <h2 class="subtitle">List of Configured Thresholds</h2>
         <ul class="list">
             {% for threshold in thresholds %}
                 <li class="list-item">
@@ -31,11 +33,12 @@
             {% endfor %}
         </ul>
     </section>
-</div>
-<div class="section" style="text-align: center;">
-    <a class="button btn-threshold" href="{% url 'thresholds' %}">
-        Configure a New Threshold
-    </a>
-</div>
 
+    <!-- ✅ MISE À JOUR : bouton en bas dans le container -->
+    <section class="section center-section">
+        <a class="button btn-threshold" href="{% url 'thresholds' %}">
+            Configure a New Threshold
+        </a>
+    </section>
+</div>
 {% endblock content %}

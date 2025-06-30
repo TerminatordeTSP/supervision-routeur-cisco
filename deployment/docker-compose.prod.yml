@@ -4,7 +4,7 @@
 services:
   router_django:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     container_name: router_django_prod
     restart: unless-stopped
@@ -18,12 +18,13 @@ services:
       - SQL_PASSWORD=password
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
-      - DJANGO_DEBUG=False
+      - DEBUG=False
+      - GUNICORN_WORKERS=4
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media
-      - ./telegraf/sample_metrics:/tmp/metrics:rw
-      - ./logs:/code/logs
+      - ../telegraf/sample_metrics:/tmp/metrics:rw
+      - ../logs:/code/logs
     depends_on:
       - db
     healthcheck:
@@ -46,7 +47,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../Caddyfile:/etc/caddy/Caddyfile
       - static_volume:/srv/static
       - media_volume:/srv/media
       - caddy_data:/data
@@ -69,7 +70,7 @@ services:
       POSTGRES_DB: routerdb
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./backup:/backup
+      - ../backup:/backup
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d routerdb"]
       interval: 30s
@@ -134,9 +135,9 @@ services:
     container_name: telegraf_prod
     restart: unless-stopped
     volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
-      - ./telegraf/sample_metrics:/tmp/metrics:rw
+      - ../telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ../telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
+      - ../telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - router_django
       - influxdb

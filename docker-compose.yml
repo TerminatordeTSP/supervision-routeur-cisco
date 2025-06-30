@@ -14,6 +14,7 @@ services:
       - SQL_PASSWORD=password
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
+      - DEBUG=True
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media

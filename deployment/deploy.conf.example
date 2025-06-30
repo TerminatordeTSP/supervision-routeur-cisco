@@ -1,0 +1,44 @@
+# Configuration de déploiement pour supervision-routeur-cisco
+# Copiez ce fichier vers deploy.conf et modifiez les valeurs selon vos besoins
+
+# Configuration du serveur distant
+SERVER_IP="172.16.10.40"           # IP ou nom de domaine de votre serveur
+SERVER_USER="user"          # Nom d'utilisateur sur le serveur
+SERVER_PATH="/opt/supervision-routeur-cisco"  # Chemin d'installation sur le serveur
+
+# Configuration SSH
+SSH_KEY_PATH="$HOME/.ssh/supervision_routeur_deploy"  # Chemin vers la clé privée
+SSH_PORT="22"                        # Port SSH (généralement 22)
+
+# Configuration de l'application
+APP_ENV="production"                 # Environnement (development/production)
+DEBUG="false"                       # Mode debug Django
+
+# Configuration de la base de données
+DB_HOST="db"                        # Hôte de la base de données (généralement 'db' pour Docker)
+DB_PORT="5432"                      # Port PostgreSQL
+DB_NAME="routerdb"                  # Nom de la base de données
+DB_USER="user"                      # Utilisateur de la base de données
+DB_PASSWORD="password"              # Mot de passe de la base de données
+
+# Configuration InfluxDB
+INFLUXDB_ORG="telecom-sudparis"     # Organisation InfluxDB
+INFLUXDB_BUCKET="router-metrics"    # Bucket InfluxDB
+INFLUXDB_TOKEN="my-super-secret-auth-token"  # Token d'authentification
+INFLUXDB_USERNAME="admin"           # Nom d'utilisateur admin
+INFLUXDB_PASSWORD="admin123456"     # Mot de passe admin
+
+# Configuration réseau
+ROUTER_IP="172.16.10.41"           # IP du routeur à surveiller
+SNMP_COMMUNITY="public"            # Communauté SNMP
+
+# Ports exposés
+WEB_PORT="80"                      # Port pour l'interface web
+INFLUXDB_PORT="8086"              # Port pour InfluxDB
+PGADMIN_PORT="5050"               # Port pour PgAdmin
+TELEGRAF_PORT="57500"             # Port pour Telegraf
+
+# Options de déploiement
+BACKUP_BEFORE_DEPLOY="true"        # Faire une sauvegarde avant déploiement
+RESTART_SERVICES="true"            # Redémarrer les services après déploiement
+CLEANUP_OLD_IMAGES="true"          # Nettoyer les anciennes images Docker

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from core_models.models import (
+from router_supervisor.core_models.models import (
     CustomUser, KPI, Seuil, Routeur, Interface, Alertes,
     UtilisateurRouteur, SeuilKPI
 )

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'router_supervisor.core_models',  # Désactivé temporairement
     'settings_app',
     'dashboard_app',
     'thresholds_app',

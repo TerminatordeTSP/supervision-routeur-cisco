@@ -30,8 +30,9 @@ RUN curl -s https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor 
 # Créer les répertoires nécessaires (si besoin)
 RUN mkdir -p /code/static /code/media
 
-# Copier le code source Django
+# Copier le code source Django et le client InfluxDB
 COPY router_supervisor/ /code/router_supervisor/
+COPY my_influxdb_client.py /code/
 
 # Scripts de lancement
 COPY entrypoint.sh /entrypoint.sh

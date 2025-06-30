@@ -20,8 +20,8 @@
                 <button class="header-button" data-bs-toggle="modal" data-bs-target="#alertesModal">
                     <i class="bi bi-bell"></i> Alertes
                 </button>
-                <button class="header-button" data-bs-toggle="modal" data-bs-target="#thresholdsModal">
-                    <i class="bi bi-gear"></i> threshold routeur
+                <button class="header-button">
+                    <a href="/thresholds/" class="option-button">thresholds</a>
                 </button>
                 <button class="header-button">
                     <a href="/settings/" class="option-button">Paramètres</a>
@@ -146,37 +146,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="header-button" data-bs-dismiss="modal">Fermer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="thresholdsModal" tabindex="-1" aria-labelledby="thresholdsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="thresholdsModalLabel">Configuration des thresholds</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="cpuThreshold" class="form-label">Threshold CPU (%)</label>
-                            <input type="number" class="form-control" id="cpuThreshold" min="0" max="100" value="80">
-                        </div>
-                        <div class="mb-3">
-                            <label for="ramThreshold" class="form-label">Threshold RAM (%)</label>
-                            <input type="number" class="form-control" id="ramThreshold" min="0" max="100" value="90">
-                        </div>
-                        <div class="mb-3">
-                            <label for="tempThreshold" class="form-label">Threshold Température (°C)</label>
-                            <input type="number" class="form-control" id="tempThreshold" min="0" max="100" value="70">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="header-button" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="header-button">Sauvegarder</button>
                 </div>
             </div>
         </div>

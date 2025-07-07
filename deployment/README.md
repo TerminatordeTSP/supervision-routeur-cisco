@@ -4,30 +4,53 @@ Ce guide vous explique comment déployer l'application de supervision de routeur
 
 ## Prérequis
 
-- Serveur Linux (Ubuntu/Debian recommandé)
-- Accès SSH au serveur
-- Docker et Docker Compose installés (ou script les installera)
+- Serveur Linux (AlmaLinux/CentOS/RHEL recommandé)
+- Accès SSH au serveur avec clé de déploiement configurée
+- Docker et Docker Compose installés sur le serveur
 - Git installé localement
 
-## Configuration initiale
+## Scripts de déploiement
 
-### 1. Configurer la clé de déploiement
+### Scripts disponibles
 
-Exécutez le script de configuration :
+1. **`deploy_simple.sh`** - Script de déploiement principal
+   - Déploie l'application complète sur le serveur
+   - Utilise la clé SSH `supervision_routeur_deploy`
+   - Redémarre tous les services nécessaires
+
+2. **`backup.sh`** - Script de sauvegarde
+   - Sauvegarde les bases de données PostgreSQL et InfluxDB
+   - Crée des archives horodatées
+   - À exécuter régulièrement pour la maintenance
+
+3. **`troubleshoot_server.sh`** - Script de diagnostic
+   - Analyse l'état des conteneurs Docker
+   - Vérifie les logs et les ports
+   - Aide à diagnostiquer les problèmes
+
+4. **`docker-compose.prod.yml`** - Configuration Docker Compose pour la production
+   - Définit tous les services (Django, PostgreSQL, InfluxDB, pgAdmin, Telegraf)
+   - Configuré pour l'environnement de production
+
+## Déploiement
+
+### 1. Déploiement initial
 
 ```bash
-chmod +x deployment/setup_deploy_key.sh
-./deployment/setup_deploy_key.sh
+./deployment/deploy_simple.sh
 ```
 
-Ce script va :
-- Générer une clé SSH dédiée au déploiement
-- Afficher la clé publique à copier
-- Créer la configuration SSH
+### 2. Vérification du déploiement
 
-### 2. Configurer le serveur distant
+L'application sera accessible sur :
+- **Port 80** : `http://[IP_SERVEUR]/` (via Apache reverse proxy)
+- **Port 8080** : `http://[IP_SERVEUR]:8080/` (accès direct Django)
+- **Port 5050** : `http://[IP_SERVEUR]:5050/` (pgAdmin)
 
-1. Copiez la clé publique affichée par le script
+### 3. Configuration Apache (déjà fait)
+
+Apache est configuré comme reverse proxy pour servir l'application Django sur le port 80.
+La configuration se trouve dans `/etc/httpd/conf.d/supervision-routeur.conf` sur le serveur.
 2. Connectez-vous à votre serveur
 3. Ajoutez la clé à `~/.ssh/authorized_keys` :
 

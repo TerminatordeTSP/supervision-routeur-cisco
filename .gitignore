@@ -19,3 +19,4 @@ __pycache__/
 *.sqlite3
 *.log
 telegraf/sample_metrics/env/
+.DS_store

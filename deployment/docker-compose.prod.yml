@@ -101,34 +101,35 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  influxdb:
-    image: influxdb:2.7
-    container_name: influxdb_prod
-    restart: unless-stopped
-    ports:
-      - "8086:8086"
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123456
-      - DOCKER_INFLUXDB_INIT_ORG=telecom-sudparis
-      - DOCKER_INFLUXDB_INIT_BUCKET=router-metrics
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
-    volumes:
-      - influxdb_data:/var/lib/influxdb2
-      - influxdb_config:/etc/influxdb2
-      - ./backup:/backup
-    healthcheck:
-      test: ["CMD", "influx", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+  # influxdb:
+  #   image: influxdb:2.7
+  #   container_name: influxdb_prod
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8086:8086"
+  #   environment:
+  #     - DOCKER_INFLUXDB_INIT_MODE=setup
+  #     - DOCKER_INFLUXDB_INIT_USERNAME=admin
+  #     - DOCKER_INFLUXDB_INIT_PASSWORD=admin123456
+  #     - DOCKER_INFLUXDB_INIT_ORG=telecom-sudparis
+  #     - DOCKER_INFLUXDB_INIT_BUCKET=router-metrics
+  #     - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+  #   volumes:
+  #     - influxdb_data:/var/lib/influxdb2
+  #     - influxdb_config:/etc/influxdb2
+  #     - ./backup:/backup
+  #   healthcheck:
+  #     test: ["CMD", "influx", "ping"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  # NOTE: InfluxDB est déjà installé sur le serveur, pas besoin du conteneur
 
   telegraf:
     image: telegraf:1.35
@@ -140,7 +141,6 @@ services:
       - ../telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - router_django
-      - influxdb
     ports:
       - "57500:57500"
     environment:
@@ -152,6 +152,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    network_mode: "host"  # Utiliser le réseau host pour accéder à l'InfluxDB local
 
 volumes:
   pgdata:

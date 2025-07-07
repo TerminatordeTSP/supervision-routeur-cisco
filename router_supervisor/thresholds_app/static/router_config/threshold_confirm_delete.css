@@ -1,0 +1,101 @@
+/* threshold_confirm_delete.css */
+
+body {
+    background-color: #f9fafb;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.threshold-details {
+    max-width: 500px;
+    margin: 50px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.threshold-details h2 {
+    color: #b91c1c;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.threshold-details p {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 30px;
+}
+
+.threshold-details strong {
+    color: #ef4444;
+}
+
+.threshold-details form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-back,
+.btn-edit {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-back {
+    background-color: #dc2626;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-back:hover {
+    background-color: #b91c1c;
+}
+
+.btn-edit {
+    background-color: #6b7280;
+    color: #ffffff;
+}
+
+.btn-edit:hover {
+    background-color: #4b5563;
+}
+.threshold-details form div {
+    width: 100%;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.threshold-details label {
+    display: block;
+    margin-bottom: 5px;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.threshold-details input,
+.threshold-details select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    background: #f9fafb;
+    font-size: 16px;
+}
+
+.threshold-details input:focus,
+.threshold-details select:focus {
+    border-color: #dc2626;
+    outline: none;
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+}

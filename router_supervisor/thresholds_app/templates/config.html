@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}Configuration Page{% endblock title %}
+
 {% block content %}
 <div class="container">
     <header class="page-header">
@@ -13,10 +15,12 @@
         <ul class="list">
             {% for router in routers %}
                 <li class="list-item">
-                    <a class="button btn-router" href="{% url 'configuration_router_config' router.id %}">
+                    <a class="button btn-router" href="{% url 'configuration_router_config' router.router_id %}">
                         {{ router.name }}
                     </a>
                 </li>
+            {% empty %}
+                <li class="list-item">No routers configured yet.</li>
             {% endfor %}
         </ul>
     </section>
@@ -30,11 +34,12 @@
                         {{ threshold.name }}
                     </a>
                 </li>
+            {% empty %}
+                <li class="list-item">No thresholds configured yet.</li>
             {% endfor %}
         </ul>
     </section>
 
-    <!-- ✅ MISE À JOUR : bouton en bas dans le container -->
     <section class="section center-section">
         <a class="button btn-threshold" href="{% url 'thresholds' %}">
             Configure a New Threshold

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Router: {{ router.name }}{% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'router_config/threshold_details.css' %}">
+
+<div class="threshold-details">
+    <h2>Router Configuration: <span>{{ router.name }}</span></h2>
+    <ul>
+        <li>
+            <strong>IP Address: </strong> {{ router.ip_address }}
+        </li>
+        <li>
+            <strong>Username: </strong> {{ router.username }}
+        </li>
+        <li>
+            <strong>Password: </strong> {{ router.password }}
+        </li>
+        <li>
+            <strong>Secret: </strong> {{ router.secret }}
+        </li>
+        <li>
+            <strong>Threshold: </strong> {{ router.threshold.name }}
+        </li>
+        <li>
+            <strong>RAM in MB: </strong> {{ router.threshold.ram }}
+        </li>
+        <li>
+            <strong>CPU Usage in %: </strong> {{ router.threshold.cpu }}
+        </li>
+        <li>
+            <strong>Bandwidth in MB/s: </strong> {{ router.threshold.traffic }}
+        </li>
+    </ul>
+
+    <div class="back-button">
+        <a href="{% url 'configuration' %}" class="btn-back">Go Back</a>
+    </div>
+    <div class="edit-button">
+        <a href="{% url 'router_update' id=router.router_id %}" class="btn-edit">Edit Router</a>
+    </div>
+    <div class="delete-button">
+        <a href="{% url 'router_delete' router.router_id %}" class="btn-edit">Delete Router</a>
+    </div>
+</div>
+{% endblock %}

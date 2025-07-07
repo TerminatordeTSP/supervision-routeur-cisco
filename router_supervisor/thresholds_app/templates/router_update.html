@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Router{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'router_config/threshold_confirm_delete.css' %}">
+
+<div class="threshold-details">
+    <h2>Edit Router</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div>
+            <label for="id_name">Router Name</label>
+            <input type="text" name="name" id="id_name" value="{{ form.name.value|default_if_none:'' }}" required>
+        </div>
+
+        <div>
+            <label for="id_ip_address">IP Address</label>
+            <input type="text" name="ip_address" id="id_ip_address" value="{{ form.ip_address.value|default_if_none:'' }}" required>
+        </div>
+
+        <div>
+            <label for="id_username">Username</label>
+            <input type="text" name="username" id="id_username" value="{{ form.username.value|default_if_none:'' }}" required>
+        </div>
+
+        <div>
+            <label for="id_password">Password</label>
+            <input type="password" name="password" id="id_password" value="{{ form.password.value|default_if_none:'' }}" required>
+        </div>
+
+        <div>
+            <label for="id_secret">Secret</label>
+            <input type="password" name="secret" id="id_secret" value="{{ form.secret.value|default_if_none:'' }}" required>
+        </div>
+
+        <div>
+            <label for="id_threshold">Threshold</label>
+            <select name="threshold" id="id_threshold" required>
+                <option value="" disabled {% if not form.threshold.value %}selected{% endif %}>
+                    -- Select Threshold --
+                </option>
+                {% for threshold in thresholds %}
+                    <option value="{{ threshold.id }}"
+                        {% if form.threshold.value == threshold.id|stringformat:"s" %}selected{% endif %}>
+                        {{ threshold.name }} (RAM: {{ threshold.ram }}MB, CPU: {{ threshold.cpu }}%)
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="btn-back">
+                Save Changes
+            </button>
+            <a href="{% url 'configuration' %}" class="btn-edit">
+                Back
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

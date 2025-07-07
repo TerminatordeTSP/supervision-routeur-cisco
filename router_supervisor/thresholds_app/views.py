@@ -5,6 +5,11 @@ from thresholds_app.models import Router, Threshold
 from thresholds_app.forms import threshold_insert
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db import IntegrityError
+from django.contrib import messages
+from .models import Router, Threshold
+from .forms import RouterForm
 
 def index(request):
     return render(request, 'config.html')
@@ -82,3 +87,117 @@ def threshold_delete(request, id):
     return render(request,
                   'threshold_confirm_delete.html',
                   {'threshold': threshold})
+
+def configuration_router_detail(request, router_id):
+    router = get_object_or_404(Router, router_id=router_id)
+    return render(request,
+                  'router_detail.html',
+                  {
+                      'router': router,
+                      'router_id': router.router_id
+                  })
+
+def routers(request):
+    if request.method == 'POST':
+        form = RouterForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            ip_address = form.cleaned_data['ip_address']
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            secret = form.cleaned_data['secret']
+            threshold = form.cleaned_data['threshold']
+
+            try:
+                if Router.objects.filter(name=name).exists():
+                    form.add_error(None, f"Error: A router with the name '{name}' already exists.")
+                else:
+                    router = Router(
+                        name=name,
+                        ip_address=ip_address,
+                        username=username,
+                        password=password,
+                        secret=secret,
+                        threshold=threshold
+                    )
+                    router.save()
+                    return redirect('configuration')
+            except IntegrityError as e:
+                form.add_error(None, f"Error creating router: {str(e)}")
+    else:
+        form = RouterForm()
+
+    return render(request,
+                  'router_update.html',
+                  {'form': form, 'thresholds': Threshold.objects.all()})
+
+def routers(request):
+    if request.method == 'POST':
+        form = RouterForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            ip_address = form.cleaned_data['ip_address']
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            secret = form.cleaned_data['secret']
+            threshold = form.cleaned_data['threshold']
+
+            try:
+                if Router.objects.filter(name=name).exists():
+                    form.add_error(None, f"Error: A router with the name '{name}' already exists.")
+                else:
+                    router = Router(
+                        name=name,
+                        ip_address=ip_address,
+                        username=username,
+                        password=password,
+                        secret=secret,
+                        threshold=threshold
+                    )
+                    router.save()
+                    return redirect('configuration')
+            except IntegrityError as e:
+                form.add_error(None, f"Error creating router: {str(e)}")
+    else:
+        form = RouterForm()
+
+    return render(request,
+                  'router_update.html',
+                  {'form': form, 'thresholds': Threshold.objects.all()})
+
+def router_update(request, id):
+    router = get_object_or_404(Router, router_id=id)
+
+    if request.method == 'POST':
+        form = RouterForm(request.POST, instance=router)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, 'Router successfully updated.')
+                return redirect('configuration')
+            except Exception as e:
+                messages.error(request, f'Error during update: {str(e)}')
+    else:
+        form = RouterForm(instance=router)
+
+    return render(request,
+                  'router_update.html',
+                  {
+                      'form': form,
+                      'router': router,
+                      'thresholds': Threshold.objects.all(),
+                      'router_id': router.router_id
+                  })
+
+def router_delete(request, id):
+    router = get_object_or_404(Router, router_id=id)
+
+    if request.method == 'POST':
+        router.delete()
+        messages.success(request, f"Router '{router.name}' successfully deleted.")
+        return redirect('configuration')
+
+    return render(request,
+                  'router_confirm_delete.html',
+                  {'router': router})
+

@@ -29,5 +29,21 @@ MEDIA_ROOT = '/code/media'
 MEDIA_URL = '/media/'
 
 # Configuration de sécurité
-DEBUG = True  # Enable for direct access to port 8080
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
 ALLOWED_HOSTS = ['*']  # À ajuster selon vos besoins de sécurité
+
+# Configuration pour servir les fichiers statiques en production
+# Ajouter whitenoise au middleware pour servir les fichiers statiques
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Ajouter pour servir les fichiers statiques
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# Configuration Whitenoise pour les fichiers statiques
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

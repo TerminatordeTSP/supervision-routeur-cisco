@@ -33,6 +33,7 @@ RUN mkdir -p /code/static /code/media
 # Copier le code source Django et le client InfluxDB
 COPY router_supervisor/ /code/router_supervisor/
 COPY my_influxdb_client.py /code/
+COPY gunicorn.conf.py /code/
 
 # Scripts de lancement
 COPY entrypoint.sh /entrypoint.sh

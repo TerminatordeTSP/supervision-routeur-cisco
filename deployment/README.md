@@ -4,30 +4,53 @@ Ce guide vous explique comment déployer l'application de supervision de routeur
 
 ## Prérequis
 
-- Serveur Linux (Ubuntu/Debian recommandé)
-- Accès SSH au serveur
-- Docker et Docker Compose installés (ou script les installera)
+- Serveur Linux (AlmaLinux/CentOS/RHEL recommandé)
+- Accès SSH au serveur avec clé de déploiement configurée
+- Docker et Docker Compose installés sur le serveur
 - Git installé localement
 
-## Configuration initiale
+## Scripts de déploiement
 
-### 1. Configurer la clé de déploiement
+### Scripts disponibles
 
-Exécutez le script de configuration :
+1. **`deploy_simple.sh`** - Script de déploiement principal
+   - Déploie l'application complète sur le serveur
+   - Utilise la clé SSH `supervision_routeur_deploy`
+   - Redémarre tous les services nécessaires
+
+2. **`backup.sh`** - Script de sauvegarde
+   - Sauvegarde les bases de données PostgreSQL et InfluxDB
+   - Crée des archives horodatées
+   - À exécuter régulièrement pour la maintenance
+
+3. **`troubleshoot_server.sh`** - Script de diagnostic
+   - Analyse l'état des conteneurs Docker
+   - Vérifie les logs et les ports
+   - Aide à diagnostiquer les problèmes
+
+4. **`docker-compose.prod.yml`** - Configuration Docker Compose pour la production
+   - Définit tous les services (Django, PostgreSQL, InfluxDB, pgAdmin, Telegraf)
+   - Configuré pour l'environnement de production
+
+## Déploiement
+
+### 1. Déploiement initial
 
 ```bash
-chmod +x deployment/setup_deploy_key.sh
-./deployment/setup_deploy_key.sh
+./deployment/deploy_simple.sh
 ```
 
-Ce script va :
-- Générer une clé SSH dédiée au déploiement
-- Afficher la clé publique à copier
-- Créer la configuration SSH
+### 2. Vérification du déploiement
 
-### 2. Configurer le serveur distant
+L'application sera accessible sur :
+- **Port 80** : `http://[IP_SERVEUR]/` (via Apache reverse proxy)
+- **Port 8080** : `http://[IP_SERVEUR]:8080/` (accès direct Django)
+- **Port 5050** : `http://[IP_SERVEUR]:5050/` (pgAdmin)
 
-1. Copiez la clé publique affichée par le script
+### 3. Configuration Apache (déjà fait)
+
+Apache est configuré comme reverse proxy pour servir l'application Django sur le port 80.
+La configuration se trouve dans `/etc/httpd/conf.d/supervision-routeur.conf` sur le serveur.
 2. Connectez-vous à votre serveur
 3. Ajoutez la clé à `~/.ssh/authorized_keys` :
 
@@ -97,15 +120,57 @@ cp deployment/deploy.conf.example deployment/deploy.conf
 Le fichier `deployment/docker-compose.prod.yml` contient une configuration optimisée pour la production avec :
 - Restart automatique des conteneurs
 - Logs limités
+## Configuration de production
+
+### Variables d'environnement
+
+L'application utilise un fichier `docker-compose.prod.yml` optimisé pour la production avec les paramètres suivants :
+
+- **DEBUG=False** : Désactive le mode debug Django pour afficher les pages d'erreur personnalisées
+- **DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings** : Utilise les paramètres de production
+- Conteneurs avec restart policy `unless-stopped`
 - Volumes persistants
 - Health checks
 
-Pour l'utiliser :
+Pour vérifier que l'application est en mode production :
+
+```bash
+# Vérifier que DEBUG=False
+ssh supervision-server "docker exec router_django_prod env | grep DEBUG"
+
+# Tester les pages d'erreur personnalisées
+curl -I http://SERVER_IP:8080/nonexistentpage
+# Doit retourner une page d'erreur personnalisée, pas la page de debug Django
+```
+
+### Utilisation du fichier de production
+
+Le script `deploy_simple.sh` utilise automatiquement le fichier `deployment/docker-compose.prod.yml` :
 
 ```bash
 # Sur le serveur distant
 cd /opt/supervision-routeur-cisco
 docker compose -f deployment/docker-compose.prod.yml up -d
+```
+
+## Configuration des fichiers statiques
+
+L'application utilise **whitenoise** pour servir les fichiers statiques (CSS, JS, images) en production. Cette configuration :
+
+- Sert les fichiers statiques directement via Django/gunicorn
+- Ajoute des hashes aux noms de fichiers pour le cache-busting
+- Applique une compression gzip automatique
+- Gère les en-têtes de cache optimaux
+
+Les fichiers statiques sont automatiquement collectés et traités lors du déploiement.
+
+#### Vérifier que les fichiers statiques fonctionnent
+
+```bash
+# Tester l'accès aux fichiers CSS
+curl -I http://SERVER_IP:8080/static/dashboard_app/style.css
+
+# Doit retourner HTTP/1.1 200 OK
 ```
 
 ## Sauvegarde
@@ -168,6 +233,36 @@ git commit -m "Vos modifications"
 
 # Redéployer
 ./deployment/deploy.sh
+```
+
+### Résolution de problèmes
+
+#### Problèmes avec les fichiers statiques
+
+Si les styles CSS ne s'affichent pas correctement :
+
+```bash
+# 1. Vérifier que whitenoise est installé
+ssh supervision-server "docker exec router_django_prod pip show whitenoise"
+
+# 2. Vérifier l'accès aux fichiers statiques
+curl -I http://SERVER_IP:8080/static/dashboard_app/style.css
+
+# 3. Recollect les fichiers statiques
+ssh supervision-server "docker exec router_django_prod bash -c 'cd router_supervisor && python3 manage.py collectstatic --noinput'"
+
+# 4. Redémarrer le conteneur Django
+ssh supervision-server "cd supervision-routeur-cisco && docker compose -f deployment/docker-compose.prod.yml restart router_django_prod"
+```
+
+#### Vérifier les logs
+
+```bash
+# Logs de l'application Django
+ssh supervision-server "cd supervision-routeur-cisco && docker compose -f deployment/docker-compose.prod.yml logs router_django_prod"
+
+# Logs de tous les services
+ssh supervision-server "cd supervision-routeur-cisco && docker compose -f deployment/docker-compose.prod.yml logs"
 ```
 
 ## Sécurité

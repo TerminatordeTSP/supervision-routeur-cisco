@@ -1,4 +1,4 @@
-localhost:80 {
+:80 {
     # Servir les fichiers statiques - one unified handler
     handle /static/* {
         root * /srv

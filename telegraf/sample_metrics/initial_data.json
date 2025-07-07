@@ -1,0 +1,11 @@
+[
+  {
+    "router_name": "Router_Sample",
+    "timestamp": "1750749808",
+    "router_metrics": {
+      "cpu_usage": 30,
+      "memory_usage": 50,
+      "traffic_mbps": 100
+    }
+  }
+]

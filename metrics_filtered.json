@@ -1,6 +1,6 @@
 [
   {
-    "measurement": "local_mem",
+    "measurement": "mem",
     "data": {
       "used": 5369319424.0,
       "free": 357752832.0,
@@ -10,7 +10,7 @@
     }
   },
   {
-    "measurement": "local_system",
+    "measurement": "system",
     "data": {
       "load1": 1.69,
       "uptime": null,
@@ -18,15 +18,28 @@
     }
   },
   {
-    "measurement": "local_system",
+    "measurement": "system",
     "data": {
+      "n_users": null,
       "load1": null,
       "uptime": 2629.0,
       "timestamp": "1750759840000000000"
     }
   },
   {
-    "measurement": "local_system",
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet2",
+    "data": {
+      "ifInOctets": 63082.0,
+      "ifOutOctets": 32152612.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1750674438000000000"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet3",
     "data": {
       "load1": null,
       "uptime": null,
@@ -34,7 +47,8 @@
     }
   },
   {
-    "measurement": "router_ping",
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet4",
     "data": {
       "latency_ms": 39.893,
       "packet_loss": 0.0,
@@ -42,7 +56,8 @@
     }
   },
   {
-    "measurement": "router_snmp",
+    "measurement": "interfaces",
+    "interface": "Null0",
     "data": {
       "router_name": "pod4-cat8kv",
       "uptime": 172540195.0,
@@ -51,7 +66,7 @@
     }
   },
   {
-    "measurement": "local_cpu",
+    "measurement": "ping_latency",
     "data": {
       "usage_idle": 76.30922693266223,
       "usage_user": 15.960099750617827,

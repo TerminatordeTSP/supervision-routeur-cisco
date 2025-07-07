@@ -29,218 +29,110 @@ def parse_telegraf_output(output):
     results = []
     lines = output.splitlines()
     for line in lines:
-        # Format InfluxDB line protocol (pas de préfixe ">")
-        if not line or line.startswith("2025-") or line.startswith("#") or line.startswith("I!") or line.startswith("W!"):
+        if not line.startswith(">"):
             continue
 
-        # Séparer measurement, tags, fields et timestamp
+        line = line[2:]  # Enlève "> "
         parts = line.split(" ")
         if len(parts) < 3:
             continue
 
-        # Parse measurement et tags
-        measurement_part = parts[0]
-        measurement = measurement_part.split(",")[0]
-        
-        # Parse tags
-        tags = {}
-        if "," in measurement_part:
-            tag_pairs = measurement_part.split(",")[1:]
-            for pair in tag_pairs:
-                if "=" in pair:
-                    key, value = pair.split("=", 1)
-                    tags[key] = value
-
-        # Parse fields
-        fields_part = parts[1]
+        measurement = parts[0].split(",")[0]
+        tags = dict(item.split("=") for item in parts[0].split(",")[1:] if "=" in item)
+        fields_raw = parts[1].split(",")
         fields = {}
-        for kv in fields_part.split(","):
+
+        for kv in fields_raw:
             if "=" in kv:
-                key, value = kv.split("=", 1)
-                # Nettoyer la valeur (enlever i pour integer, etc.)
-                value = re.sub(r"[ui]$", "", value)
+                key, value = kv.split("=")
+                value = re.sub(r"[ui]$", "", value)  # Enlève le u ou i final
                 try:
                     fields[key] = float(value)
                 except ValueError:
-                    fields[key] = value.strip('"')
+                    fields[key] = value
 
-        timestamp = parts[2] if len(parts) > 2 else None
+        timestamp = parts[2]
 
-        # === FILTRAGE ADAPTÉ AUX NOUVELLES DONNÉES ===
+        # === FILTRAGE ===
 
-        # Métriques SNMP du routeur
-        if measurement == "snmp" and "hostname" in tags:
+        # Métriques générales SNMP
+        if measurement == "snmp":
             filtered = {
-                "router_name": tags.get("hostname"),
-                "uptime": fields.get("uptime"),
                 "cpu_5min": fields.get("cpu_5min"),
+                "cpu_0_usage": fields.get("cpu_0_usage"),
+                "cpu_0_index": fields.get("cpu_0_index"),
+                "ram_used": fields.get("ram_used"),
+                "ram_free": fields.get("ram_free"),
                 "timestamp": timestamp,
             }
-            results.append({"measurement": "router_snmp", "data": filtered})
+            if any(v is not None for v in filtered.values()):
+                results.append({"measurement": "snmp", "data": filtered})
 
-        # Ping vers le routeur
-        elif measurement == "ping" and "url" in tags and tags["url"] == "172.16.10.41":
+        # Interfaces – on garde toutes celles détectées
+        elif measurement == "interfaces" and "ifDescr" in tags:
             filtered = {
-                "latency_ms": fields.get("average_response_ms"),
-                "packet_loss": fields.get("percent_packet_loss"),
+                "ifInOctets": fields.get("ifInOctets"),
+                "ifOutOctets": fields.get("ifOutOctets"),
+                "ifInErrors": fields.get("ifInErrors"),
+                "ifOutErrors": fields.get("ifOutErrors"),
                 "timestamp": timestamp,
             }
-            results.append({"measurement": "router_ping", "data": filtered})
+            results.append({
+                "measurement": "interfaces",
+                "interface": tags["ifDescr"],
+                "data": filtered
+            })
 
-        # CPU local (total seulement)
-        elif measurement == "cpu" and tags.get("cpu") == "cpu-total":
-            filtered = {
-                "usage_idle": fields.get("usage_idle"),
-                "usage_user": fields.get("usage_user"),
-                "usage_system": fields.get("usage_system"),
-                "timestamp": timestamp,
-            }
-            results.append({"measurement": "local_cpu", "data": filtered})
+        # Ping
+        elif measurement == "ping_latency":
+            results.append({
+                "measurement": "ping_latency",
+                "data": {
+                    "latency_ms": fields.get("value"),
+                    "timestamp": timestamp,
+                }
+            })
 
-        # RAM locale
+        # CPU machine hôte (résumé total uniquement)
+        elif measurement == "cpu-total":
+            results.append({
+                "measurement": "cpu-total",
+                "data": {
+                    "usage_idle": fields.get("usage_idle"),
+                    "usage_user": fields.get("usage_user"),
+                    "usage_system": fields.get("usage_system"),
+                    "timestamp": timestamp,
+                }
+            })
+
+        # RAM machine hôte
         elif measurement == "mem":
-            filtered = {
-                "used": fields.get("used"),
-                "free": fields.get("free"),
-                "used_percent": fields.get("used_percent"),
-                "total": fields.get("total"),
-                "timestamp": timestamp,
-            }
-            results.append({"measurement": "local_mem", "data": filtered})
+            results.append({
+                "measurement": "mem",
+                "data": {
+                    "used": fields.get("used"),
+                    "free": fields.get("free"),
+                    "used_percent": fields.get("used_percent"),
+                    "timestamp": timestamp,
+                }
+            })
 
-        # Système local
+        # Système machine hôte (filtrage utile)
         elif measurement == "system":
             filtered = {
+                "n_users": fields.get("n_users"),
                 "load1": fields.get("load1"),
                 "uptime": fields.get("uptime"),
                 "timestamp": timestamp,
             }
-            results.append({"measurement": "local_system", "data": filtered})
+            # On n’ajoute que si on a au moins un champ pertinent
+            if any(v is not None for v in [filtered["n_users"], filtered["load1"], filtered["uptime"]]):
+                results.append({
+                    "measurement": "system",
+                    "data": filtered
+                })
 
     return results
-
-def generate_test_data():
-    """Génère des données de test simulées au format Telegraf"""
-    import time
-    timestamp = int(time.time() * 1000000000)  # nanoseconds
-    
-    test_data = f"""
-> cpu-total,cpu=cpu-total,host=test-host usage_idle=85.5,usage_user=10.2,usage_system=4.3 {timestamp}
-> mem,host=test-host used=4294967296,free=8589934592,used_percent=33.3 {timestamp}
-> system,host=test-host load1=0.8,n_users=2,uptime=86400 {timestamp}
-> ping_latency,host=test-host value=25.5 {timestamp}
-"""
-    return test_data.strip()
-
-def save_to_postgresql(data_entries):
-    """
-    Sauvegarde les métriques dans la base de données PostgreSQL pour l'historique
-    
-    Args:
-        data_entries (list): Liste des entrées de métriques
-    """
-    # Vérifier si l'intégration Django est activée
-    if not USE_DJANGO or not DJANGO_INITIALIZED:
-        print("ℹ️ Sauvegarde PostgreSQL ignorée - Django n'est pas initialisé")
-        return
-        
-    try:
-        # Récupérer ou créer le routeur principal
-        router_name = None
-        for entry in data_entries:
-            if entry["measurement"] == "router_snmp" and "router_name" in entry["data"]:
-                router_name = entry["data"]["router_name"]
-                break
-        
-        if not router_name:
-            print("ℹ️ Aucun nom de routeur trouvé dans les données")
-            return
-            
-        # Rechercher le routeur dans la base de données
-        try:
-            router = Routeur.objects.get(nom=router_name)
-        except Routeur.DoesNotExist:
-            print(f"ℹ️ Routeur '{router_name}' non trouvé dans la base de données")
-            return
-        except Exception as db_error:
-            print(f"⚠️ Erreur lors de l'accès à la base de données: {db_error}")
-            return
-        
-        # Obtenir l'interface par défaut
-        try:
-            default_interface, _ = Interface.objects.get_or_create(
-                id_routeur=router,
-                nom='default',
-                defaults={'trafic': 0.0}
-            )
-        except Exception as e:
-            print(f"⚠️ Impossible de créer l'interface par défaut: {e}")
-            return
-        
-        # Créer ou récupérer les KPIs nécessaires
-        try:
-            cpu_kpi, _ = KPI.objects.get_or_create(nom='CPU')
-            ram_kpi, _ = KPI.objects.get_or_create(nom='RAM')
-            latency_kpi, _ = KPI.objects.get_or_create(nom='Latency')
-        except Exception as e:
-            print(f"⚠️ Impossible de créer les KPIs: {e}")
-            return
-        
-        # Traiter chaque entrée de métrique
-        for entry in data_entries:
-            measurement = entry["measurement"]
-            data = entry["data"]
-            
-            # Router CPU usage
-            if measurement == "router_snmp" and "cpu_5min" in data:
-                # Vérifier si la valeur est valide
-                if data["cpu_5min"] is not None:
-                    # Créer une alerte si nécessaire (au-dessus du seuil)
-                    if hasattr(router, 'id_seuil') and router.id_seuil and data["cpu_5min"] > router.id_seuil.cpu:
-                        try:
-                            alert = Alertes(
-                                interface=default_interface,
-                                message=f"CPU usage high: {data['cpu_5min']}% > {router.id_seuil.cpu}%",
-                                severity="high"
-                            )
-                            alert.save()
-                            alert.kpis.add(cpu_kpi)
-                        except Exception as e:
-                            print(f"⚠️ Impossible de créer une alerte CPU: {e}")
-            
-            # Memory usage - we don't have direct RAM metrics from the router, 
-            # so we'll use local_mem for demonstration
-            if measurement == "local_mem" and "used_percent" in data:
-                if data["used_percent"] is not None:
-                    # Créer une alerte si nécessaire (au-dessus du seuil)
-                    if hasattr(router, 'id_seuil') and router.id_seuil and data["used_percent"] > router.id_seuil.ram:
-                        try:
-                            alert = Alertes(
-                                interface=default_interface,
-                                message=f"Memory usage high: {data['used_percent']}% > {router.id_seuil.ram}%",
-                                severity="high"
-                            )
-                            alert.save()
-                            alert.kpis.add(ram_kpi)
-                        except Exception as e:
-                            print(f"⚠️ Impossible de créer une alerte RAM: {e}")
-            
-            # Latency metrics
-            if measurement == "router_ping" and "latency_ms" in data:
-                if data["latency_ms"] is not None and data["latency_ms"] > 100:  # Example threshold
-                    try:
-                        alert = Alertes(
-                            interface=default_interface,
-                            message=f"High latency: {data['latency_ms']}ms",
-                            severity="medium"
-                        )
-                        alert.save()
-                        alert.kpis.add(latency_kpi)
-                    except Exception as e:
-                        print(f"⚠️ Impossible de créer une alerte Latence: {e}")
-                    
-    except Exception as e:
-        print(f"❌ Erreur lors de la sauvegarde dans PostgreSQL : {e}")
 
 # === SCRIPT PRINCIPAL ===
 
@@ -256,7 +148,7 @@ else:
     print("ℹ️ L'historique dans PostgreSQL ne sera pas disponible")
 
 INFLUX_URL = "http://localhost:8086"
-INFLUX_TOKEN = "my-super-secret-auth-token"
+INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="
 INFLUX_ORG = "telecom-sudparis"
 INFLUX_BUCKET = "router-metrics"
 
@@ -264,30 +156,11 @@ client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
 while os.path.exists("run.flag"):
-    # Essayer d'abord avec le container docker et la config simplifiée
-    try:
-        result = subprocess.run(
-            ["docker", "run", "--rm", "--network", "host", 
-             "-v", f"{os.getcwd()}/telegraf/telegraf_basic.conf:/etc/telegraf/telegraf.conf",
-             "telegraf:1.35", "telegraf", "--test", "--once"],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
-        if result.returncode != 0:
-            print(f"⚠️  Erreur Telegraf Docker (code: {result.returncode})")
-            print(f"Stderr: {result.stderr}")
-            # Utiliser des données de test à la place
-            result.stdout = generate_test_data()
-        else:
-            print("✅ Données reçues du routeur Cisco 172.16.10.41")
-    except subprocess.TimeoutExpired:
-        print("⚠️  Timeout Telegraf Docker - utilisation de données de test")
-        result = type('obj', (object,), {'stdout': generate_test_data()})
-    except Exception as e:
-        print(f"⚠️  Erreur Docker: {e} - utilisation de données de test")
-        result = type('obj', (object,), {'stdout': generate_test_data()})
+    result = subprocess.run(
+        ["telegraf", "--config", "telegraf/telegraf.conf", "--test"],
+        capture_output=True,
+        text=True
+    )
 
     parsed = parse_telegraf_output(result.stdout)
 

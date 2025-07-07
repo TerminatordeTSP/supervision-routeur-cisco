@@ -20,3 +20,4 @@ __pycache__/
 *.log
 telegraf/sample_metrics/env/
 .DS_store
+__init__.py

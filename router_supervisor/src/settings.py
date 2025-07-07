@@ -80,21 +80,30 @@ WSGI_APPLICATION = 'router_supervisor.src.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 APPEND_SLASH = True
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+# Configuration de base de données adaptative
+# Utilise PostgreSQL si les variables d'environnement sont présentes, sinon SQLite
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL or os.environ.get('SQL_HOST'):
+    # Configuration PostgreSQL (production et développement Docker)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('SQL_DATABASE', 'routerdb'),
+            'USER': os.environ.get('SQL_USER', 'user'),
+            'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+            'HOST': os.environ.get('SQL_HOST', 'localhost'),
+            'PORT': os.environ.get('SQL_PORT', '5432'),
+        }
     }
-    # PostgreSQL configuration (uncomment for production)
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.environ.get('SQL_DATABASE', 'routerdb'),
-    #     'USER': os.environ.get('SQL_USER', 'user'),
-    #     'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
-    #     'HOST': os.environ.get('SQL_HOST', 'db'),
-    #     'PORT': os.environ.get('SQL_PORT', '5432'),
-    # }
-}
+else:
+    # Configuration SQLite (développement local)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 

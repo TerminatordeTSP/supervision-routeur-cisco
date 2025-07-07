@@ -57,6 +57,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - db
 
@@ -102,6 +104,7 @@ services:
 
 volumes:
   pgdata:
+  pgadmin_data:
   static_volume:
   media_volume:
   influxdb_data:

@@ -10,21 +10,24 @@ from django.db import IntegrityError
 from django.contrib import messages
 from router_supervisor.core_models.models import Router, Threshold
 from .forms import RouterForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def index(request):
     return render(request, 'config.html')
-
+@login_required
 def configuration(request):
     routers = Router.objects.all()
     thresholds = Threshold.objects.all()
     return render(request, 'config.html', {'routers': routers, 'thresholds': thresholds})
 
+@login_required
 def configuration_router_config(request, id):
     router = Router.objects.get(id=id)
     return render(request,
                   'router_config.html',
                   {'router': router})
-
+@login_required
 def configuration_threshold_detail(request, th_id):
     threshold = Threshold.objects.get(threshold_id=th_id)
     return render(request,
@@ -33,6 +36,7 @@ def configuration_threshold_detail(request, th_id):
                       'threshold': threshold,
                       'threshold_id': threshold.threshold_id  # 👈 Ajoute ça
                   })
+@login_required
 def thresholds(request):
     if request.method == 'POST':
         form = threshold_insert(request.POST)
@@ -56,7 +60,7 @@ def thresholds(request):
     return render(request,
                   'threshold_update.html',
                   {'form': form})
-
+@login_required
 def threshold_update(request, id):
     threshold = get_object_or_404(Threshold, threshold_id=id)
 
@@ -75,7 +79,7 @@ def threshold_update(request, id):
     return render(request,
                   'threshold_update.html',
                   {'form': form, 'threshold': threshold})
-
+@login_required
 def threshold_delete(request, id):
     threshold = get_object_or_404(Threshold, threshold_id=id)
 
@@ -87,7 +91,7 @@ def threshold_delete(request, id):
     return render(request,
                   'threshold_confirm_delete.html',
                   {'threshold': threshold})
-
+@login_required
 def configuration_router_detail(request, router_id):
     router = get_object_or_404(Router, router_id=router_id)
     return render(request,
@@ -96,7 +100,7 @@ def configuration_router_detail(request, router_id):
                       'router': router,
                       'router_id': router.router_id
                   })
-
+@login_required
 def routers(request):
     if request.method == 'POST':
         form = RouterForm(request.POST)
@@ -130,7 +134,7 @@ def routers(request):
     return render(request,
                   'router_update.html',
                   {'form': form, 'thresholds': Threshold.objects.all()})
-
+@login_required
 def routers(request):
     if request.method == 'POST':
         form = RouterForm(request.POST)
@@ -164,7 +168,7 @@ def routers(request):
     return render(request,
                   'router_update.html',
                   {'form': form, 'thresholds': Threshold.objects.all()})
-
+@login_required
 def router_update(request, id):
     router = get_object_or_404(Router, router_id=id)
 
@@ -188,7 +192,7 @@ def router_update(request, id):
                       'thresholds': Threshold.objects.all(),
                       'router_id': router.router_id
                   })
-
+@login_required
 def router_delete(request, id):
     router = get_object_or_404(Router, router_id=id)
 

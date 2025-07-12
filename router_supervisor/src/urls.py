@@ -4,6 +4,8 @@ from django.urls import path, include # type: ignore
 from django.conf import settings
 from django.conf.urls.static import static
 import sys, os
+from django.contrib.auth import views as auth_views
+
 
 # Import des gestionnaires d'erreur personnalisés
 from . import error_views
@@ -42,6 +44,8 @@ urlpatterns = [
     path('test-404/', test_404, name='test_404'),
     path('test-500/', test_500, name='test_500'),
     path('test-403/', test_403, name='test_403'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

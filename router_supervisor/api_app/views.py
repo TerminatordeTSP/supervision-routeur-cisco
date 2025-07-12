@@ -9,12 +9,14 @@ from .metrics_handlers import MetricsProcessor
 import os
 from django.conf import settings
 from influxdb_client import InfluxDBClient
+from django.contrib.auth.decorators import login_required
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
 @require_POST
+@login_required
 def receive_metrics(request):
     """
     API endpoint to receive metrics from Telegraf
@@ -46,7 +48,7 @@ def receive_metrics(request):
     except Exception as e:
         logger.exception(f"Error processing metrics: {str(e)}")
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
+@login_required
 def process_metrics(data):
     """
     Process the received metrics data
@@ -77,7 +79,7 @@ def process_metrics(data):
             process_single_metric(data)
     else:
         logger.warning(f"Unexpected data format: {type(data)}")
-
+@login_required
 def process_single_metric(metric):
     """
     Process a single metric entry
@@ -153,7 +155,7 @@ def process_single_metric(metric):
             
     except Exception as e:
         logger.exception(f"Error processing single metric: {str(e)}")
-
+@login_required
 def get_latest_metrics(request):
     """
     API endpoint to get the latest router metrics for the dashboard

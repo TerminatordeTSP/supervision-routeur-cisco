@@ -3,7 +3,9 @@ from django.contrib import messages
 from router_supervisor.core_models.models import User
 from .forms import UserInfoForm, AppearanceForm, LanguageForm
 from .models import UserPreferences
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def get_or_create_user():
     """Get the first user or create a demo user"""
     user = User.objects.first()
@@ -16,12 +18,13 @@ def get_or_create_user():
             role='admin'
         )
     return user
-
+@login_required
 def get_user_preferences(user):
     """Get or create user preferences"""
     preferences, created = UserPreferences.objects.get_or_create(user=user)
     return preferences
 
+@login_required
 def index(request):
     # Get or create demo user
     user = get_or_create_user()
@@ -32,7 +35,7 @@ def index(request):
         'preferences': preferences,
     }
     return render(request, "settings/base.html", context)
-
+@login_required
 def user_info(request):
     # Get or create demo user
     user = get_or_create_user()
@@ -58,7 +61,7 @@ def user_info(request):
         'preferences': preferences,
     }
     return render(request, "settings/info_user.html", context)
-
+@login_required
 def appearance(request):
     user = get_or_create_user()
     preferences = get_user_preferences(user)
@@ -78,7 +81,7 @@ def appearance(request):
         'user': user,
     }
     return render(request, "settings/appearance.html", context)
-
+@login_required
 def language(request):
     user = get_or_create_user()
     preferences = get_user_preferences(user)

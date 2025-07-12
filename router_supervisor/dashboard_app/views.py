@@ -3,7 +3,8 @@ from api_app.influx_utils import get_influx_dashboard_context
 # from router_supervisor.core_models.models import Routeur, Alertes  # Désactivé temporairement
 import json
 from datetime import datetime, timedelta
-
+from django.contrib.auth.decorators import login_required
+@login_required
 def index(request):
     # Get router data from InfluxDB
     influx_context = get_influx_dashboard_context()

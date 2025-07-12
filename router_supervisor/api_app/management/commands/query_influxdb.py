@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from my_influxdb_client import InfluxDBClient
+from influxdb_client import InfluxDBClient
 import os
 
 

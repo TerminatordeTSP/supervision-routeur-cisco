@@ -87,10 +87,7 @@ echo "Python path: $(python3 -c 'import sys; print(sys.path)')"
 echo "Django settings: $DJANGO_SETTINGS_MODULE"
 
 # Create symlinks to simplify imports
-ln -sf /code/router_supervisor/src /code/src 2>/dev/null || echo "Symlink for src already exists"
-ln -sf /code/router_supervisor/dashboard_app /code/dashboard_app 2>/dev/null || echo "Symlink for dashboard_app already exists"
-ln -sf /code/router_supervisor/settings_app /code/settings_app 2>/dev/null || echo "Symlink for settings_app already exists"
-ln -sf /code/router_supervisor/thresholds_app /code/thresholds_app 2>/dev/null || echo "Symlink for thresholds_app already exists"
+ln -sf /code/router_supervisor/src /code/src
 
 echo "Launching: $@"
 exec "$@"

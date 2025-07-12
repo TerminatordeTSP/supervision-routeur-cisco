@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from thresholds_app.models import Router, Interface, KPI, KPI_Interface_Log
+from router_supervisor.core_models.models import Router, Interface, KPI, KPI_Interface_Log
 from django.db import transaction
 from django.utils import timezone
 

@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'router_supervisor.core_models',  # Désactivé temporairement
-    'settings_app',
-    'dashboard_app',
-    'thresholds_app',
-    'api_app',
+    'router_supervisor.core_models.apps.CoreModelsConfig',
+    'router_supervisor.settings_app',
+    'router_supervisor.dashboard_app',
+    'router_supervisor.thresholds_app',
+    'router_supervisor.api_app',
 ]
 
 MIDDLEWARE = [
@@ -146,9 +146,9 @@ STATICFILES_FINDERS = [
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'dashboard_app/static'),
-    os.path.join(BASE_DIR, 'settings_app/static'),
-    os.path.join(BASE_DIR, 'thresholds_app/static'),
+    os.path.join(BASE_DIR, 'router_supervisor/dashboard_app/static'),
+    os.path.join(BASE_DIR, 'router_supervisor/settings_app/static'),
+    os.path.join(BASE_DIR, 'router_supervisor/thresholds_app/static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 LOGIN_URL = '/login/'

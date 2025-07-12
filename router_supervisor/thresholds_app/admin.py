@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (
+from router_supervisor.core_models.models import (
     User,
     Threshold,
     KPI,

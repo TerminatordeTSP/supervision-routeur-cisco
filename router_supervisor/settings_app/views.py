@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from thresholds_app.models import User
+from router_supervisor.core_models.models import User
 from .forms import UserInfoForm, AppearanceForm, LanguageForm
 from .models import UserPreferences
 

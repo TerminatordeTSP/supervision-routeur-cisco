@@ -1,5 +1,5 @@
 from django.db import models
-from thresholds_app.models import User
+from router_supervisor.core_models.models import User
 
 class UserPreferences(models.Model):
     THEME_CHOICES = [

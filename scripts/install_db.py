@@ -100,7 +100,7 @@ def seed_initial_data():
         except ImportError:
             print("ℹ️  Core models not available, loading basic data...")
             # Use existing thresholds_app models
-            from thresholds_app.models import InterfaceThreshold
+            from router_supervisor.core_models.models import InterfaceThreshold
             
             # Create sample thresholds if none exist
             if not InterfaceThreshold.objects.exists():

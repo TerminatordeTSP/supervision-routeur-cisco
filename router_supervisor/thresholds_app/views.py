@@ -1,14 +1,14 @@
 from sqlite3 import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from thresholds_app.models import Router, Threshold
+from router_supervisor.core_models.models import Router, Threshold
 from thresholds_app.forms import threshold_insert
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db import IntegrityError
 from django.contrib import messages
-from .models import Router, Threshold
+from router_supervisor.core_models.models import Router, Threshold
 from .forms import RouterForm
 
 def index(request):

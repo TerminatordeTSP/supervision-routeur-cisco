@@ -1,5 +1,5 @@
 from django import forms
-from thresholds_app.models import Threshold, Router
+from router_supervisor.core_models.models import Threshold, Router
 
 class threshold_insert(forms.ModelForm):
     ram = forms.FloatField(

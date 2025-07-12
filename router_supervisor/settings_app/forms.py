@@ -1,5 +1,5 @@
 from django import forms
-from thresholds_app.models import User
+from router_supervisor.core_models.models import User
 from .models import UserPreferences
 
 class UserInfoForm(forms.ModelForm):

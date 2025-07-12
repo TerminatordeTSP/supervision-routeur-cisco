@@ -2,19 +2,19 @@
   {
     "measurement": "mem",
     "data": {
-      "used": 5369319424.0,
-      "free": 357752832.0,
-      "used_percent": 32.54364287888335,
-      "total": 16498827264.0,
-      "timestamp": "1750759840000000000"
+      "used": 1162551296.0,
+      "free": 6091153408.0,
+      "used_percent": 14.226460697614153,
+      "timestamp": "1752335339000000000"
     }
   },
   {
     "measurement": "system",
     "data": {
-      "load1": 1.69,
+      "n_users": 2.0,
+      "load1": 0.17,
       "uptime": null,
-      "timestamp": "1750759840000000000"
+      "timestamp": "1752335339000000000"
     }
   },
   {
@@ -22,56 +22,74 @@
     "data": {
       "n_users": null,
       "load1": null,
-      "uptime": 2629.0,
-      "timestamp": "1750759840000000000"
+      "uptime": 1734.0,
+      "timestamp": "1752335339000000000"
+    }
+  },
+  {
+    "measurement": "snmp",
+    "data": {
+      "cpu_5min": 0.0,
+      "cpu_0_usage": 7.0,
+      "cpu_0_index": 11.0,
+      "ram_used": 195325504.0,
+      "ram_free": 1882741632.0,
+      "timestamp": "IOS"
+    }
+  },
+  {
+    "measurement": "interfaces",
+    "interface": "GigabitEthernet1",
+    "data": {
+      "ifInOctets": 384496614.0,
+      "ifOutOctets": 180507174.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1752335340000000000"
     }
   },
   {
     "measurement": "interfaces",
     "interface": "GigabitEthernet2",
     "data": {
-      "ifInOctets": 63082.0,
-      "ifOutOctets": 32152612.0,
+      "ifInOctets": 125662.0,
+      "ifOutOctets": 64699938.0,
       "ifInErrors": 0.0,
       "ifOutErrors": 0.0,
-      "timestamp": "1750674438000000000"
+      "timestamp": "1752335340000000000"
     }
   },
   {
     "measurement": "interfaces",
     "interface": "GigabitEthernet3",
     "data": {
-      "load1": null,
-      "uptime": null,
-      "timestamp": "0:43\""
+      "ifInOctets": 13974869.0,
+      "ifOutOctets": 64696529.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1752335340000000000"
     }
   },
   {
     "measurement": "interfaces",
     "interface": "GigabitEthernet4",
     "data": {
-      "latency_ms": 39.893,
-      "packet_loss": 0.0,
-      "timestamp": "1750759840000000000"
+      "ifInOctets": 26577236.0,
+      "ifOutOctets": 64708793.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1752335340000000000"
     }
   },
   {
     "measurement": "interfaces",
     "interface": "Null0",
     "data": {
-      "router_name": "pod4-cat8kv",
-      "uptime": 172540195.0,
-      "cpu_5min": 0.0,
-      "timestamp": "1750759840000000000"
-    }
-  },
-  {
-    "measurement": "ping_latency",
-    "data": {
-      "usage_idle": 76.30922693266223,
-      "usage_user": 15.960099750617827,
-      "usage_system": 4.2394014962561775,
-      "timestamp": "1750759840000000000"
+      "ifInOctets": 0.0,
+      "ifOutOctets": 0.0,
+      "ifInErrors": 0.0,
+      "ifOutErrors": 0.0,
+      "timestamp": "1752335340000000000"
     }
   }
 ]

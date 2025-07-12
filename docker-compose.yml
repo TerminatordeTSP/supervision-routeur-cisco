@@ -74,7 +74,7 @@ services:
       - DOCKER_INFLUXDB_INIT_PASSWORD=admin123456
       - DOCKER_INFLUXDB_INIT_ORG=telecom-sudparis
       - DOCKER_INFLUXDB_INIT_BUCKET=router-metrics
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2

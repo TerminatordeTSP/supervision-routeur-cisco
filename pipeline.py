@@ -4,6 +4,14 @@ import time
 import json
 import os
 import re
+from influxdb_client import Point, WritePrecision, InfluxDBClient
+from influxdb_client.client.write_api import SYNCHRONOUS
+
+
+INFLUX_URL = "http://localhost:8086"
+INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="
+INFLUX_ORG = "telecom-sudparis"
+INFLUX_BUCKET = "router-metrics"
 
 def parse_telegraf_output(output):
     results = []
@@ -101,6 +109,51 @@ def parse_telegraf_output(output):
 
     return results
 
+def format_value(key, value):
+    if "percent" in key or "cpu" in key:
+        try:
+            return round(float(value), 2)
+        except Exception:
+            return value
+    if key in ("in_bytes", "out_bytes", "in_octets", "out_octets"):
+        try:
+            return round(float(value) * 8 / 1_000_000, 3)  # Convertir en Mbit/s
+        except Exception:
+            return value
+    return value
+
+def send_to_influx(metrics):
+    client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
+    write_api = client.write_api(write_options=SYNCHRONOUS)
+
+    for entry in metrics:
+        measurement = entry["measurement"]
+        data = entry.get("data", {})
+        tags = {}
+
+        if "interface" in entry:
+            tags["interface_name"] = entry["interface"]
+            tags["type"] = "interface"
+        else:
+            tags["type"] = measurement
+
+        ts = data.get("timestamp")
+        timestamp = int(ts) if ts and str(ts).isdigit() else None
+
+        point = Point(measurement)
+        for k, v in data.items():
+            if k == "timestamp" or v is None:
+                continue
+            point = point.field(k, format_value(k, v))
+        for tag, value in tags.items():
+            point = point.tag(tag, value)
+        if timestamp:
+            point = point.time(timestamp, WritePrecision.NS)
+
+        write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
+
+    client.close()
+
 def main():
     if not os.path.exists("run.flag"):
         print("❌ run.flag manquant. Créez-le avec : touch run.flag")
@@ -114,15 +167,12 @@ def main():
                 text=True,
                 env={**os.environ, "MIBS": ""}
             )
-            parsed = parse_telegraf_output(result.stdout)
-
-            with open("metrics_filtered.json", "w") as f:
-                json.dump(parsed, f, indent=2)
-            print("📦 Données enregistrées dans metrics_filtered.json")
-
+            parsed_metrics = parse_telegraf_output(result.stdout)
+            send_to_influx(parsed_metrics)
+            print("✅ Données envoyées à InfluxDB.")
             time.sleep(5)
     finally:
-        print("🛑 Collecte arrêtée (run.flag supprimé).")
+        print("🛑 Pipeline arrêté (run.flag supprimé).")
 
 if __name__ == "__main__":
     main()

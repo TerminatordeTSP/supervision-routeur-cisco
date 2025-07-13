@@ -1,9 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from router_supervisor.core_models.models import User
-from .forms import UserInfoForm, AppearanceForm, LanguageForm
-from .models import UserPreferences
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import login
+from router_supervisor.settings_app.forms import CustomUserCreationForm
+
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Inscription réussie ! Vous êtes connecté.")
+            return redirect('/')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'register.html', {'form': form})
+
 
 @login_required
 def get_or_create_user():
@@ -18,11 +39,6 @@ def get_or_create_user():
             role='admin'
         )
     return user
-@login_required
-def get_user_preferences(user):
-    """Get or create user preferences"""
-    preferences, created = UserPreferences.objects.get_or_create(user=user)
-    return preferences
 
 @login_required
 def index(request):
@@ -61,43 +77,3 @@ def user_info(request):
         'preferences': preferences,
     }
     return render(request, "settings/info_user.html", context)
-@login_required
-def appearance(request):
-    user = get_or_create_user()
-    preferences = get_user_preferences(user)
-    
-    if request.method == 'POST':
-        form = AppearanceForm(request.POST, instance=preferences)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Appearance settings updated successfully!")
-            return redirect('/settings/appearance/')
-    else:
-        form = AppearanceForm(instance=preferences)
-    
-    context = {
-        'form': form,
-        'preferences': preferences,
-        'user': user,
-    }
-    return render(request, "settings/appearance.html", context)
-@login_required
-def language(request):
-    user = get_or_create_user()
-    preferences = get_user_preferences(user)
-    
-    if request.method == 'POST':
-        form = LanguageForm(request.POST, instance=preferences)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Language settings updated successfully!")
-            return redirect('/settings/language/')
-    else:
-        form = LanguageForm(instance=preferences)
-    
-    context = {
-        'form': form,
-        'preferences': preferences,
-        'user': user,
-    }
-    return render(request, "settings/language.html", context)

@@ -1,21 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion</title>
+    <title>Inscription</title>
     <link rel="stylesheet" href="{% static 'css/login_style.css' %}">
 </head>
 <body>
 <div class="login-container">
-    <h1>Connexion</h1>
+    <h1>Inscription</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Se connecter">
+        <input type="submit" value="S'inscrire">
     </form>
-    <p>Pas encore inscrit ? <a href="{% url 'register' %}">S'inscrire</a></p>
-    <p><a href="{% url 'password_reset' %}">Mot de passe oublié ?</a></p>
+    <p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
 </div>
 </body>
 </html>

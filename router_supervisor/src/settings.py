@@ -166,3 +166,6 @@ handler403 = 'router_supervisor.src.error_views.custom_403_view'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'     # Où aller après login
 LOGOUT_REDIRECT_URL = '/login/' # Où aller après logout
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+AUTH_USER_MODEL = 'core_models.User'

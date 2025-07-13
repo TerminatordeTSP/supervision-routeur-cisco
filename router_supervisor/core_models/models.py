@@ -78,7 +78,12 @@ class Router(models.Model):
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
     secret = models.CharField(max_length=50)
-    threshold = models.ForeignKey(Threshold, on_delete=models.CASCADE)
+    threshold = models.ForeignKey(
+        Threshold,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name

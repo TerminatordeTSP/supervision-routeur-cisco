@@ -6,213 +6,233 @@
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/css/boosted.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
     {% load static %}
-<link rel="stylesheet" href="{% static 'dashboard_app/style.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard_app/style.css' %}">
 
+    <style>
+        .header-button a {
+            color: #ff6c2c !important; /* orange boosted */
+            text-decoration: none;
+        }
+
+        .header-button {
+            border: 1px solid #ff6c2c;
+            background-color: transparent;
+            color: #ff6c2c;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .header-button:hover {
+            background-color: #ff6c2c;
+            color: #000;
+        }
+
+        .header-button a:hover {
+            color: #000 !important;
+        }
+
+        .router-info strong,
+        .router-info span {
+            color: #ffffff;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- En-tête avec boutons -->
-        <div class="header">
-            <h1>Welcome to the Dashboard</h1>
-            <div class="header-buttons">
-                <button class="header-button" data-bs-toggle="modal" data-bs-target="#alertesModal">
-                    <i class="bi bi-bell"></i> Alertes
-                </button>
-                <button class="header-button">
-                    <a href="/thresholds/" class="option-button">thresholds</a>
-                </button>
-                <button class="header-button">
-                    <a href="/settings/" class="option-button">Paramètres</a>
-                </button>
-            </div>
-        </div>
-
-        <!-- Premier dashboard (grille) -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-title">Router CPU</div>
-                <div class="metric-value" id="router-cpu">0</div>
-                <div class="metric-unit">%</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title">Router Uptime</div>
-                <div class="metric-value" id="router-uptime">0</div>
-                <div class="metric-unit">h</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title">System CPU</div>
-                <div class="metric-value" id="system-cpu">0</div>
-                <div class="metric-unit">%</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title">Latency</div>
-                <div class="metric-value" id="router-latency">0</div>
-                <div class="metric-unit">ms</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title">System Load</div>
-                <div class="metric-value" id="system-load">0</div>
-                <div class="metric-unit"></div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title">RAM Usage</div>
-                <div class="metric-value" id="ram-usage">0</div>
-                <div class="metric-unit">%</div>
-            </div>
-        </div>
-
-        <!-- Second dashboard (cartes avec barres de progression) -->
-        <div class="dashboard-cards">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="metric-card-modern custom-bg-cpu">
-                        <h5 class="card-title text-light">Router CPU Usage</h5>
-                        <div class="mt-3">
-                            <h2 class="text-light mb-3"><span id="cpuUsageCard">0</span>%</h2>
-                            <div class="progress">
-                                <div class="progress-bar" id="cpuProgressBar" role="progressbar" style="width: 0%;"
-                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="metric-card-modern custom-bg-ram">
-                        <h5 class="card-title text-light">Memory Usage</h5>
-                        <div class="mt-3">
-                            <h2 class="text-light mb-3"><span id="ramUsageCard">0</span>%</h2>
-                            <div class="progress">
-                                <div class="progress-bar" id="ramProgressBar" role="progressbar" style="width: 0%;"
-                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="metric-card-modern custom-bg-network">
-                        <h5 class="card-title text-light">Network Latency</h5>
-                        <div class="mt-3">
-                            <h2 class="text-light mb-3"><span id="latencyCard">0</span> ms</h2>
-                            <div class="progress">
-                                <div class="progress-bar" id="latencyProgressBar" role="progressbar" style="width: 0%;"
-                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="200"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="router-info mt-4">
-                <h4>Router Information</h4>
-                <div class="alert alert-info">
-                    <strong>Router Name:</strong> <span id="routerName">-</span><br>
-                    <strong>Last Updated:</strong> <span id="lastUpdated">{{ last_updated }}</span>
-                </div>
-            </div>
+<div class="dashboard-container">
+    <!-- En-tête avec boutons -->
+    <div class="header">
+        <h1 style="color: #ff6c2c;">Welcome to the Dashboard</h1>
+        <div class="header-buttons">
+            <button class="header-button" data-bs-toggle="modal" data-bs-target="#alertesModal">
+                <i class="bi bi-bell"></i> Alertes
+            </button>
+            <button class="header-button">
+                <a href="/thresholds/" class="option-button">thresholds</a>
+            </button>
+            <button class="header-button">
+                <a href="/settings/" class="option-button">Paramètres</a>
+            </button>
+            <button class="header-button">
+                <a href="http://localhost:8080/logout/" class="option-button">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </button>
         </div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal fade" id="alertesModal" tabindex="-1" aria-labelledby="alertesModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="alertesModalLabel">Alertes</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {% if alerts %}
-                        {% for alert in alerts %}
-                            <div class="alert {% if alert.severity == 'high' or alert.severity == 'critical' %}alert-danger{% elif alert.severity == 'medium' %}alert-warning{% else %}alert-info{% endif %} mb-2">
-                                <small>{{ alert.date_log|date:'Y-m-d H:i:s' }}</small>
-                                <p class="mb-1"><strong>{{ alert.severity|upper }}:</strong> {{ alert.message }}</p>
-                                <small>Router: {{ alert.interface.id_routeur.nom }}</small>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="alert alert-info">
-                            Aucune alerte active
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="header-button" data-bs-dismiss="modal">Fermer</button>
-                </div>
-            </div>
+    <!-- Premier dashboard (grille) -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-title">Router CPU</div>
+            <div class="metric-value" id="router-cpu">0</div>
+            <div class="metric-unit">%</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">Router Uptime</div>
+            <div class="metric-value" id="router-uptime">0</div>
+            <div class="metric-unit">h</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">System CPU</div>
+            <div class="metric-value" id="system-cpu">0</div>
+            <div class="metric-unit">%</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">Latency</div>
+            <div class="metric-value" id="router-latency">0</div>
+            <div class="metric-unit">ms</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">System Load</div>
+            <div class="metric-value" id="system-load">0</div>
+            <div class="metric-unit"></div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">RAM Usage</div>
+            <div class="metric-value" id="ram-usage">0</div>
+            <div class="metric-unit">%</div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/js/boosted.bundle.min.js"></script>
-    <script>
-        // Fonction pour mettre à jour les métriques
-        function updateMetrics(data) {
-            if (!data) return;
-            
-            // Mise à jour des valeurs dans la grille
-            document.getElementById('router-cpu').textContent = data.cpu_5min !== null ? data.cpu_5min.toFixed(1) : '0';
-            document.getElementById('router-uptime').textContent = data.uptime !== null ? (data.uptime / 3600).toFixed(1) : '0';
-            document.getElementById('system-cpu').textContent = data.system_cpu !== null ? data.system_cpu.toFixed(1) : '0';
-            document.getElementById('router-latency').textContent = data.latency_ms !== null ? data.latency_ms.toFixed(1) : '0';
-            document.getElementById('system-load').textContent = data.load1 !== null ? data.load1.toFixed(2) : '0';
-            document.getElementById('ram-usage').textContent = data.used_percent !== null ? data.used_percent.toFixed(1) : '0';
-            
-            // Mise à jour des cartes avec les barres de progression
-            const cpuValue = data.cpu_5min !== null ? data.cpu_5min : 0;
-            document.getElementById('cpuUsageCard').textContent = cpuValue.toFixed(1);
-            const cpuProgressBar = document.getElementById('cpuProgressBar');
-            cpuProgressBar.style.width = `${cpuValue}%`;
-            cpuProgressBar.setAttribute('aria-valuenow', cpuValue);
-            
-            const ramValue = data.used_percent !== null ? data.used_percent : 0;
-            document.getElementById('ramUsageCard').textContent = ramValue.toFixed(1);
-            const ramProgressBar = document.getElementById('ramProgressBar');
-            ramProgressBar.style.width = `${ramValue}%`;
-            ramProgressBar.setAttribute('aria-valuenow', ramValue);
-            
-            const latencyValue = data.latency_ms !== null ? data.latency_ms : 0;
-            document.getElementById('latencyCard').textContent = latencyValue.toFixed(1);
-            // Pour la latence, nous normalisons l'affichage (100ms = 50%)
-            const latencyPercent = Math.min(100, (latencyValue / 200) * 100);
-            const latencyProgressBar = document.getElementById('latencyProgressBar');
-            latencyProgressBar.style.width = `${latencyPercent}%`;
-            latencyProgressBar.setAttribute('aria-valuenow', latencyValue);
-            
-            // Afficher le nom du routeur
-            document.getElementById('routerName').textContent = data.router_name || "-";
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-        }
-        
-        // Fonction pour charger les données
-        async function fetchMetricsData() {
-            try {
-                const response = await fetch('/api/latest-metrics/');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                updateMetrics(data);
-            } catch (error) {
-                console.error('Error fetching metrics data:', error);
+    <!-- Second dashboard (cartes avec barres de progression) -->
+    <div class="dashboard-cards">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="metric-card-modern custom-bg-cpu">
+                    <h5 class="card-title text-light">Router CPU Usage</h5>
+                    <div class="mt-3">
+                        <h2 class="text-light mb-3"><span id="cpuUsageCard">0</span>%</h2>
+                        <div class="progress">
+                            <div class="progress-bar" id="cpuProgressBar" role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="metric-card-modern custom-bg-ram">
+                    <h5 class="card-title text-light">Memory Usage</h5>
+                    <div class="mt-3">
+                        <h2 class="text-light mb-3"><span id="ramUsageCard">0</span>%</h2>
+                        <div class="progress">
+                            <div class="progress-bar" id="ramProgressBar" role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="metric-card-modern custom-bg-network">
+                    <h5 class="card-title text-light">Network Latency</h5>
+                    <div class="mt-3">
+                        <h2 class="text-light mb-3"><span id="latencyCard">0</span> ms</h2>
+                        <div class="progress">
+                            <div class="progress-bar" id="latencyProgressBar" role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="200"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="router-info mt-4">
+            <h4>Router Information</h4>
+            <div class="alert alert-info">
+                <strong>Router Name:</strong> <span id="routerName">-</span><br>
+                <strong>Last Updated:</strong> <span id="lastUpdated">{{ last_updated }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="alertesModal" tabindex="-1" aria-labelledby="alertesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertesModalLabel">Alertes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if alerts %}
+                    {% for alert in alerts %}
+                        <div class="alert {% if alert.severity == 'high' or alert.severity == 'critical' %}alert-danger{% elif alert.severity == 'medium' %}alert-warning{% else %}alert-info{% endif %} mb-2">
+                            <small>{{ alert.date_log|date:'Y-m-d H:i:s' }}</small>
+                            <p class="mb-1"><strong>{{ alert.severity|upper }}:</strong> {{ alert.message }}</p>
+                            <small>Router: {{ alert.interface.id_routeur.nom }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        Aucune alerte active
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="header-button" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/boosted@5.3.3/dist/js/boosted.bundle.min.js"></script>
+<script>
+    function updateMetrics(data) {
+        if (!data) return;
+        document.getElementById('router-cpu').textContent = data.cpu_5min !== null ? data.cpu_5min.toFixed(1) : '0';
+        document.getElementById('router-uptime').textContent = data.uptime !== null ? (data.uptime / 3600).toFixed(1) : '0';
+        document.getElementById('system-cpu').textContent = data.system_cpu !== null ? data.system_cpu.toFixed(1) : '0';
+        document.getElementById('router-latency').textContent = data.latency_ms !== null ? data.latency_ms.toFixed(1) : '0';
+        document.getElementById('system-load').textContent = data.load1 !== null ? data.load1.toFixed(2) : '0';
+        document.getElementById('ram-usage').textContent = data.used_percent !== null ? data.used_percent.toFixed(1) : '0';
+
+        const cpuValue = data.cpu_5min !== null ? data.cpu_5min : 0;
+        document.getElementById('cpuUsageCard').textContent = cpuValue.toFixed(1);
+        document.getElementById('cpuProgressBar').style.width = `${cpuValue}%`;
+        document.getElementById('cpuProgressBar').setAttribute('aria-valuenow', cpuValue);
+
+        const ramValue = data.used_percent !== null ? data.used_percent : 0;
+        document.getElementById('ramUsageCard').textContent = ramValue.toFixed(1);
+        document.getElementById('ramProgressBar').style.width = `${ramValue}%`;
+        document.getElementById('ramProgressBar').setAttribute('aria-valuenow', ramValue);
+
+        const latencyValue = data.latency_ms !== null ? data.latency_ms : 0;
+        document.getElementById('latencyCard').textContent = latencyValue.toFixed(1);
+        const latencyPercent = Math.min(100, (latencyValue / 200) * 100);
+        document.getElementById('latencyProgressBar').style.width = `${latencyPercent}%`;
+        document.getElementById('latencyProgressBar').setAttribute('aria-valuenow', latencyValue);
+
+        document.getElementById('routerName').textContent = data.router_name || "-";
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+    }
+
+    async function fetchMetricsData() {
+        try {
+            const response = await fetch('/api/latest-metrics/');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            const data = await response.json();
+            updateMetrics(data);
+        } catch (error) {
+            console.error('Error fetching metrics data:', error);
         }
+    }
 
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            // Charger les données initiales
-            fetchMetricsData();
-            
-            // Mise à jour périodique des données
-            setInterval(fetchMetricsData, 5000);
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchMetricsData();
+        setInterval(fetchMetricsData, 5000);
+    });
+</script>
 </body>
 </html>

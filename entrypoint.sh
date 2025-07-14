@@ -102,17 +102,26 @@ chmod -R 755 /code/static /code/media /tmp/metrics
 # Créer un fichier init dans le dossier src pour qu'il soit reconnu comme un package Python
 touch /code/router_supervisor/src/__init__.py
 
-# Nettoyer les migrations (sauf __init__.py) à chaque démarrage
-if [ -f /code/scripts/clean_migrations.sh ]; then
-    echo "Cleaning Django migration files..."
-    /code/scripts/clean_migrations.sh
+# Initialize database with robust error handling
+echo "Running database initialization script..."
+if [ -f /code/scripts/init_database.sh ]; then
+    /code/scripts/init_database.sh
+else
+    # Fallback to old method if script is missing
+    echo "Database initialization script not found, using fallback method..."
+    cd /code && python3 router_supervisor/manage.py initialize_db --max-retries=30
+    
+    # Additional fallback: try manual migration if initialize_db command fails
+    if [ $? -ne 0 ]; then
+        echo "initialize_db command failed, trying manual migration..."
+        
+        echo "Checking for missing migrations..."
+        cd /code && python3 router_supervisor/manage.py makemigrations --no-input || echo "Warning: makemigrations failed"
+        
+        echo "Applying migrations..."
+        cd /code && python3 router_supervisor/manage.py migrate --noinput || echo "Warning: migration failed"
+    fi
 fi
-
-echo "Checking for missing migrations..."
-cd /code && python3 router_supervisor/manage.py makemigrations --check --no-input || echo "Missing migrations detected!"
-
-echo "Applying migrations..."
-cd /code && python3 router_supervisor/manage.py migrate --noinput || echo "Migration failed but continuing..."
 
 # Collecte des fichiers statiques
 echo "Collecting static files..."

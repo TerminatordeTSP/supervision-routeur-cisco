@@ -5,18 +5,39 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from router_supervisor.settings_app.forms import CustomUserCreationForm, UserInfoForm, UserPreferencesForm
 from router_supervisor.settings_app.models import UserPreferences
+from django.db import OperationalError, ProgrammingError
+from django.http import HttpResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 def register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "Inscription réussie ! Vous êtes connecté.")
-            return redirect('/')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'register.html', {'form': form})
+    try:
+        if request.method == 'POST':
+            form = CustomUserCreationForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+                login(request, user)
+                messages.success(request, "Inscription réussie ! Vous êtes connecté.")
+                return redirect('/')
+        else:
+            form = CustomUserCreationForm()
+        return render(request, 'register.html', {'form': form})
+    
+    except (OperationalError, ProgrammingError) as e:
+        logger.error(f"Database error in registration: {e}")
+        error_message = """
+        <h1>Database Error</h1>
+        <p>It appears the database is not properly initialized. This usually happens when migrations haven't been run.</p>
+        <p>To fix this issue, please run the following commands:</p>
+        <pre>
+        docker-compose exec router_django /usr/bin/python3 /code/router_supervisor/manage.py makemigrations
+        docker-compose exec router_django /usr/bin/python3 /code/router_supervisor/manage.py migrate
+        </pre>
+        <p>Or restart the container to trigger automatic database initialization.</p>
+        <p>Technical details: {}</p>
+        """.format(str(e))
+        return HttpResponse(error_message, status=500)
 
 
 @login_required

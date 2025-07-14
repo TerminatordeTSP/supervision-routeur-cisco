@@ -2,9 +2,7 @@ version: '3.9'
 
 services:
   telegraf:
-    build:
-      context: ./telegraf/docker
-      dockerfile: Dockerfile
+    image: telegraf:1.35
     container_name: telegraf
     restart: always
     volumes:

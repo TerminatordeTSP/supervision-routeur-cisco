@@ -1,5 +1,6 @@
 services:
   router_django:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
@@ -101,7 +102,7 @@ services:
     working_dir: /code
 
   telegraf:
-    image: telegraf:1.35        # ← l’image officielle multi-architecture
+    image: telegraf:1.35        # ← l’image officielle
     container_name: telegraf
     restart: always
     volumes:

@@ -1,4 +1,57 @@
 #!/bin/sh
+# Script d'entrée pour le conteneur Docker
+
+# Vérification des variables d'environnement nécessaires
+: "${DATABASE:?DATABASE environment variable is required}"
+: "${SQL_HOST:?SQL_HOST environment variable is required}"
+: "${SQL_PORT:?SQL_PORT environment variable is required}"
+: "${DJANGO_SETTINGS_MODULE:?DJANGO_SETTINGS_MODULE environment variable is required}"
+
+# Configuration de Django
+export DJANGO_SETTINGS_MODULE="$DJANGO_SETTINGS_MODULE"
+export PYTHONPATH="/code"
+
+echo "Entrypoint script started with DATABASE=$DATABASE, SQL_HOST=$SQL_HOST, SQL_PORT=$SQL_PORT, DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE"
+
+# Activer le mode strict pour arrêter le script en cas d'erreur
+if [ -z "$DATABASE" ] || [ -z "$SQL_HOST" ] || [ -z "$SQL_PORT" ] || [ -z "$DJANGO_SETTINGS_MODULE" ]; then
+    echo "Error: Required environment variables are not set."
+    exit 1
+fi
+
+# Vérifier si le conteneur est en mode développement ou production
+if [ "$DJANGO_SETTINGS_MODULE" = "router_supervisor.src.settings.dev" ]; then
+    echo "Running in development mode"
+else
+    echo "Running in production mode"
+fi
+
+# Activer le mode strict pour arrêter le script en cas d'erreur
+if [ -z "$DJANGO_SETTINGS_MODULE" ]; then
+    echo "Error: DJANGO_SETTINGS_MODULE is not set."
+    exit 1
+fi
+
+# Installer les dépendances si nécessaire
+if [ ! -d "/code/venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv /code/venv
+fi
+
+# Activer l'environnement virtuel
+echo "Activating virtual environment..."
+. /code/venv/bin/activate
+
+# Installer les dépendances Python
+echo "Installing Python dependencies..."
+pip install --upgrade pip
+pip install -r /code/requirements.txt
+
+# Vérifier si 'nc' est installé pour vérifier la disponibilité de PostgreSQL
+if ! command -v nc >/dev/null 2>&1; then
+    echo "Installing 'nc' (netcat) for checking PostgreSQL availability..."
+    dnf install -y nc || apt-get install -y netcat || yum install -y nc || echo "Failed to install 'nc'."
+fi
 set -e
 
 if [ "$DATABASE" = "postgres" ]
@@ -75,18 +128,18 @@ find /code/static -name "*.css" -type f | sort
 echo "Running system checks..."
 cd /code && python3 router_supervisor/manage.py check --deploy || echo "System check failed but continuing..."
 
-echo "Configuring Telegraf..."
+# echo "Configuring Telegraf..."
 # Check if a telegraf config exists in the mounted volume
-if [ -f /etc/telegraf/telegraf.conf.custom ]; then
-    echo "Using custom Telegraf config from volume"
-    cp /etc/telegraf/telegraf.conf.custom /etc/telegraf/telegraf.conf
-fi
+# if [ -f /etc/telegraf/telegraf.conf.custom ]; then
+#     echo "Using custom Telegraf config from volume"
+#     cp /etc/telegraf/telegraf.conf.custom /etc/telegraf/telegraf.conf
+# fi
 
 # Ensure the telegraf config has the right permissions
-chmod 644 /etc/telegraf/telegraf.conf
+#chmod 644 /etc/telegraf/telegraf.conf
 
-echo "Starting Telegraf..."
-telegraf --config /etc/telegraf/telegraf.conf & # start as a background process
+#echo "Starting Telegraf..."
+#telegraf --config /etc/telegraf/telegraf.conf & # start as a background process
 
 echo "Starting pipeline data collection..."
 # Create run flag for pipeline

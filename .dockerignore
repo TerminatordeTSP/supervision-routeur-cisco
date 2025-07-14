@@ -9,3 +9,6 @@ venv/
 .env.*
 .idea/
 *.sqlite3
+*.json
+*.log
+*.db

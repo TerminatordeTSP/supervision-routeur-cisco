@@ -17,8 +17,6 @@ RUN mkdir -p /usr/share/snmp/mibs \
 # Variables d'environnement
 ENV PIP_ROOT_USER_ACTION=ignore
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE="router_supervisor.prod_settings"
-ENV PYTHONPATH=/code
 
 # Répertoire de travail
 WORKDIR /code
@@ -26,8 +24,7 @@ WORKDIR /code
 # Installation des dépendances Python
 COPY requirements.txt /code/
 RUN pip3 install --upgrade pip setuptools wheel
-RUN pip3 install --use-pep517 -r requirements.txt
-RUN pip3 install psycopg2-binary gunicorn influxdb-client
+RUN pip3 install influxdb-client
 
 # Installation de Telegraf via dépôt officiel
 RUN curl -s https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor > /etc/pki/rpm-gpg/influxdata.gpg && \
@@ -35,28 +32,14 @@ RUN curl -s https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor 
     dnf install -y telegraf && \
     dnf clean all
 
-# Créer les répertoires nécessaires (si besoin)
-RUN mkdir -p /code/static /code/media
-
-
-# Copier le code source Django, le client InfluxDB et les scripts
-COPY router_supervisor/ /code/router_supervisor/
-COPY gunicorn.conf.py /code/
-COPY scripts/ /code/scripts/
+# Copier le pipeline script
 COPY pipeline.py /code/
 
-# Scripts de lancement
-COPY entrypoint.sh /entrypoint.sh
-COPY start /start
-RUN chmod +x /entrypoint.sh /start /code/scripts/clean_migrations.sh
+# Create run flag
+RUN touch /code/run.flag
 
-# Exposer le port Django
+# Exposer le port (optionnel)
 EXPOSE 8080/tcp
 
-# Healthcheck Django
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/health/ || exit 1
-
-# Entrée du conteneur
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/start"]
+# Commande par défaut
+CMD ["python3", "pipeline.py"]

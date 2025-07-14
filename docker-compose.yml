@@ -85,6 +85,21 @@ services:
       retries: 5
       start_period: 30s
 
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.pipeline
+    container_name: pipeline
+    environment:
+      - MIBS=
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
+      - ./telegraf/sample_metrics:/tmp/metrics:rw
+    depends_on:
+      - influxdb
+    working_dir: /code
+
   telegraf:
     image: telegraf:1.35        # ← l’image officielle multi-architecture
     container_name: telegraf

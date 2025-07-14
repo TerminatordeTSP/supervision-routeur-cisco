@@ -34,7 +34,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy:/etc/caddy
       - static_volume:/srv/static
       - media_volume:/srv/media
     depends_on:
@@ -106,7 +106,7 @@ services:
     restart: always
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./telegraf/processors.conf:/etc/telegraf.d/processors.conf:ro
+      - ./telegraf:/etc/telegraf.d
       - ./telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
       - router_django

@@ -2,16 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from router_supervisor.core_models.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth import login
-from router_supervisor.settings_app.forms import CustomUserCreationForm
+from router_supervisor.settings_app.forms import CustomUserCreationForm, UserInfoForm, UserPreferencesForm
+from router_supervisor.settings_app.models import UserPreferences
 
 def register(request):
     if request.method == 'POST':
@@ -40,10 +33,22 @@ def get_or_create_user():
         )
     return user
 
+
+def get_user_preferences(user):
+    """Get or create user preferences"""
+    preferences, created = UserPreferences.objects.get_or_create(
+        user=user,
+        defaults={
+            'theme': 'orange',
+            'language': 'en'
+        }
+    )
+    return preferences
+
 @login_required
 def index(request):
-    # Get or create demo user
-    user = get_or_create_user()
+    # Use the current logged-in user
+    user = request.user
     preferences = get_user_preferences(user)
     
     context = {
@@ -53,26 +58,21 @@ def index(request):
     return render(request, "settings/base.html", context)
 @login_required
 def user_info(request):
-    # Get or create demo user
-    user = get_or_create_user()
+    """Vue pour modifier les informations personnelles de l'utilisateur connecté"""
+    user = request.user
     
     if request.method == 'POST':
         form = UserInfoForm(request.POST, instance=user)
         if form.is_valid():
-            # Handle password change
-            if form.cleaned_data.get('password'):
-                user.password = form.cleaned_data['password']
-                user.save()
-            else:
-                form.save()
-            messages.success(request, "Your information has been updated successfully!")
+            form.save()
+            messages.success(request, "Vos informations ont été mises à jour avec succès!")
             return redirect('/settings/user_info/')
     else:
         form = UserInfoForm(instance=user)
-
+    
     preferences = get_user_preferences(user)
     context = {
-        'form': form, 
+        'form': form,
         'user': user,
         'preferences': preferences,
     }
@@ -92,3 +92,67 @@ class CustomPasswordResetView(PasswordResetView):
         'domain': 'z.imt.fr',
         'protocol': 'https'
     }
+
+@login_required
+def preferences(request):
+    """Vue pour modifier les préférences de l'utilisateur connecté"""
+    user = request.user
+    user_preferences = get_user_preferences(user)
+    
+    if request.method == 'POST':
+        preferences_form = UserPreferencesForm(request.POST, instance=user_preferences)
+        if preferences_form.is_valid():
+            preferences_form.save()
+            messages.success(request, "Vos préférences ont été mises à jour avec succès!")
+            return redirect('/settings/preferences/')
+    else:
+        preferences_form = UserPreferencesForm(instance=user_preferences)
+    
+    context = {
+        'preferences_form': preferences_form,
+        'user': user,
+        'preferences': user_preferences,
+    }
+    return render(request, "settings/preferences.html", context)
+
+
+@login_required
+def appearance(request):
+    """Vue pour modifier l'apparence (thème)"""
+    user = request.user
+    user_preferences = get_user_preferences(user)
+    
+    if request.method == 'POST':
+        theme = request.POST.get('theme')
+        if theme in ['orange', 'blue', 'green']:
+            user_preferences.theme = theme
+            user_preferences.save()
+            messages.success(request, "Thème mis à jour avec succès!")
+        return redirect('/settings/appearance/')
+    
+    context = {
+        'user': user,
+        'preferences': user_preferences,
+    }
+    return render(request, "settings/appearance.html", context)
+
+
+@login_required
+def language(request):
+    """Vue pour modifier la langue"""
+    user = request.user
+    user_preferences = get_user_preferences(user)
+    
+    if request.method == 'POST':
+        language = request.POST.get('language')
+        if language in ['en', 'fr', 'es']:
+            user_preferences.language = language
+            user_preferences.save()
+            messages.success(request, "Langue mise à jour avec succès!")
+        return redirect('/settings/language/')
+    
+    context = {
+        'user': user,
+        'preferences': user_preferences,
+    }
+    return render(request, "settings/language.html", context)

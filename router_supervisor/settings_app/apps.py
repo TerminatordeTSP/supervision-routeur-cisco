@@ -1,6 +1,7 @@
-from django.apps import AppConfig # type: ignore
+from django.apps import AppConfig
 
 
 class SettingsAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'settings_app'
+    name = 'router_supervisor.settings_app'
+    verbose_name = 'Settings App'

@@ -39,4 +39,5 @@ class UserPreferences(models.Model):
         db_table = 'user_preferences'
     
     def __str__(self):
-        return f"Preferences for {self.user.username}"
+        return f"Preferences for {self.user.email}"
+ 

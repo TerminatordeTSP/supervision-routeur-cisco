@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'router_supervisor.dashboard_app',
     'router_supervisor.thresholds_app',
     'router_supervisor.api_app',
+    'router_supervisor.alerts_app.apps.AlertsAppConfig',  # Temporarily disabled
 ]
 
 MIDDLEWARE = [

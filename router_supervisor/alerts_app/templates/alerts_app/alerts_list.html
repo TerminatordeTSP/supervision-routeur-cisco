@@ -1,0 +1,524 @@
+{% extends 'alerts_app/base_alerts.html' %}
+{% load static %}
+{% load alerts_extras %}
+
+{% block alerts_content %}
+<!-- Header moderne -->
+<div class="alerts-header">
+    <div class="container">
+        <h1 class="alerts-title">
+            <i class="fas fa-list"></i>
+            Toutes les Alertes
+        </h1>
+        <p class="alerts-subtitle">
+            Liste complète et filtrable de toutes les alertes système
+        </p>
+        
+        <!-- Navigation -->
+        <nav class="alerts-nav">
+            <a href="{% url 'alerts_app:dashboard' %}" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'alerts_app:alerts_list' %}" class="nav-link active">
+                <i class="fas fa-list"></i> Toutes les alertes
+            </a>
+            <a href="{% url 'alerts_app:statistics' %}" class="nav-link">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+            <a href="/thresholds/" class="nav-link">
+                <i class="fas fa-cogs"></i> Seuils & Configuration
+            </a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filtres modernes -->
+    <div class="alerts-filters">
+        <form method="get" id="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Recherche</label>
+                    <input type="text" 
+                           name="search" 
+                           id="search-alerts"
+                           class="filter-input" 
+                           placeholder="Rechercher dans les alertes..."
+                           value="{{ current_filters.search }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Statut</label>
+                    <select name="status" id="status-filter" class="filter-input">
+                        <option value="">Tous les statuts</option>
+                        {% for status_key, status_label in alert_statuses %}
+                        <option value="{{ status_key }}" 
+                                {% if current_filters.status == status_key %}selected{% endif %}>
+                            {{ status_label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Sévérité</label>
+                    <select name="severity" id="severity-filter" class="filter-input">
+                        <option value="">Toutes les sévérités</option>
+                        {% for severity_key, severity_label in alert_severities %}
+                        <option value="{{ severity_key }}" 
+                                {% if current_filters.severity == severity_key %}selected{% endif %}>
+                            {{ severity_label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Routeur</label>
+                    <select name="router" class="filter-input">
+                        <option value="">Tous les routeurs</option>
+                        {% for router in routers %}
+                        <option value="{{ router.router_id }}" 
+                                {% if current_filters.router == router.router_id|stringformat:"s" %}selected{% endif %}>
+                            {{ router.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Actions</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="submit" class="btn-action btn-acknowledge" style="background: var(--info-gradient);">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                        <a href="{% url 'alerts_app:alerts_list' %}" class="btn-action btn-dismiss">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Résultats -->
+    {% if alerts %}
+    <div class="alerts-grid">
+        {% for alert in alerts %}
+        <div class="alert-card {{ alert.severity }}" data-alert-id="{{ alert.alert_id }}">
+            <div class="alert-header">
+                <h3 class="alert-title">{{ alert.title }}</h3>
+                <div class="alert-badges">
+                    <span class="alert-badge severity-{{ alert.severity }}">{{ alert.get_severity_display }}</span>
+                    <span class="alert-badge status-{{ alert.status }}">{{ alert.get_status_display }}</span>
+                    <span class="alert-badge" style="background: #74b9ff; color: white;">{{ alert.get_alert_type_display }}</span>
+                </div>
+            </div>
+            
+            <div class="alert-body">
+                <p class="alert-description">{{ alert.description }}</p>
+                
+                <div class="alert-metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Routeur</div>
+                        <div class="metadata-value">{{ alert.router.name }}</div>
+                    </div>
+                    {% if alert.interface %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Interface</div>
+                        <div class="metadata-value">{{ alert.interface.name }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Créée</div>
+                        <div class="metadata-value">{{ alert.created_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    {% if alert.acknowledged_at %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Acquittée</div>
+                        <div class="metadata-value">{{ alert.acknowledged_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if alert.metric_value and alert.threshold_value %}
+                <div class="alert-metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Valeur mesurée</div>
+                        <div class="metadata-value">
+                            <span class="metric-value">{{ alert.metric_value|floatformat:2 }}{{ alert.metric_unit }}</span>
+                        </div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Seuil configuré</div>
+                        <div class="metadata-value">{{ alert.threshold_value|floatformat:2 }}{{ alert.metric_unit }}</div>
+                    </div>
+                    {% if alert.metric_value > alert.threshold_value %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Dépassement</div>
+                        <div class="metadata-value" style="color: #e74c3c; font-weight: bold;">
+                            +{{ alert.metric_value|sub:alert.threshold_value|floatformat:2 }}{{ alert.metric_unit }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="alert-actions">
+                <a href="{% url 'alerts_app:alert_detail' alert.alert_id %}" class="btn-action" style="background: var(--info-gradient);">
+                    <i class="fas fa-eye"></i> Détails
+                </a>
+                
+                {% if alert.status == 'active' %}
+                <button class="btn-action btn-acknowledge" data-tooltip="Marquer comme acquittée">
+                    <i class="fas fa-check"></i> Acquitter
+                </button>
+                <button class="btn-action btn-resolve" data-tooltip="Marquer comme résolue">
+                    <i class="fas fa-check-double"></i> Résoudre
+                </button>
+                <button class="btn-action btn-dismiss" data-tooltip="Rejeter cette alerte">
+                    <i class="fas fa-times"></i> Rejeter
+                </button>
+                {% elif alert.status == 'acknowledged' %}
+                <button class="btn-action btn-resolve" data-tooltip="Marquer comme résolue">
+                    <i class="fas fa-check-double"></i> Résoudre
+                </button>
+                <button class="btn-action btn-dismiss" data-tooltip="Rejeter cette alerte">
+                    <i class="fas fa-times"></i> Rejeter
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination moderne -->
+    {% if is_paginated %}
+    <div class="pagination-wrapper">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?{% if current_filters %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page=1" class="page-link">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?{% if current_filters %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+            
+            <span class="page-link active">
+                {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?{% if current_filters %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.next_page_number }}" class="page-link">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?{% if current_filters %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.paginator.num_pages }}" class="page-link">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.1);">
+        <div style="font-size: 4rem; color: #74b9ff; margin-bottom: 1rem;">
+            <i class="fas fa-search"></i>
+        </div>
+        <h3 style="color: #2c3e50; margin-bottom: 0.5rem;">Aucune alerte trouvée</h3>
+        <p style="color: #7f8c8d;">Essayez de modifier vos filtres de recherche</p>
+        <a href="{% url 'alerts_app:alerts_list' %}" class="btn-action btn-acknowledge" style="margin-top: 1rem;">
+            <i class="fas fa-refresh"></i> Réinitialiser les filtres
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- CSRF Token pour les actions AJAX -->
+{% csrf_token %}
+                    <select name="type" id="type" class="form-select">
+                        <option value="">Tous</option>
+                        {% for type_key, type_label in alert_types %}
+                        <option value="{{ type_key }}" 
+                                {% if current_filters.type == type_key %}selected{% endif %}>
+                            {{ type_label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Recherche</label>
+                    <input type="text" name="search" id="search" class="form-control" 
+                           placeholder="Titre, description, routeur..." 
+                           value="{{ current_filters.search }}">
+                </div>
+                
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        Tri: 
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=-created_at" 
+                           class="text-decoration-none {% if current_filters.sort == '-created_at' %}fw-bold{% endif %}">
+                            Plus récent
+                        </a> |
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=created_at" 
+                           class="text-decoration-none {% if current_filters.sort == 'created_at' %}fw-bold{% endif %}">
+                            Plus ancien
+                        </a> |
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=-severity" 
+                           class="text-decoration-none {% if current_filters.sort == '-severity' %}fw-bold{% endif %}">
+                            Sévérité
+                        </a>
+                    </small>
+                </div>
+                <div class="col-md-6 text-end">
+                    {% if request.GET %}
+                    <a href="{% url 'alerts_app:alerts_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times"></i> Effacer filtres
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des alertes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    Alertes 
+                    <span class="badge bg-secondary">{{ alerts.paginator.count }}</span>
+                </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-success" onclick="markAllAsResolved()" 
+                            {% if not alerts.object_list %}disabled{% endif %}>
+                        <i class="fas fa-check-double"></i> Résoudre sélectionnées
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                {% if alerts.object_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
+                                <th>Alerte</th>
+                                <th>Routeur</th>
+                                <th>Interface</th>
+                                <th>Sévérité</th>
+                                <th>Statut</th>
+                                <th>Type</th>
+                                <th>Valeur</th>
+                                <th>Créée</th>
+                                <th style="width: 120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in alerts.object_list %}
+                            <tr class="alert-row" data-alert-id="{{ alert.alert_id }}">
+                                <td>
+                                    <input type="checkbox" class="form-check-input alert-checkbox" 
+                                           value="{{ alert.alert_id }}">
+                                </td>
+                                <td>
+                                    <a href="{% url 'alerts_app:alert_detail' alert.alert_id %}" 
+                                       class="text-decoration-none fw-bold">
+                                        {{ alert.title|truncatechars:60 }}
+                                    </a>
+                                    {% if alert.interface %}
+                                    <br><small class="text-muted">{{ alert.interface.name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ alert.router.name }}</strong>
+                                    <br><small class="text-muted">{{ alert.router.ip_address }}</small>
+                                </td>
+                                <td>
+                                    {% if alert.interface %}
+                                    {{ alert.interface.name }}
+                                    {% else %}
+                                    <span class="text-muted">Global</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="alert-badge severity-{{ alert.severity|lower }}">
+                                        {{ alert.get_severity_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="alert-badge status-{{ alert.status|lower }}">
+                                        {{ alert.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ alert.get_alert_type_display }}</small>
+                                </td>
+                                <td>
+                                    <div class="metric-value {% if alert.threshold_value and alert.current_value > alert.threshold_value %}threshold-exceeded{% endif %}">
+                                        {{ alert.current_value }}{{ alert.unit }}
+                                    </div>
+                                    {% if alert.threshold_value %}
+                                    <small class="text-muted">Seuil: {{ alert.threshold_value }}{{ alert.unit }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ alert.created_at|date:"d/m/Y" }}</div>
+                                    <small class="text-muted">{{ alert.created_at|date:"H:i" }}</small>
+                                </td>
+                                <td>
+                                    {% if alert.status == 'ACTIVE' %}
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-acknowledge" 
+                                                onclick="acknowledgeAlert({{ alert.alert_id }})"
+                                                title="Acquitter">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-resolve" 
+                                                onclick="resolveAlert({{ alert.alert_id }})"
+                                                title="Résoudre">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if alerts.has_other_pages %}
+                <div class="pagination-wrapper px-3 py-3">
+                    <div class="results-info">
+                        Affichage de {{ alerts.start_index }} à {{ alerts.end_index }} 
+                        sur {{ alerts.paginator.count }} alertes
+                    </div>
+                    
+                    <nav aria-label="Navigation des alertes">
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if alerts.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ alerts.previous_page_number }}">
+                                    Précédent
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in alerts.paginator.page_range %}
+                            {% if num == alerts.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > alerts.number|add:'-3' and num < alerts.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if alerts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ alerts.next_page_number }}">
+                                    Suivant
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search text-muted fa-3x mb-3"></i>
+                    <h5>Aucune alerte trouvée</h5>
+                    <p class="text-muted">
+                        {% if request.GET %}
+                        Aucune alerte ne correspond à vos critères de recherche.
+                        <br><a href="{% url 'alerts_app:alerts_list' %}" class="btn btn-outline-primary mt-2">
+                            Voir toutes les alertes
+                        </a>
+                        {% else %}
+                        Aucune alerte n'a été enregistrée pour le moment.
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Gestion de la sélection multiple
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.alert-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Gestion des actions en lot
+function markAllAsResolved() {
+    const selected = Array.from(document.querySelectorAll('.alert-checkbox:checked'))
+                          .map(cb => cb.value);
+    
+    if (selected.length === 0) {
+        alert('Veuillez sélectionner au moins une alerte.');
+        return;
+    }
+    
+    if (confirm(`Êtes-vous sûr de vouloir résoudre ${selected.length} alerte(s) ?`)) {
+        // Implémenter l'action en lot ici
+        console.log('Résoudre les alertes:', selected);
+        // TODO: Implémenter l'appel AJAX pour résoudre en lot
+    }
+}
+
+// Mise à jour automatique de la liste
+function refreshAlertsList() {
+    if (autoRefreshEnabled) {
+        // Recharger la page en conservant les paramètres de recherche
+        location.reload();
+    }
+}
+
+// Remplacer la fonction de rafraîchissement
+function refreshAlertData() {
+    refreshAlertsList();
+}
+</script>
+{% endblock %}

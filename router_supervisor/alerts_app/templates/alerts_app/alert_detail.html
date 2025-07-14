@@ -1,0 +1,293 @@
+{% extends 'alerts_app/base_alerts.html' %}
+{% load static %}
+
+{% block alerts_content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ alert.title }}</h4>
+                <div class="d-flex gap-2">
+                    <span class="alert-badge severity-{{ alert.severity|lower }}">
+                        {{ alert.get_severity_display }}
+                    </span>
+                    <span class="alert-badge status-{{ alert.status|lower }}">
+                        {{ alert.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Informations principales -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="alert-detail-info">
+                            <h6><i class="fas fa-info-circle"></i> Informations générales</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td><strong>ID:</strong></td>
+                                    <td>#{{ alert.alert_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Type:</strong></td>
+                                    <td>{{ alert.get_alert_type_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Routeur:</strong></td>
+                                    <td>{{ alert.router.name }} ({{ alert.router.ip_address }})</td>
+                                </tr>
+                                {% if alert.interface %}
+                                <tr>
+                                    <td><strong>Interface:</strong></td>
+                                    <td>{{ alert.interface.name }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td><strong>Métrique:</strong></td>
+                                    <td>{{ alert.metric_name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="alert-detail-info">
+                            <h6><i class="fas fa-chart-line"></i> Valeurs</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td><strong>Valeur actuelle:</strong></td>
+                                    <td>
+                                        <span class="metric-value {% if alert.threshold_value and alert.current_value > alert.threshold_value %}threshold-exceeded{% endif %}">
+                                            {{ alert.current_value }}{{ alert.unit }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% if alert.threshold_value %}
+                                <tr>
+                                    <td><strong>Seuil configuré:</strong></td>
+                                    <td>{{ alert.threshold_value }}{{ alert.unit }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dépassement:</strong></td>
+                                    <td>
+                                        {% if alert.current_value > alert.threshold_value %}
+                                        <span class="text-danger">
+                                            +{{ alert.current_value|floatformat:1|add:alert.threshold_value|add:"-"|floatformat:1 }}{{ alert.unit }}
+                                            ({{ alert.current_value|mul:100|div:alert.threshold_value|add:"-100"|floatformat:1 }}%)
+                                        </span>
+                                        {% else %}
+                                        <span class="text-success">Aucun</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert-detail-info">
+                            <h6><i class="fas fa-file-alt"></i> Description</h6>
+                            <p class="mb-0">{{ alert.description|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timestamps -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="alert-detail-info">
+                            <h6><i class="fas fa-clock"></i> Chronologie</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td><strong>Créée le:</strong></td>
+                                    <td>{{ alert.created_at|date:"d/m/Y à H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mise à jour:</strong></td>
+                                    <td>{{ alert.updated_at|date:"d/m/Y à H:i:s" }}</td>
+                                </tr>
+                                {% if alert.acknowledged_at %}
+                                <tr>
+                                    <td><strong>Acquittée le:</strong></td>
+                                    <td>{{ alert.acknowledged_at|date:"d/m/Y à H:i:s" }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if alert.resolved_at %}
+                                <tr>
+                                    <td><strong>Résolue le:</strong></td>
+                                    <td>{{ alert.resolved_at|date:"d/m/Y à H:i:s" }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td><strong>Durée:</strong></td>
+                                    <td>{{ alert.duration }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    {% if alert.additional_data %}
+                    <div class="col-md-6">
+                        <div class="alert-detail-info">
+                            <h6><i class="fas fa-database"></i> Données supplémentaires</h6>
+                            <pre class="bg-light p-2 rounded"><code>{{ alert.additional_data|pprint }}</code></pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Actions -->
+                {% if alert.status == 'ACTIVE' %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-cogs"></i> Actions disponibles</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <form method="post" action="{% url 'alerts_app:acknowledge_alert' alert.alert_id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <label for="acknowledge-comment" class="form-label">Commentaire (optionnel):</label>
+                                                <textarea name="comment" id="acknowledge-comment" class="form-control" rows="2" placeholder="Raison de l'acquittement..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-acknowledge w-100">
+                                                <i class="fas fa-check"></i> Acquitter
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <form method="post" action="{% url 'alerts_app:resolve_alert' alert.alert_id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <label for="resolve-comment" class="form-label">Commentaire (optionnel):</label>
+                                                <textarea name="comment" id="resolve-comment" class="form-control" rows="2" placeholder="Résolution appliquée..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-resolve w-100">
+                                                <i class="fas fa-check-circle"></i> Résoudre
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <form method="post" action="{% url 'alerts_app:dismiss_alert' alert.alert_id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                <label class="form-label">Action:</label>
+                                                <p class="text-muted small">Ignorer cette alerte (fausse alerte, non pertinente, etc.)</p>
+                                            </div>
+                                            <button type="submit" class="btn btn-dismiss w-100" onclick="return confirm('Êtes-vous sûr de vouloir ignorer cette alerte ?')">
+                                                <i class="fas fa-times"></i> Ignorer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historique -->
+{% if history %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Historique des changements</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for entry in history %}
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ entry.previous_status }} → {{ entry.new_status }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    Par {{ entry.changed_by|default:"Système" }} le {{ entry.changed_at|date:"d/m/Y à H:i:s" }}
+                                </small>
+                                {% if entry.comment %}
+                                <br>
+                                <em>"{{ entry.comment }}"</em>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Alertes similaires -->
+{% if similar_alerts %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search"></i> Alertes similaires (24h)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Sévérité</th>
+                                <th>Statut</th>
+                                <th>Valeur</th>
+                                <th>Créée</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for similar in similar_alerts %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'alerts_app:alert_detail' similar.alert_id %}" class="text-decoration-none">
+                                        {{ similar.title|truncatechars:50 }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="alert-badge severity-{{ similar.severity|lower }}">
+                                        {{ similar.get_severity_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="alert-badge status-{{ similar.status|lower }}">
+                                        {{ similar.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ similar.current_value }}{{ similar.unit }}</td>
+                                <td>{{ similar.created_at|date:"d/m H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'alerts_app:alert_detail' similar.alert_id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

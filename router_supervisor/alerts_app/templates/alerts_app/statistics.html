@@ -1,0 +1,320 @@
+{% extends 'alerts_app/base_alerts.html' %}
+{% load static %}
+
+{% block alerts_content %}
+<!-- Header -->
+<div class="alerts-header">
+    <div class="container">
+        <h1 class="alerts-title">
+            <i class="fas fa-chart-bar"></i>
+            Statistiques des Alertes
+        </h1>
+        <p class="alerts-subtitle">
+            Analyse des tendances et métriques des alertes sur {{ days }} jours
+        </p>
+        
+        <!-- Navigation -->
+        <nav class="alerts-nav">
+            <a href="{% url 'alerts_app:dashboard' %}" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'alerts_app:alerts_list' %}" class="nav-link">
+                <i class="fas fa-list"></i> Toutes les alertes
+            </a>
+            <a href="{% url 'alerts_app:statistics' %}" class="nav-link active">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+            <a href="/thresholds/" class="nav-link">
+                <i class="fas fa-cogs"></i> Seuils & Configuration
+            </a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filtres de période -->
+    <div class="filters-section">
+        <div class="filters-header">
+            <h3><i class="fas fa-filter"></i> Période d'analyse</h3>
+        </div>
+        <div class="filters-content">
+            <form method="GET" class="period-filters">
+                <div class="filter-group">
+                    <label for="days">Période:</label>
+                    <select name="days" id="days" onchange="this.form.submit()">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>7 derniers jours</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>30 derniers jours</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>3 derniers mois</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Dernière année</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-header">
+                <div class="stat-icon primary">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    Total
+                </div>
+            </div>
+            <h2 class="stat-number">{{ stats.total_alerts }}</h2>
+            <p class="stat-label">Alertes Totales</p>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-header">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-trend trend-stable">
+                    <i class="fas fa-arrow-right"></i>
+                    {% widthratio stats.resolved_alerts stats.total_alerts 100 %}%
+                </div>
+            </div>
+            <h2 class="stat-number">{{ stats.resolved_alerts }}</h2>
+            <p class="stat-label">Alertes Résolues</p>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-header">
+                <div class="stat-icon warning">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="stat-trend trend-{% if stats.active_alerts > 0 %}up{% else %}stable{% endif %}">
+                    <i class="fas fa-arrow-{% if stats.active_alerts > 0 %}up{% else %}right{% endif %}"></i>
+                    Actives
+                </div>
+            </div>
+            <h2 class="stat-number">{{ stats.active_alerts }}</h2>
+            <p class="stat-label">Alertes Actives</p>
+        </div>
+
+        <div class="stat-card critical">
+            <div class="stat-header">
+                <div class="stat-icon critical">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-trend trend-{% if stats.by_severity.CRITICAL > 0 %}up{% else %}stable{% endif %}">
+                    <i class="fas fa-arrow-{% if stats.by_severity.CRITICAL > 0 %}up{% else %}right{% endif %}"></i>
+                    Critiques
+                </div>
+            </div>
+            <h2 class="stat-number">{{ stats.by_severity.CRITICAL }}</h2>
+            <p class="stat-label">Alertes Critiques</p>
+        </div>
+    </div>
+
+    <!-- Graphiques et répartitions -->
+    <div class="charts-section">
+        <div class="chart-row">
+            <!-- Répartition par sévérité -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Répartition par Sévérité</h3>
+                </div>
+                <div class="chart-content">
+                    <div class="severity-breakdown">
+                        <div class="severity-item critical">
+                            <div class="severity-bar">
+                                <div class="severity-fill" style="width: {% widthratio stats.by_severity.CRITICAL stats.total_alerts 100 %}%"></div>
+                            </div>
+                            <div class="severity-info">
+                                <span class="severity-label">Critique</span>
+                                <span class="severity-count">{{ stats.by_severity.CRITICAL }}</span>
+                            </div>
+                        </div>
+                        <div class="severity-item high">
+                            <div class="severity-bar">
+                                <div class="severity-fill" style="width: {% widthratio stats.by_severity.HIGH stats.total_alerts 100 %}%"></div>
+                            </div>
+                            <div class="severity-info">
+                                <span class="severity-label">Élevé</span>
+                                <span class="severity-count">{{ stats.by_severity.HIGH }}</span>
+                            </div>
+                        </div>
+                        <div class="severity-item medium">
+                            <div class="severity-bar">
+                                <div class="severity-fill" style="width: {% widthratio stats.by_severity.MEDIUM stats.total_alerts 100 %}%"></div>
+                            </div>
+                            <div class="severity-info">
+                                <span class="severity-label">Moyen</span>
+                                <span class="severity-count">{{ stats.by_severity.MEDIUM }}</span>
+                            </div>
+                        </div>
+                        <div class="severity-item low">
+                            <div class="severity-bar">
+                                <div class="severity-fill" style="width: {% widthratio stats.by_severity.LOW stats.total_alerts 100 %}%"></div>
+                            </div>
+                            <div class="severity-info">
+                                <span class="severity-label">Faible</span>
+                                <span class="severity-count">{{ stats.by_severity.LOW }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Répartition par type -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Répartition par Type</h3>
+                </div>
+                <div class="chart-content">
+                    <div class="type-breakdown">
+                        {% for type_key, type_count in stats.by_type.items %}
+                        <div class="type-item">
+                            <div class="type-bar">
+                                <div class="type-fill" style="width: {% widthratio type_count stats.total_alerts 100 %}%"></div>
+                            </div>
+                            <div class="type-info">
+                                <span class="type-label">{{ type_key }}</span>
+                                <span class="type-count">{{ type_count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top routeurs -->
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3><i class="fas fa-server"></i> Top 10 Routeurs par Nombre d'Alertes</h3>
+            </div>
+            <div class="chart-content">
+                {% if stats.by_router %}
+                <div class="router-breakdown">
+                    {% for router_stat in stats.by_router %}
+                    <div class="router-item">
+                        <div class="router-name">{{ router_stat.router__name|default:"Routeur inconnu" }}</div>
+                        <div class="router-bar">
+                            <div class="router-fill" style="width: {% widthratio router_stat.count stats.by_router.0.count 100 %}%"></div>
+                        </div>
+                        <div class="router-count">{{ router_stat.count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Aucune donnée de routeur disponible pour cette période</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Évolution temporelle -->
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Évolution Temporelle ({{ days }} derniers jours)</h3>
+            </div>
+            <div class="chart-content">
+                {% if daily_stats %}
+                <div class="timeline-chart">
+                    <canvas id="timelineChart" width="800" height="300"></canvas>
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Aucune donnée temporelle disponible pour cette période</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé -->
+    <div class="summary-section">
+        <div class="summary-card">
+            <h3><i class="fas fa-info-circle"></i> Résumé de la Période</h3>
+            <div class="summary-content">
+                <p><strong>Période analysée:</strong> {{ days }} jours (du {{ start_date|date:"d/m/Y" }} à aujourd'hui)</p>
+                <p><strong>Taux de résolution:</strong> 
+                    {% if stats.total_alerts > 0 %}
+                        {% widthratio stats.resolved_alerts stats.total_alerts 100 %}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+                <p><strong>Alerte la plus fréquente:</strong> 
+                    {% for type_key, type_count in stats.by_type.items %}
+                        {% if forloop.first %}{{ type_key }} ({{ type_count }} occurrences){% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Données pour le graphique temporel
+const timelineData = {
+    labels: [
+        {% for day_stat in daily_stats %}
+        '{{ day_stat.date }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    datasets: [{
+        label: 'Total',
+        data: [
+            {% for day_stat in daily_stats %}
+            {{ day_stat.total }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: true
+    }, {
+        label: 'Critiques',
+        data: [
+            {% for day_stat in daily_stats %}
+            {{ day_stat.critical }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        fill: false
+    }]
+};
+
+// Configuration du graphique
+const timelineConfig = {
+    type: 'line',
+    data: timelineData,
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Évolution des alertes'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+};
+
+// Initialiser le graphique
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('timelineChart');
+    if (canvas) {
+        new Chart(canvas, timelineConfig);
+    }
+});
+</script>
+{% endblock %}

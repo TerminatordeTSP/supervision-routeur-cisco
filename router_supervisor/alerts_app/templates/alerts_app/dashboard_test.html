@@ -1,0 +1,28 @@
+{% extends 'alerts_app/base_alerts.html' %}
+{% load static %}
+{% load alerts_extras %}
+
+{% block alerts_content %}
+<div class="alerts-header">
+    <div class="container">
+        <h1 class="alerts-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            Test Dashboard
+        </h1>
+        <p class="alerts-subtitle">
+            Template syntax test
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <p>Template test - if you see this, the basic structure works.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+console.log('JavaScript test');
+</script>
+{% endblock %}

@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Database initialization and health check script
-# This script ensures the database is properly set up before starting the application
-
+# Fixed database initialization script
 set -e
 
 # Colors for output
@@ -11,7 +9,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}Starting database initialization and health check...${NC}"
+echo -e "${GREEN}Starting database initialization...${NC}"
 
 # Change to the router_supervisor directory
 cd /code/router_supervisor
@@ -36,7 +34,7 @@ run_django_command() {
 check_database_tables() {
     echo -e "${YELLOW}Checking if database tables exist...${NC}"
     
-    # Use Django shell to check if tables exist
+    # Use inspect_db instead of dbhealth if available
     if python3 manage.py shell -c "
 from django.db import connection
 cursor = connection.cursor()
@@ -68,8 +66,7 @@ initialize_database() {
     python3 manage.py makemigrations --noinput || echo "Other migrations might already exist"
     
     # Apply migrations
-    echo -e "${YELLOW}Applying migrations${NC}"
-    if python3 manage.py migrate --noinput; then
+    if run_django_command "migrate --noinput" "Applying migrations"; then
         echo -e "${GREEN}✓ Database migration completed${NC}"
     else
         echo -e "${RED}✗ Database migration failed${NC}"
@@ -102,18 +99,13 @@ main() {
         if initialize_database; then
             echo -e "${GREEN}Database initialization completed!${NC}"
         else
-            echo -e "${RED}Database initialization failed. The application may not work correctly.${NC}"
+            echo -e "${RED}Database initialization failed.${NC}"
             exit 1
         fi
     fi
     
-    # Final health check
-    echo -e "${YELLOW}Running final check...${NC}"
-    python3 manage.py check --deploy 2>/dev/null || echo "Deploy check completed with warnings"
-    
     # Collect static files
-    echo -e "${YELLOW}Collecting static files${NC}"
-    python3 manage.py collectstatic --noinput || echo "Warning: Static files collection failed"
+    run_django_command "collectstatic --noinput" "Collecting static files" || echo "Warning: Static files collection failed"
     
     echo -e "${GREEN}Database setup completed successfully!${NC}"
 }

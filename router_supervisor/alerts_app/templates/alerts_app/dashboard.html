@@ -1,0 +1,117 @@
+{% extends 'alerts_app/base_alerts.html' %}
+{% load static %}
+{% load alerts_extras %}
+
+{% block alerts_content %}
+<!-- Header moderne -->
+<div class="alerts-header">
+    <div class="container">
+        <h1 class="alerts-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            Tableau de Bord des Alertes
+        </h1>
+        <p class="alerts-subtitle">
+            Supervision en temps réel de vos équipements réseau
+        </p>
+        
+        <!-- Navigation -->
+        <nav class="alerts-nav">
+            <a href="{% url 'alerts_app:dashboard' %}" class="nav-link active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'alerts_app:alerts_list' %}" class="nav-link">
+                <i class="fas fa-list"></i> Toutes les alertes
+            </a>
+            <a href="{% url 'alerts_app:statistics' %}" class="nav-link">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+            <a href="/thresholds/" class="nav-link">
+                <i class="fas fa-cogs"></i> Seuils & Configuration
+            </a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Statistiques principales -->
+    <div class="stats-grid">
+        <div class="stat-card critical">
+            <div class="stat-header">
+                <div class="stat-icon critical">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-trend trend-{% if summary.total_active > 0 %}up{% else %}stable{% endif %}">
+                    <i class="fas fa-arrow-{% if summary.total_active > 0 %}up{% else %}right{% endif %}"></i>
+                    {% if summary.total_active > 0 %}Attention requise{% else %}Système stable{% endif %}
+                </div>
+            </div>
+            <h2 class="stat-number" id="total-alerts">{{ summary.total_active|default:0 }}</h2>
+            <p class="stat-label">Alertes Actives</p>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-header">
+                <div class="stat-icon warning">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-trend trend-{% if summary.by_severity.critical > 0 %}up{% else %}stable{% endif %}">
+                    <i class="fas fa-arrow-{% if summary.by_severity.critical > 0 %}up{% else %}right{% endif %}"></i>
+                    {% if summary.by_severity.critical > 0 %}Critique{% else %}Normal{% endif %}
+                </div>
+            </div>
+            <h2 class="stat-number" id="critical-alerts">{{ summary.by_severity.critical|default:0 }}</h2>
+            <p class="stat-label">Alertes Critiques</p>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-header">
+                <div class="stat-icon info">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="stat-trend trend-stable">
+                    <i class="fas fa-arrow-right"></i>
+                    Surveillé
+                </div>
+            </div>
+            <h2 class="stat-number" id="high-alerts">{{ summary.by_severity.high|default:0 }}</h2>
+            <p class="stat-label">Alertes Élevées</p>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-header">
+                <div class="stat-icon success">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="stat-trend trend-stable">
+                    <i class="fas fa-arrow-right"></i>
+                    Normal
+                </div>
+            </div>
+            <h2 class="stat-number" id="medium-alerts">{{ summary.by_severity.medium|default:0 }}</h2>
+            <p class="stat-label">Alertes Moyennes</p>
+        </div>
+    </div>
+    
+    <!-- CSRF Token pour les actions AJAX -->
+    {% csrf_token %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Dashboard JavaScript
+console.log('Dashboard loaded');
+
+// Simple dashboard functionality
+function refreshDashboard() {
+    console.log('Refreshing dashboard');
+    location.reload();
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard initialized');
+});
+</script>
+{% endblock %}

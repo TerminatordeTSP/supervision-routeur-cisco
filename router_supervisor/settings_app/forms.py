@@ -6,13 +6,51 @@ from router_supervisor.settings_app.models import UserPreferences
 
 class CustomUserCreationForm(UserCreationForm):
     """Formulaire de création d'utilisateur personnalisé"""
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Email'
+        }),
+        label='Email'
+    )
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Prénom'
+        }),
+        label='Prénom'
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nom'
+        }),
+        label='Nom'
+    )
     
     class Meta:
         model = User
         fields = ('email', 'first_name', 'last_name', 'password1', 'password2')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ajouter des classes CSS aux champs password
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Mot de passe'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Confirmer le mot de passe'
+        })
+        # Simplifier les messages d'aide
+        self.fields['password1'].help_text = None
+        self.fields['password2'].help_text = None
     
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -26,6 +64,14 @@ class CustomUserCreationForm(UserCreationForm):
 
 class UserInfoForm(forms.ModelForm):
     """Formulaire pour modifier les informations personnelles"""
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nouveau mot de passe (laisser vide pour conserver)'
+        }),
+        required=False,
+        label='Nouveau mot de passe'
+    )
     
     class Meta:
         model = User
@@ -49,6 +95,15 @@ class UserInfoForm(forms.ModelForm):
             'last_name': 'Nom',
             'email': 'Email',
         }
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+        return user
 
 
 class UserPreferencesForm(forms.ModelForm):

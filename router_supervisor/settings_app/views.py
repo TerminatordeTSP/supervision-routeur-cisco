@@ -60,6 +60,7 @@ def index(request):
 def user_info(request):
     """Vue pour modifier les informations personnelles de l'utilisateur connecté"""
     user = request.user
+    print(f"DEBUG: User: {user.email}, First: {user.first_name}, Last: {user.last_name}")
     
     if request.method == 'POST':
         form = UserInfoForm(request.POST, instance=user)
@@ -67,8 +68,11 @@ def user_info(request):
             form.save()
             messages.success(request, "Vos informations ont été mises à jour avec succès!")
             return redirect('/settings/user_info/')
+        else:
+            print(f"DEBUG: Form errors: {form.errors}")
     else:
         form = UserInfoForm(instance=user)
+        print(f"DEBUG: Form initial data: {form.initial}")
     
     preferences = get_user_preferences(user)
     context = {

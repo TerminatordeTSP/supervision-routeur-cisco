@@ -5,6 +5,9 @@ import json
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from .influx_utils import get_latest_cpu_usage, get_latest_ram_usage, get_latest_octets
+from django.http import JsonResponse
+from influxdb_client import InfluxDBClient
+from django.views.decorators.csrf import csrf_exempt
 @login_required
 def index(request):
     # Get router data from InfluxDB
@@ -98,3 +101,31 @@ def latest_metrics_api(request):
         "router_name": get_router_name(),
     }
     return JsonResponse(data)
+
+INFLUX_URL = "http://influxdb:8086"
+INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="
+INFLUX_ORG = "telecom-sudparis"
+INFLUX_BUCKET = "router-metrics"
+
+@csrf_exempt  # (désactive temporairement le CSRF pour tester)
+def get_latest_metrics(request):
+    client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
+    query_api = client.query_api()
+    query = f'''
+        from(bucket: "{INFLUX_BUCKET}")
+          |> range(start: -1m)
+          |> last()
+    '''
+    result = query_api.query(org=INFLUX_ORG, query=query)
+    data = []
+    for table in result:
+        for record in table.records:
+            data.append({
+                "measurement": record.get_measurement(),
+                "field": record.get_field(),
+                "value": record.get_value(),
+                "time": str(record.get_time()),
+                "tags": record.values
+            })
+    client.close()
+    return JsonResponse(data, safe=False)

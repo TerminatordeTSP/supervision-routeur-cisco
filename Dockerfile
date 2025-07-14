@@ -38,14 +38,16 @@ RUN curl -s https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor 
 # Créer les répertoires nécessaires (si besoin)
 RUN mkdir -p /code/static /code/media
 
-# Copier le code source Django et le client InfluxDB
+
+# Copier le code source Django, le client InfluxDB et les scripts
 COPY router_supervisor/ /code/router_supervisor/
 COPY gunicorn.conf.py /code/
+COPY scripts/ /code/scripts/
 
 # Scripts de lancement
 COPY entrypoint.sh /entrypoint.sh
 COPY start /start
-RUN chmod +x /entrypoint.sh /start
+RUN chmod +x /entrypoint.sh /start /code/scripts/clean_migrations.sh
 
 # Exposer le port Django
 EXPOSE 8080/tcp

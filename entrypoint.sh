@@ -45,8 +45,15 @@ echo "DJANGO_SETTINGS_MODULE: $DJANGO_SETTINGS_MODULE"
 mkdir -p /code/static /code/media /tmp/metrics
 chmod -R 755 /code/static /code/media /tmp/metrics
 
+
 # Créer un fichier init dans le dossier src pour qu'il soit reconnu comme un package Python
 touch /code/router_supervisor/src/__init__.py
+
+# Nettoyer les migrations (sauf __init__.py) à chaque démarrage
+if [ -f /code/scripts/clean_migrations.sh ]; then
+    echo "Cleaning Django migration files..."
+    /code/scripts/clean_migrations.sh
+fi
 
 echo "Checking for missing migrations..."
 cd /code && python3 router_supervisor/manage.py makemigrations --check --no-input || echo "Missing migrations detected!"

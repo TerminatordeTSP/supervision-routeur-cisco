@@ -11,6 +11,13 @@ from django.contrib import messages
 from router_supervisor.core_models.models import Router, Threshold
 from .forms import RouterForm
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from router_supervisor.core_models.models import Router
+from thresholds_app.forms import RouterForm
+
 
 @login_required
 def index(request):
@@ -102,96 +109,69 @@ def configuration_router_detail(request, router_id):
                   })
 @login_required
 def routers(request):
+    router = None
+
     if request.method == 'POST':
         form = RouterForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            ip_address = form.cleaned_data['ip_address']
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            secret = form.cleaned_data['secret']
-            threshold = form.cleaned_data['threshold']
-
             try:
-                if Router.objects.filter(name=name).exists():
-                    form.add_error(None, f"Error: A router with the name '{name}' already exists.")
+                # NE PAS SAUVER TOUT DE SUITE
+                router = form.save(commit=False)
+
+                # Vérifie la clé étrangère :
+                if not router.threshold:
+                    router.threshold = None
+
+                # Unicité sur le nom :
+                if Router.objects.filter(name=router.name).exists():
+                    form.add_error(None, f"Error: A router with the name '{router.name}' already exists.")
                 else:
-                    router = Router(
-                        name=name,
-                        ip_address=ip_address,
-                        username=username,
-                        password=password,
-                        secret=secret,
-                        threshold=threshold
-                    )
                     router.save()
+                    messages.success(request, f"Router '{router.name}' successfully created.")
                     return redirect('configuration')
+
             except IntegrityError as e:
                 form.add_error(None, f"Error creating router: {str(e)}")
+
     else:
         form = RouterForm()
 
-    return render(request,
-                  'router_update.html',
-                  {'form': form, 'thresholds': Threshold.objects.all()})
-@login_required
-def routers(request):
-    if request.method == 'POST':
-        form = RouterForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            ip_address = form.cleaned_data['ip_address']
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            secret = form.cleaned_data['secret']
-            threshold = form.cleaned_data['threshold']
-
-            try:
-                if Router.objects.filter(name=name).exists():
-                    form.add_error(None, f"Error: A router with the name '{name}' already exists.")
-                else:
-                    router = Router(
-                        name=name,
-                        ip_address=ip_address,
-                        username=username,
-                        password=password,
-                        secret=secret,
-                        threshold=threshold
-                    )
-                    router.save()
-                    return redirect('configuration')
-            except IntegrityError as e:
-                form.add_error(None, f"Error creating router: {str(e)}")
-    else:
-        form = RouterForm()
-
-    return render(request,
-                  'router_update.html',
-                  {'form': form, 'thresholds': Threshold.objects.all()})
+    return render(
+        request,
+        'router_create.html',
+        {'form': form, 'router': router}
+    )
 @login_required
 def router_update(request, id):
-    router = get_object_or_404(Router, router_id=id)
+    router = get_object_or_404(Router, pk=id)
 
     if request.method == 'POST':
         form = RouterForm(request.POST, instance=router)
         if form.is_valid():
             try:
-                form.save()
-                messages.success(request, 'Router successfully updated.')
+                router = form.save(commit=False)
+
+                if not router.threshold:
+                    router.threshold = None
+
+                router.save()
+                messages.success(request, f"Router '{router.name}' successfully updated.")
                 return redirect('configuration')
             except Exception as e:
-                messages.error(request, f'Error during update: {str(e)}')
+                messages.error(request, f"Error during update: {str(e)}")
     else:
         form = RouterForm(instance=router)
 
-    return render(request,
-                  'router_update.html',
-                  {
-                      'form': form,
-                      'router': router,
-                      'thresholds': Threshold.objects.all(),
-                      'router_id': router.router_id
-                  })
+    return render(
+        request,
+        'router_update.html',
+        {
+            'form': form,
+            'router': router,
+            'thresholds': Threshold.objects.all(),
+            'router_id': router.router_id
+        }
+    )
 @login_required
 def router_delete(request, id):
     router = get_object_or_404(Router, router_id=id)

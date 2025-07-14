@@ -167,5 +167,13 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'     # Où aller après login
 LOGOUT_REDIRECT_URL = '/login/' # Où aller après logout
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 AUTH_USER_MODEL = 'core_models.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'z.imt.fr'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ryan.zerhouni@telecom-sudparis.eu'
+EMAIL_HOST_PASSWORD = 'Azertyuiop007**'
+DEFAULT_FROM_EMAIL = 'admin@telecom-sudparis.eu'

@@ -1,5 +1,5 @@
 from django import forms
-from router_supervisor.core_models.models import Threshold, Router
+from router_supervisor.core_models.models import Router, Threshold
 
 class threshold_insert(forms.ModelForm):
     ram = forms.FloatField(
@@ -19,7 +19,7 @@ class threshold_insert(forms.ModelForm):
             'step': '0.1'
         })
     )
-    traffic = forms.FloatField(  # ici corrigé
+    traffic = forms.FloatField(
         min_value=0.001,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
@@ -41,52 +41,11 @@ class threshold_insert(forms.ModelForm):
 
 
 class RouterForm(forms.ModelForm):
-    name = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter router name'
-        })
-    )
-
-    ip_address = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter IP address'
-        })
-    )
-
-    username = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter username'
-        })
-    )
-
-    password = forms.CharField(
-        max_length=50,
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter password'
-        })
-    )
-
-    secret = forms.CharField(
-        max_length=50,
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter secret'
-        })
-    )
-
     threshold = forms.ModelChoiceField(
         queryset=Threshold.objects.all(),
-        empty_label="-- Select Threshold --",
-        widget=forms.Select(attrs={
-            'class': 'form-select'
-        })
+        required=False,
+        empty_label="No threshold",
+        widget = forms.Select(attrs={"class": "form-select"})
     )
 
     class Meta:

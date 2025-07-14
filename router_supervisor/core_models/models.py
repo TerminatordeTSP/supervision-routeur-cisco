@@ -78,7 +78,12 @@ class Router(models.Model):
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
     secret = models.CharField(max_length=50)
-    threshold = models.ForeignKey(Threshold, on_delete=models.CASCADE)
+    threshold = models.ForeignKey(
+        Threshold,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name
@@ -167,3 +172,12 @@ class KPI_Interface_Log(models.Model):
 
     def __str__(self):
         return f"Interface {self.interface} - Log {self.log_id} - KPI {self.kpi}: {self.value}"
+
+class RouterMetricLog(models.Model):
+    router = models.ForeignKey(Router, on_delete=models.CASCADE)
+    metric_name = models.CharField(max_length=50)
+    value = models.FloatField(null=True, blank=True)
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        db_table = "router_metric_log"

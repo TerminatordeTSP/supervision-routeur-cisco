@@ -5,8 +5,22 @@
 
 {% block content %}
 <div class="container">
-    <header class="page-header">
-        <h1 class="title">Configuration Page</h1>
+    <header class="page-header" style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    ">
+        <div style="flex: 1;"></div>  <!-- espace gauche vide -->
+
+        <h1 class="title" style="flex: 1; text-align: center; margin: 0;">
+            Configuration Page
+        </h1>
+
+        <div style="flex: 1; text-align: right;">
+            <a href="http://localhost:8080/" class="button btn-router">
+                Home
+            </a>
+        </div>
         <link rel="stylesheet" href="{% static 'router_config/config_style.css' %}" />
     </header>
 
@@ -15,7 +29,7 @@
         <ul class="list">
             {% for router in routers %}
                 <li class="list-item">
-                    <a class="button btn-router" href="{% url 'configuration_router_config' router.router_id %}">
+                    <a class="button btn-router" href="{% url 'configuration_router_detail' router.router_id %}">
                         {{ router.name }}
                     </a>
                 </li>
@@ -43,6 +57,12 @@
     <section class="section center-section">
         <a class="button btn-threshold" href="{% url 'thresholds' %}">
             Configure a New Threshold
+        </a>
+    </section>
+
+    <section class="section center-section" style="margin-top: 20px;">
+        <a class="button btn-router" href="{% url 'routers' %}">
+            Configure a New Router
         </a>
     </section>
 </div>

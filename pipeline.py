@@ -4,11 +4,13 @@ import time
 import json
 import os
 import re
+import signal
+import sys
 from influxdb_client import Point, WritePrecision, InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 
-INFLUX_URL = "http://localhost:8086"
+INFLUX_URL = "http://influxdb:8086"
 INFLUX_TOKEN = "BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA=="
 INFLUX_ORG = "telecom-sudparis"
 INFLUX_BUCKET = "router-metrics"
@@ -150,11 +152,27 @@ def send_to_influx(metrics):
         if timestamp:
             point = point.time(timestamp, WritePrecision.NS)
 
+        # 🟡 Ajout ICI du print debug :
+        print("➡️ Sending to InfluxDB:", point.to_line_protocol())
+
         write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
 
     client.close()
 
+
+def signal_handler(signum, frame):
+    """Handle graceful shutdown"""
+    print(f"\n🛑 Received signal {signum}. Stopping pipeline...")
+    if os.path.exists("run.flag"):
+        os.remove("run.flag")
+    sys.exit(0)
+
+
 def main():
+    # Set up signal handlers for graceful shutdown
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+
     if not os.path.exists("run.flag"):
         print("❌ run.flag manquant. Créez-le avec : touch run.flag")
         return
@@ -162,13 +180,17 @@ def main():
     try:
         while os.path.exists("run.flag"):
             result = subprocess.run(
-                ["telegraf", "--config", "telegraf/telegraf.conf", "--test"],
+                ["telegraf", "--config", "/etc/telegraf/telegraf.conf", "--test"],
                 capture_output=True,
                 text=True,
                 env={**os.environ, "MIBS": ""}
             )
             parsed_metrics = parse_telegraf_output(result.stdout)
             send_to_influx(parsed_metrics)
+
+            with open("latest_metrics.json", "w") as f:
+                json.dump(parsed_metrics, f, indent=2)
+
             print("✅ Données envoyées à InfluxDB.")
             time.sleep(5)
     finally:

@@ -88,6 +88,12 @@ chmod 644 /etc/telegraf/telegraf.conf
 echo "Starting Telegraf..."
 telegraf --config /etc/telegraf/telegraf.conf & # start as a background process
 
+echo "Starting pipeline data collection..."
+# Create run flag for pipeline
+touch /code/run.flag
+# Start pipeline as background process
+cd /code && python3 pipeline.py &
+
 echo "Current directory: $(pwd)"
 echo "Directory contents: $(ls -la)"
 echo "Python path: $(python3 -c 'import sys; print(sys.path)')"

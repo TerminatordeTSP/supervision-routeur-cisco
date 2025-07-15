@@ -42,7 +42,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("router_supervisor.settings_app.urls")),
     path('thresholds/', include('thresholds_app.urls')),
-    path('alerts/', include('router_supervisor.alerts_app.urls')),
+    path('alertes/', include('router_supervisor.alerts_app.urls')),
     path('api/', include('router_supervisor.api_app.urls')),
     path('api/interfaces/', interfaces_api, name='interfaces_api'),
     path('health/', health_check, name='health_check'),

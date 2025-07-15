@@ -1,0 +1,12 @@
+:80 {
+    # Servir les fichiers statiques - one unified handler
+    handle /static/* {
+        root * /srv
+        file_server
+    }
+    
+    # Fallback pour l'application Django
+    handle {
+        reverse_proxy router_django:8080
+    }
+}

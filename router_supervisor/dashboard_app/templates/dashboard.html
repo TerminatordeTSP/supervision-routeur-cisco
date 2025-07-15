@@ -119,6 +119,60 @@
         background: var(--main-orange);
         color: #1A1111;
     }
+    /* Indicateurs de status */
+    .alert-orange {
+        color: var(--main-orange) !important;
+        text-shadow: 0 0 10px var(--main-orange);
+    }
+    
+    .alert-low {
+        color: var(--main-orange) !important;
+        text-shadow: 0 0 10px var(--main-orange);
+    }
+    
+    .alert-medium {
+        color: var(--main-orange) !important;
+        text-shadow: 0 0 10px var(--main-orange);
+    }
+    
+    .alert-high {
+        color: #e74c3c !important;
+        text-shadow: 0 0 10px #e74c3c;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+
+    /* Animations pour les barres de progression */
+    .bar {
+        background-color: var(--main-orange);
+        height: 20px;
+        border-radius: 10px;
+        transition: width 0.5s ease-in-out !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shine 2s infinite;
+    }
+    
+    @keyframes shine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
     @media (max-width: 900px) {
         .top-cards, .mid-cards, .charts-row {
             flex-direction: column;
@@ -204,46 +258,189 @@
 </div>
 
 <script>
+// Variables pour maintenir les dernières valeurs connues
+let lastKnownValues = {
+    cpu: 0,
+    ram: 0,
+    latency: 0,
+    uptime: 0,
+    sys_cpu: 0,
+    sys_load: 0,
+    router_name: 'pod4-cat8kv',
+    last_updated: new Date().toISOString()
+};
+
+// Variables pour l'animation et les performances
+let isUpdating = false;
+let animationQueue = [];
+
+function animateValue(elementId, newValue, suffix = '') {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const currentValue = parseFloat(element.textContent) || 0;
+    const difference = newValue - currentValue;
+    const steps = 20;
+    const stepValue = difference / steps;
+    
+    let step = 0;
+    const animate = () => {
+        if (step < steps) {
+            const value = currentValue + (stepValue * step);
+            element.textContent = value.toFixed(1) + suffix;
+            step++;
+            requestAnimationFrame(animate);
+        } else {
+            element.textContent = newValue.toFixed(1) + suffix;
+        }
+    };
+    
+    requestAnimationFrame(animate);
+}
+
+function updateDisplay(values) {
+    if (isUpdating) return;
+    isUpdating = true;
+    
+    try {
+        // Animer les valeurs numériques
+        animateValue('router_cpu', values.cpu, '');
+        animateValue('system_cpu', values.sys_cpu, '');
+        animateValue('system_load', values.sys_load, '');
+        animateValue('latency', values.latency, '');
+        animateValue('ram_usage', values.ram, '');
+        
+        // Uptime sans animation (trop grand pour être animé)
+        document.getElementById('router_uptime').textContent = (values.uptime / 3600).toFixed(2);
+
+        // Mettre à jour les barres de progression avec animation
+        const progressBars = [
+            { id: 'router_cpu_progress', value: Math.min(values.cpu, 100) },
+            { id: 'memory_usage_progress', value: Math.min(values.ram, 100) },
+            { id: 'latency_progress', value: Math.min(values.latency / 10, 100) }
+        ];
+        
+        progressBars.forEach(bar => {
+            const element = document.getElementById(bar.id);
+            if (element) {
+                element.style.transition = 'width 0.5s ease-in-out';
+                element.style.width = bar.value + '%';
+            }
+        });
+
+        // Mettre à jour les labels des barres
+        document.getElementById('router_cpu_bar').textContent = values.cpu.toFixed(1) + "%";
+        document.getElementById('memory_usage_bar').textContent = values.ram.toFixed(1) + "%";
+        document.getElementById('latency_bar').textContent = values.latency.toFixed(1) + " ms";
+
+        // Mettre à jour les infos du routeur
+        document.getElementById('router_name').textContent = values.router_name;
+        
+        // Formatter la date pour l'affichage
+        const date = new Date(values.last_updated);
+        const formatted = date.toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('last_updated').textContent = formatted;
+        
+        // Ajouter des indicateurs de status
+        updateStatusIndicators(values);
+        
+    } finally {
+        isUpdating = false;
+    }
+}
+
+function updateStatusIndicators(values) {
+    // Indicateur de santé CPU - Orange par défaut, rouge si critique
+    const cpuElement = document.getElementById('router_cpu');
+    if (cpuElement) {
+        cpuElement.className = values.cpu > 80 ? 'alert-high' : 'alert-orange';
+    }
+    
+    // Indicateur de santé mémoire - Orange par défaut, rouge si critique
+    const memElement = document.getElementById('ram_usage');
+    if (memElement) {
+        memElement.className = values.ram > 85 ? 'alert-high' : 'alert-orange';
+    }
+    
+    // Indicateur de santé réseau - Orange par défaut, rouge si critique
+    const latencyElement = document.getElementById('latency');
+    if (latencyElement) {
+        latencyElement.className = values.latency > 10 ? 'alert-high' : 'alert-orange';
+    }
+}
+
 function fetchMetrics() {
-    fetch('/api/latest_metrics/')
-        .then(response => response.json())
+    fetch('/api/latest-metrics/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            let cpu = data.find(x => x.field === "cpu_0_usage");
-            let ram = data.find(x => x.field === "used_percent" || x.field === "ram_used");
-            let latency = data.find(x => x.field === "latency_ms");
-            let uptime = data.find(x => x.field === "uptime");
-            let sys_cpu = data.find(x => x.field === "usage_system");
-            let sys_load = data.find(x => x.field === "load1");
-
-            document.getElementById('router_cpu').textContent = cpu ? cpu.value : "0";
-            document.getElementById('system_cpu').textContent = sys_cpu ? sys_cpu.value : "0";
-            document.getElementById('system_load').textContent = sys_load ? sys_load.value : "0";
-            document.getElementById('latency').textContent = latency ? latency.value : "0";
-            document.getElementById('ram_usage').textContent = ram ? ram.value : "0";
-            document.getElementById('router_uptime').textContent = uptime ? (uptime.value / 3600).toFixed(2) : "0";
-
-            document.getElementById('router_cpu_bar').textContent = cpu ? cpu.value + "%" : "0%";
-            document.getElementById('memory_usage_bar').textContent = ram ? ram.value + "%" : "0%";
-            document.getElementById('latency_bar').textContent = latency ? latency.value + " ms" : "0 ms";
-            document.getElementById('router_cpu_progress').style.width = cpu ? (cpu.value || 0) + "%" : "0%";
-            document.getElementById('memory_usage_progress').style.width = ram ? (ram.value || 0) + "%" : "0%";
-            document.getElementById('latency_progress').style.width = latency ? Math.min((latency.value || 0) / 10, 100) + "%" : "0%";
-
-            if (cpu && cpu.tags && cpu.tags.hostname) {
-                document.getElementById('router_name').textContent = cpu.tags.hostname;
-            } else {
-                document.getElementById('router_name').textContent = '';
+            console.log('Received data:', data);
+            
+            // Traiter les données reçues avec les nouvelles clés
+            let newValues = { ...lastKnownValues };
+            
+            if (data.cpu_5min !== undefined && data.cpu_5min !== null) {
+                newValues.cpu = data.cpu_5min;
             }
-
-            if (cpu && cpu.time) {
-                document.getElementById('last_updated').textContent = cpu.time.replace("T", " ").replace("Z", "");
-            } else {
-                document.getElementById('last_updated').textContent = '';
+            
+            if (data.ram_used !== undefined && data.ram_used !== null) {
+                newValues.ram = data.ram_used;
             }
+            
+            if (data.latency_ms !== undefined && data.latency_ms !== null) {
+                newValues.latency = data.latency_ms;
+            }
+            
+            if (data.uptime !== undefined && data.uptime !== null) {
+                newValues.uptime = data.uptime;
+            }
+            
+            if (data.system_cpu !== undefined && data.system_cpu !== null) {
+                newValues.sys_cpu = data.system_cpu;
+            }
+            
+            if (data.load1 !== undefined && data.load1 !== null) {
+                newValues.sys_load = data.load1;
+            }
+            
+            if (data.router_name !== undefined && data.router_name !== null) {
+                newValues.router_name = data.router_name;
+            }
+            
+            // Mettre à jour le timestamp
+            newValues.last_updated = new Date().toISOString();
+            
+            // Mettre à jour les dernières valeurs connues
+            lastKnownValues = newValues;
+            
+            // Mettre à jour l'affichage
+            updateDisplay(newValues);
+        })
+        .catch(error => {
+            console.error('Error fetching metrics:', error);
+            // En cas d'erreur, garder les dernières valeurs connues
+            // Mais mettre à jour le timestamp pour indiquer qu'il y a un problème
+            lastKnownValues.last_updated = new Date().toISOString();
+            updateDisplay(lastKnownValues);
         });
 }
 
-setInterval(fetchMetrics, 5000);
-fetchMetrics();
+// Initialiser l'affichage au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    updateDisplay(lastKnownValues);
+    fetchMetrics();
+    setInterval(fetchMetrics, 5000);
+});
 </script>
 {% endblock %}

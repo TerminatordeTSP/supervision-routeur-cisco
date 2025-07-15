@@ -119,6 +119,20 @@ services:
       - HOST_SYS=/host/sys
       - HOST_ETC=/host/etc
 
+  data_generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.data-generator
+    container_name: data_generator
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
+      - INFLUX_ORG=telecom-sudparis
+      - INFLUX_BUCKET=router-metrics
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
 volumes:
   pgdata:
   pgadmin_data:

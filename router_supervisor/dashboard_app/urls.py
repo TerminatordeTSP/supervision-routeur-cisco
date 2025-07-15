@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     path('', index, name="dashboard_index"),
-    #path('api/latest-metrics/', latest_metrics_api, name='latest_metrics_api'),
+    path('api/latest-metrics/', views.latest_metrics_api, name='latest_metrics_api'),
     # path('dashboard/', include("dashboard_app.urls")),
-    path('api/latest_metrics/', views.get_latest_metrics, name='latest_metrics'),
+    path('api/latest_metrics/', views.latest_metrics_api, name='latest_metrics'),
 ]

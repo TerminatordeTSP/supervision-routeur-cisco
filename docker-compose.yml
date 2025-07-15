@@ -40,7 +40,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./caddy:/etc/caddy
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - static_volume:/srv/static
       - media_volume:/srv/media
     depends_on:

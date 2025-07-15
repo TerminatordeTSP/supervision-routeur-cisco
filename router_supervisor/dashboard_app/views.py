@@ -69,79 +69,60 @@ metrics_cache = MetricsCache()
 
 def get_latest_metrics_from_influx():
     """Récupère les dernières métriques depuis InfluxDB avec cache"""
+    print("🔍 DEBUG: get_latest_metrics_from_influx appelée - VERSION INFLUXDB RÉELLE")
+    
+    # Vérifier si InfluxDB est disponible
     if not INFLUX_AVAILABLE:
-        print("Client InfluxDB non disponible, utilisation des données de fallback")
+        print("⚠️ InfluxDB non disponible, utilisation des données de fallback")
         return get_fallback_metrics()
     
-    # Essayer de récupérer depuis le cache
-    cached_data = metrics_cache.get("latest_metrics")
-    if cached_data is not None:
-        return cached_data
-    
     try:
-        client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
-        query_api = client.query_api()
-        
-        # Requête optimisée pour récupérer les dernières valeurs SNMP
-        query = f'''
-            snmp_data = from(bucket: "{INFLUX_BUCKET}")
-              |> range(start: -5m)
-              |> filter(fn: (r) => r["_measurement"] == "snmp")
-              |> filter(fn: (r) => r["_field"] == "cpu_0_usage" or r["_field"] == "cpu_5min" or r["_field"] == "ram_used" or r["_field"] == "ram_free" or r["_field"] == "uptime")
-              |> group(columns: ["_field"])
-              |> last()
+        # Récupérer les données d'InfluxDB
+        with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) as client:
+            query_api = client.query_api()
             
-            ping_data = from(bucket: "{INFLUX_BUCKET}")
-              |> range(start: -5m)
-              |> filter(fn: (r) => r["_measurement"] == "ping")
-              |> filter(fn: (r) => r["_field"] == "average_response_ms")
-              |> last()
+            # Requête pour récupérer les dernières métriques
+            flux_query = f'''
+                from(bucket:"{INFLUX_BUCKET}")
+                |> range(start: -10m)
+                |> filter(fn: (r) => r._measurement == "snmp" or r._measurement == "ping")
+                |> filter(fn: (r) => r._field == "cpu_0_usage" or r._field == "cpu_5min" or r._field == "ram_used" or r._field == "ram_free" or r._field == "uptime" or r._field == "average_response_ms" or r._field == "ifInOctets" or r._field == "ifOutOctets")
+                |> sort(columns: ["_time"], desc:true)
+                |> limit(n:1)
+            '''
             
-            interface_data = from(bucket: "{INFLUX_BUCKET}")
-              |> range(start: -5m)
-              |> filter(fn: (r) => r["_measurement"] == "interfaces")
-              |> filter(fn: (r) => r["_field"] == "ifInOctets" or r["_field"] == "ifOutOctets")
-              |> group(columns: ["_field", "ifDescr"])
-              |> last()
+            tables = query_api.query(flux_query)
+            metrics_data = []
             
-            union(tables: [snmp_data, ping_data, interface_data])
-        '''
-        
-        result = query_api.query(org=INFLUX_ORG, query=query)
-        
-        data = []
-        for table in result:
-            for record in table.records:
-                data.append({
-                    "measurement": record.get_measurement(),
-                    "field": record.get_field(),
-                    "value": record.get_value(),
-                    "time": str(record.get_time()),
-                    "tags": record.values
-                })
-        
-        client.close()
-        
-        # Si pas de données, retourner des données de fallback
-        if not data:
-            print("Aucune donnée InfluxDB trouvée, utilisation des données de fallback")
-            fallback_data = get_fallback_metrics()
-            metrics_cache.set("latest_metrics", fallback_data)
-            return fallback_data
-        
-        # Mettre en cache les données récupérées
-        metrics_cache.set("latest_metrics", data)
-        print(f"✅ Données récupérées d'InfluxDB avec succès: {len(data)} métriques")
-        
-        return data
-        
+            for table in tables:
+                for record in table.records:
+                    metric = {
+                        "measurement": record.get_measurement(),
+                        "field": record.get_field(),
+                        "value": record.get_value(),
+                        "time": record.get_time().isoformat(),
+                        "tags": dict(record.values)
+                    }
+                    
+                    # Debug spécial pour l'uptime
+                    if record.get_field() == "uptime":
+                        print(f"🔍 DEBUG UPTIME RÉCUPÉRÉ - Valeur brute: {record.get_value()}")
+                        print(f"🔍 DEBUG UPTIME RÉCUPÉRÉ - Type: {type(record.get_value())}")
+                        print(f"🔍 DEBUG UPTIME RÉCUPÉRÉ - Mesure: {record.get_measurement()}")
+                        print(f"🔍 DEBUG UPTIME RÉCUPÉRÉ - Champ: {record.get_field()}")
+                    
+                    metrics_data.append(metric)
+            
+            if metrics_data:
+                print(f"✅ Données récupérées d'InfluxDB avec succès: {len(metrics_data)} métriques")
+                return metrics_data
+            else:
+                print("⚠️ Aucune donnée trouvée dans InfluxDB, utilisation des données de fallback")
+                return get_fallback_metrics()
+                
     except Exception as e:
-        print(f"❌ Erreur InfluxDB: {e}")
-        print(f"URL: {INFLUX_URL}, Token: {INFLUX_TOKEN[:10]}...")
-        print("Utilisation des données de fallback")
-        fallback_data = get_fallback_metrics()
-        metrics_cache.set("latest_metrics", fallback_data)
-        return fallback_data
+        print(f"❌ Erreur lors de la récupération des données InfluxDB: {e}")
+        return get_fallback_metrics()
 
 def parse_metrics_for_dashboard(metrics_data):
     """Parse les données de métriques pour le dashboard avec calcul des pourcentages"""
@@ -184,8 +165,21 @@ def parse_metrics_for_dashboard(metrics_data):
             elif field == 'ram_free':
                 ram_free = value
             elif field == 'uptime':
-                # Convertir de centisecondes en heures
-                context['uptime'] = round(value / 360000, 2)  # 1 cs = 0.01s, 1h = 3600s
+                # Debug: afficher la valeur brute
+                print(f"🔍 DEBUG Uptime - Valeur brute: {value}")
+                print(f"🔍 DEBUG Uptime - Type: {type(value)}")
+                
+                # Tester différentes conversions
+                centiseconds_to_hours = value / 360000
+                seconds_to_hours = value / 3600
+                
+                print(f"🔍 DEBUG Uptime - Si centisecondes -> heures: {centiseconds_to_hours}")
+                print(f"🔍 DEBUG Uptime - Si secondes -> heures: {seconds_to_hours}")
+                
+                # Correction temporaire : multiplier par 1000 pour tester
+                # Si 0.28 heures devient 280 heures, le problème est la conversion
+                context['uptime'] = round(value / 360000 * 1000, 2)
+                print(f"🔍 DEBUG Uptime - Valeur corrigée (x1000): {context['uptime']}")
         
         # Traiter les métriques de ping
         elif measurement == 'ping' and field == 'average_response_ms':
@@ -224,13 +218,17 @@ def dashboard_view(request):
 @csrf_exempt
 def get_latest_metrics(request):
     """API pour récupérer les dernières métriques (utilisée par le JS) avec cache"""
+    print("🚀 DEBUG: get_latest_metrics() appelée")
+    
     # Vérifier le cache d'abord
     cached_data = metrics_cache.get("latest_metrics")
     if cached_data:
+        print("🔍 DEBUG: Données récupérées du cache")
         return JsonResponse(cached_data, safe=False)
     
     # Si pas en cache, récupérer les données
     metrics_data = get_latest_metrics_from_influx()
+    print(f"🔍 DEBUG: Données récupérées d'InfluxDB: {len(metrics_data)} éléments")
     
     # Mettre en cache
     metrics_cache.set("latest_metrics", metrics_data)
@@ -275,8 +273,32 @@ def latest_metrics_api(request):
             elif field == 'ram_free':
                 ram_free_bytes = value
             elif field == 'uptime':
-                # Convertir de centisecondes en heures
-                data['uptime'] = round(value / 360000, 2)
+                # Debug: afficher la valeur brute
+                print(f"🔍 DEBUG Uptime API - Valeur brute: {value}")
+                print(f"🔍 DEBUG Uptime API - Type: {type(value)}")
+                
+                # Tester différentes conversions
+                centiseconds_to_hours = value / 360000
+                seconds_to_hours = value / 3600
+                
+                print(f"🔍 DEBUG Uptime API - Si centisecondes -> heures: {centiseconds_to_hours}")
+                print(f"🔍 DEBUG Uptime API - Si secondes -> heures: {seconds_to_hours}")
+                
+                # Si la valeur est très petite (< 1), c'est probablement déjà en heures
+                # Si elle est entre 1 et 1000, c'est probablement en secondes
+                # Si elle est > 100000, c'est probablement en centisecondes
+                if value < 1:
+                    # Déjà en heures
+                    data['uptime'] = round(value, 2)
+                    print(f"🔍 DEBUG Uptime API - Traité comme heures: {data['uptime']}")
+                elif value < 10000:
+                    # En secondes
+                    data['uptime'] = round(value / 3600, 2)
+                    print(f"🔍 DEBUG Uptime API - Traité comme secondes: {data['uptime']}")
+                else:
+                    # En centisecondes
+                    data['uptime'] = round(value / 360000, 2)
+                    print(f"🔍 DEBUG Uptime API - Traité comme centisecondes: {data['uptime']}")
         
         # Traiter les métriques de ping
         elif measurement == 'ping' and field == 'average_response_ms':

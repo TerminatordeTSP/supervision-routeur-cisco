@@ -377,7 +377,8 @@ function updateDisplay(values) {
         animateValue('ram_usage', values.ram, '');
         
         // Uptime sans animation (trop grand pour être animé)
-        document.getElementById('router_uptime').textContent = (values.uptime / 3600).toFixed(2);
+        // L'API retourne déjà l'uptime en heures, pas besoin de diviser par 3600
+        document.getElementById('router_uptime').textContent = values.uptime.toFixed(2);
 
         // Mettre à jour les barres de progression avec animation
         const progressBars = [

@@ -116,7 +116,7 @@ def get_latest_uptime():
         flux = f'''
             from(bucket:"{INFLUX_BUCKET}")
             |> range(start: -10m)
-            |> filter(fn: (r) => r._measurement == "system")
+            |> filter(fn: (r) => r._measurement == "snmp")
             |> filter(fn: (r) => r._field == "uptime")
             |> sort(columns: ["_time"], desc:true)
             |> limit(n:1)
@@ -124,7 +124,13 @@ def get_latest_uptime():
         tables = query_api.query(flux)
         for table in tables:
             for record in table.records:
-                return float(record.get_value())
+                uptime_centiseconds = float(record.get_value())
+                print(f"🔍 DEBUG get_latest_uptime - Valeur brute: {uptime_centiseconds} centisecondes")
+                # Convertir les centisecondes en heures
+                uptime_hours = uptime_centiseconds / 360000
+                print(f"🔍 DEBUG get_latest_uptime - Converti en heures: {uptime_hours}")
+                print(f"🔍 DEBUG get_latest_uptime - Converti en jours: {uptime_hours / 24}")
+                return uptime_hours
     return 0
 
 def get_router_name():

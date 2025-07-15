@@ -560,11 +560,47 @@ function fetchMetrics() {
         });
 }
 
+function fetchInterfaces() {
+    fetch('/api/interfaces/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received interfaces data:', data);
+            
+            // Convertir le tableau en objet pour la fonction updateInterfaces
+            const interfacesObj = {};
+            data.forEach(interface => {
+                interfacesObj[interface.name] = {
+                    in_octets: interface.in_octets,
+                    out_octets: interface.out_octets,
+                    in_errors: 0,  // Pas encore récupéré
+                    out_errors: 0,  // Pas encore récupéré
+                    status: interface.status
+                };
+            });
+            
+            updateInterfaces(interfacesObj);
+        })
+        .catch(error => {
+            console.error('Error fetching interfaces:', error);
+            const container = document.getElementById('interfaces-container');
+            if (container) {
+                container.innerHTML = '<div style="color: #ff6b6b; font-style: italic;">Error loading interfaces</div>';
+            }
+        });
+}
+
 // Initialiser l'affichage au chargement
 document.addEventListener('DOMContentLoaded', function() {
     updateDisplay(lastKnownValues);
     fetchMetrics();
+    fetchInterfaces();
     setInterval(fetchMetrics, 5000);
+    setInterval(fetchInterfaces, 10000); // Actualiser les interfaces toutes les 10 secondes
 });
 </script>
 {% endblock %}

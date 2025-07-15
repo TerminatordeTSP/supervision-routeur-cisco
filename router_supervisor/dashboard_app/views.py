@@ -327,3 +327,69 @@ def index(request):
         'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     }
     return render(request, "dashboard.html", context)
+
+def get_interfaces_data():
+    """Récupère les données d'interfaces depuis InfluxDB"""
+    if not INFLUX_AVAILABLE:
+        return []
+    
+    try:
+        with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) as client:
+            query_api = client.query_api()
+            
+            # Requête pour récupérer les dernières données d'interfaces
+            flux_query = f'''
+                from(bucket:"{INFLUX_BUCKET}")
+                |> range(start: -10m)
+                |> filter(fn: (r) => r._measurement == "interfaces")
+                |> filter(fn: (r) => r._field == "ifInOctets" or r._field == "ifOutOctets")
+                |> sort(columns: ["_time"], desc:true)
+                |> group(columns: ["ifDescr", "_field"])
+                |> first()
+            '''
+            
+            tables = query_api.query(flux_query)
+            interfaces_data = {}
+            
+            for table in tables:
+                for record in table.records:
+                    interface_name = record.values.get('ifDescr', 'Unknown')
+                    field = record.get_field()
+                    value = record.get_value()
+                    
+                    if interface_name not in interfaces_data:
+                        interfaces_data[interface_name] = {}
+                    
+                    interfaces_data[interface_name][field] = value
+            
+            # Convertir en format pour le dashboard
+            interfaces_list = []
+            for interface_name, data in interfaces_data.items():
+                if interface_name != 'Unknown' and interface_name != 'Null0':  # Ignorer les interfaces non utiles
+                    in_octets = data.get('ifInOctets', 0)
+                    out_octets = data.get('ifOutOctets', 0)
+                    
+                    # Convertir en MB
+                    in_mb = round(in_octets / (1024 * 1024), 2) if in_octets > 0 else 0
+                    out_mb = round(out_octets / (1024 * 1024), 2) if out_octets > 0 else 0
+                    
+                    interfaces_list.append({
+                        'name': interface_name,
+                        'in_octets': in_octets,
+                        'out_octets': out_octets,
+                        'in_mb': in_mb,
+                        'out_mb': out_mb,
+                        'status': 'active' if (in_octets > 0 or out_octets > 0) else 'inactive'
+                    })
+            
+            print(f"✅ {len(interfaces_list)} interfaces actives récupérées")
+            return interfaces_list
+            
+    except Exception as e:
+        print(f"❌ Erreur lors de la récupération des interfaces: {e}")
+        return []
+
+def interfaces_api(request):
+    """API pour récupérer les données d'interfaces"""
+    interfaces_data = get_interfaces_data()
+    return JsonResponse(interfaces_data, safe=False)

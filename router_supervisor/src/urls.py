@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.urls import path
 from router_supervisor.settings_app.views import CustomPasswordResetView
 from django.contrib.auth import views as auth_views
+from router_supervisor.dashboard_app.views import interfaces_api
 # Import des gestionnaires d'erreur personnalisés
 from . import error_views
 
@@ -42,6 +43,7 @@ urlpatterns = [
     path('settings/', include("router_supervisor.settings_app.urls")),
     path('thresholds/', include('router_supervisor.thresholds_app.urls')),
     path('api/', include('router_supervisor.api_app.urls')),
+    path('api/interfaces/', interfaces_api, name='interfaces_api'),
     path('health/', health_check, name='health_check'),
     path('test-static-direct/', test_static_direct, name='test_static_direct'),
     path('test-404/', test_404, name='test_404'),

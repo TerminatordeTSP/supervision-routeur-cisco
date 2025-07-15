@@ -188,6 +188,69 @@
             margin-bottom: 15px;
         }
     }
+
+    /* Styles pour les interfaces */
+    .interface-item {
+        background: #1a1111;
+        margin: 8px 0;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #424242;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .interface-name {
+        color: var(--main-orange);
+        font-weight: bold;
+        font-size: 1.1em;
+        min-width: 150px;
+    }
+
+    .interface-stats {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .interface-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+    }
+
+    .interface-stat-label {
+        color: #ccc;
+        font-size: 0.9em;
+        margin-bottom: 2px;
+    }
+
+    .interface-stat-value {
+        color: var(--main-orange);
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .interface-errors {
+        color: #e74c3c;
+        font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+        .interface-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .interface-stats {
+            width: 100%;
+            justify-content: space-around;
+        }
+    }
 </style>
 
 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -251,6 +314,15 @@
                 <b>Router Name:</b> <span id="router_name"></span>
                 <b>Last Updated:</b> <span id="last_updated"></span>
             </span>
+        </div>
+    </div>
+
+    <div class="router-info">
+        <span>Router Interfaces</span>
+        <div class="router-details">
+            <div id="interfaces-container">
+                <div style="color: #ccc; font-style: italic;">Loading interfaces...</div>
+            </div>
         </div>
     </div>
 </div>
@@ -370,6 +442,66 @@ function updateStatusIndicators(values) {
     }
 }
 
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateInterfaces(interfaces) {
+    const container = document.getElementById('interfaces-container');
+    if (!container) return;
+    
+    if (!interfaces || Object.keys(interfaces).length === 0) {
+        container.innerHTML = '<div style="color: #ccc; font-style: italic;">No interface data available</div>';
+        return;
+    }
+    
+    let html = '';
+    
+    // Filtrer les interfaces importantes (exclure Null0)
+    const importantInterfaces = Object.entries(interfaces).filter(([name, data]) => 
+        name !== 'Null0' && data.in_octets !== undefined && data.out_octets !== undefined
+    );
+    
+    importantInterfaces.forEach(([interfaceName, data]) => {
+        const inOctets = data.in_octets || 0;
+        const outOctets = data.out_octets || 0;
+        const inErrors = data.in_errors || 0;
+        const outErrors = data.out_errors || 0;
+        
+        html += `
+            <div class="interface-item">
+                <div class="interface-name">${interfaceName}</div>
+                <div class="interface-stats">
+                    <div class="interface-stat">
+                        <div class="interface-stat-label">IN</div>
+                        <div class="interface-stat-value">${formatBytes(inOctets)}</div>
+                    </div>
+                    <div class="interface-stat">
+                        <div class="interface-stat-label">OUT</div>
+                        <div class="interface-stat-value">${formatBytes(outOctets)}</div>
+                    </div>
+                    ${(inErrors > 0 || outErrors > 0) ? 
+                        `<div class="interface-stat">
+                            <div class="interface-stat-label">ERRORS</div>
+                            <div class="interface-errors">IN: ${inErrors} | OUT: ${outErrors}</div>
+                        </div>` : ''
+                    }
+                </div>
+            </div>
+        `;
+    });
+    
+    if (html === '') {
+        container.innerHTML = '<div style="color: #ccc; font-style: italic;">No active interfaces found</div>';
+    } else {
+        container.innerHTML = html;
+    }
+}
+
 function fetchMetrics() {
     fetch('/api/latest-metrics/')
         .then(response => {
@@ -412,6 +544,11 @@ function fetchMetrics() {
             
             // Mettre à jour l'affichage
             updateDisplay(newValues);
+            
+            // Mettre à jour les interfaces
+            if (data.interfaces) {
+                updateInterfaces(data.interfaces);
+            }
         })
         .catch(error => {
             console.error('Error fetching metrics:', error);

@@ -170,106 +170,132 @@ def get_latest_metrics(request):
         client = InfluxDBClient(url=influx_url, token=influx_token, org=influx_org)
         query_api = client.query_api()
         
-        # Query for router_snmp metrics
-        router_query = f'''
+        # Query for SNMP router metrics
+        snmp_query = f'''
         from(bucket: "{influx_bucket}")
           |> range(start: -1h)
-          |> filter(fn: (r) => r["_measurement"] == "router_snmp")
+          |> filter(fn: (r) => r["_measurement"] == "snmp")
           |> sort(columns: ["_time"], desc: true)
           |> limit(n: 1)
         '''
         
-        # Query for router_ping metrics
+        # Query for ping metrics
         ping_query = f'''
         from(bucket: "{influx_bucket}")
           |> range(start: -1h)
-          |> filter(fn: (r) => r["_measurement"] == "router_ping")
+          |> filter(fn: (r) => r["_measurement"] == "ping")
           |> sort(columns: ["_time"], desc: true)
           |> limit(n: 1)
         '''
         
-        # Query for local_mem metrics
-        mem_query = f'''
+        # Query for interfaces metrics
+        interfaces_query = f'''
         from(bucket: "{influx_bucket}")
           |> range(start: -1h)
-          |> filter(fn: (r) => r["_measurement"] == "local_mem")
+          |> filter(fn: (r) => r["_measurement"] == "interfaces")
           |> sort(columns: ["_time"], desc: true)
-          |> limit(n: 1)
-        '''
-        
-        # Query for local_cpu metrics
-        cpu_query = f'''
-        from(bucket: "{influx_bucket}")
-          |> range(start: -1h)
-          |> filter(fn: (r) => r["_measurement"] == "local_cpu")
-          |> sort(columns: ["_time"], desc: true)
-          |> limit(n: 1)
-        '''
-        
-        # Query for local_system metrics
-        system_query = f'''
-        from(bucket: "{influx_bucket}")
-          |> range(start: -1h)
-          |> filter(fn: (r) => r["_measurement"] == "local_system")
-          |> sort(columns: ["_time"], desc: true)
-          |> limit(n: 1)
+          |> limit(n: 20)
         '''
         
         # Execute the queries
-        router_result = query_api.query(org=influx_org, query=router_query)
+        snmp_result = query_api.query(org=influx_org, query=snmp_query)
         ping_result = query_api.query(org=influx_org, query=ping_query)
-        mem_result = query_api.query(org=influx_org, query=mem_query)
-        cpu_result = query_api.query(org=influx_org, query=cpu_query)
-        system_result = query_api.query(org=influx_org, query=system_query)
+        interfaces_result = query_api.query(org=influx_org, query=interfaces_query)
         
         # Process the results
         metrics = {
             'timestamp': datetime.now().isoformat(),
         }
         
-        # Process router SNMP data
-        for table in router_result:
+        # Process SNMP data
+        for table in snmp_result:
             for record in table.records:
-                if record.get_field() == "router_name":
+                field = record.get_field()
+                if field == "hostname":
                     metrics["router_name"] = record.get_value()
-                elif record.get_field() == "cpu_5min":
+                elif field == "cpu_5min":
                     metrics["cpu_5min"] = record.get_value()
-                elif record.get_field() == "uptime":
-                    metrics["uptime"] = record.get_value()
+                elif field == "cpu_0_usage":
+                    metrics["cpu_0_usage"] = record.get_value()
+                elif field == "uptime":
+                    # Convert uptime from centiseconds to hours
+                    uptime_centiseconds = record.get_value()
+                    uptime_hours = uptime_centiseconds / 100 / 3600
+                    metrics["uptime"] = round(uptime_hours, 2)
+                elif field == "ram_used":
+                    metrics["ram_used_bytes"] = record.get_value()
+                elif field == "ram_free":
+                    metrics["ram_free_bytes"] = record.get_value()
+        
+        # Calculate RAM usage percentage
+        if "ram_used_bytes" in metrics and "ram_free_bytes" in metrics:
+            total_ram = metrics["ram_used_bytes"] + metrics["ram_free_bytes"]
+            metrics["ram_used"] = round((metrics["ram_used_bytes"] / total_ram) * 100, 2)
+            metrics["used_percent"] = metrics["ram_used"]
         
         # Process ping data
         for table in ping_result:
             for record in table.records:
-                if record.get_field() == "latency_ms":
+                field = record.get_field()
+                if field == "average_response_ms":
                     metrics["latency_ms"] = record.get_value()
-                elif record.get_field() == "packet_loss":
+                elif field == "percent_packet_loss":
                     metrics["packet_loss"] = record.get_value()
         
-        # Process memory data
-        for table in mem_result:
+        # Process interfaces data
+        interfaces = {}
+        for table in interfaces_result:
             for record in table.records:
-                if record.get_field() == "used_percent":
-                    metrics["used_percent"] = record.get_value()
-                elif record.get_field() == "total":
-                    metrics["total_memory"] = record.get_value()
+                # Get interface name from tags
+                tags = record.values
+                if_descr = tags.get("ifDescr", "unknown")
+                
+                if if_descr not in interfaces:
+                    interfaces[if_descr] = {}
+                
+                field = record.get_field()
+                if field == "ifInOctets":
+                    interfaces[if_descr]["in_octets"] = record.get_value()
+                elif field == "ifOutOctets":
+                    interfaces[if_descr]["out_octets"] = record.get_value()
+                elif field == "ifInErrors":
+                    interfaces[if_descr]["in_errors"] = record.get_value()
+                elif field == "ifOutErrors":
+                    interfaces[if_descr]["out_errors"] = record.get_value()
         
-        # Process local CPU data
-        for table in cpu_result:
-            for record in table.records:
-                if record.get_field() == "usage_idle":
-                    metrics["system_cpu"] = 100 - record.get_value()
-        
-        # Process system data
-        for table in system_result:
-            for record in table.records:
-                if record.get_field() == "load1":
-                    metrics["load1"] = record.get_value()
+        # Add interfaces to metrics
+        metrics["interfaces"] = interfaces
         
         # Close the client
         client.close()
+        
+        # Fallback values if no data is found
+        if not metrics.get("cpu_5min"):
+            metrics["cpu_5min"] = 0
+        if not metrics.get("cpu_0_usage"):
+            metrics["cpu_0_usage"] = 0
+        if not metrics.get("ram_used"):
+            metrics["ram_used"] = 0
+        if not metrics.get("latency_ms"):
+            metrics["latency_ms"] = 0
+        if not metrics.get("router_name"):
+            metrics["router_name"] = "Unknown Router"
+        if not metrics.get("uptime"):
+            metrics["uptime"] = 0
         
         return JsonResponse(metrics)
     
     except Exception as e:
         logger.exception(f"Error getting latest metrics: {str(e)}")
-        return JsonResponse({"error": str(e)}, status=500)
+        # Return fallback data on error
+        return JsonResponse({
+            "cpu_5min": 0,
+            "cpu_0_usage": 0,
+            "ram_used": 0,
+            "latency_ms": 0,
+            "uptime": 0,
+            "used_percent": 0,
+            "router_name": "Unknown Router",
+            "interfaces": {},
+            "error": str(e)
+        })

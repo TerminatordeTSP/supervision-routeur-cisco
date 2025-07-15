@@ -2,6 +2,58 @@
 
 Ce projet permet de surveiller et d'afficher les métriques d'un routeur Cisco. Il collecte les données via Telegraf, les stocke dans InfluxDB et PostgreSQL, et les affiche sur un tableau de bord Django avec interface d'administration.
 
+## 🚀 Installation automatique (Recommandé)
+
+### Pour Windows :
+```batch
+# Cloner le projet
+git clone https://github.com/TerminatordeTSP/supervision-routeur-cisco.git
+cd supervision-routeur-cisco
+
+# Lancer l'installation automatique
+install.bat
+```
+
+### Pour Linux/macOS :
+```bash
+# Cloner le projet
+git clone https://github.com/TerminatordeTSP/supervision-routeur-cisco.git
+cd supervision-routeur-cisco
+
+# Rendre le script exécutable
+chmod +x install.sh
+
+# Lancer l'installation automatique
+./install.sh
+```
+
+### Installation manuelle rapide :
+```bash
+# Alternative simple
+docker-compose up --build
+```
+
+## ✨ Qu'est-ce que l'installation automatique fait ?
+
+1. **Vérification des prérequis** : Docker et Docker Compose
+2. **Nettoyage automatique** : Suppression des anciens conteneurs
+3. **Configuration automatique** : Création du fichier `.env` avec les valeurs par défaut
+4. **Migrations automatiques** : Initialisation de la base de données
+5. **Création du superutilisateur** : admin/admin123
+6. **Démarrage des services** : Tous les conteneurs sont lancés
+7. **Vérification de santé** : Statut des services
+
+## 🎯 Accès immédiat après installation
+
+- **Dashboard principal** : http://localhost:8080/
+- **Page Settings** : http://localhost:8080/settings/
+- **Page Alertes** : http://localhost:8080/alertes/
+- **Page Thresholds** : http://localhost:8080/thresholds/
+- **InfluxDB** : http://localhost:8086/
+- **pgAdmin** : http://localhost:5050/
+
+**Compte administrateur** : `admin` / `admin123`
+
 ## 🏗️ Architecture
 
 ```

@@ -41,11 +41,11 @@ def parse_telegraf_output(output):
 
         if measurement == "snmp":
             filtered = {
-                "cpu_5min": fields.get("cpu_5min"),
-                "cpu_0_usage": fields.get("cpu_0_usage"),
-                "cpu_0_index": fields.get("cpu_0_index"),
-                "ram_used": fields.get("ram_used"),
-                "ram_free": fields.get("ram_free"),
+                "cpu_5min": float(fields.get("cpu_5min")) if fields.get("cpu_5min") is not None else None,
+                "cpu_0_usage": float(fields.get("cpu_0_usage")) if fields.get("cpu_0_usage") is not None else None,
+                "cpu_0_index": float(fields.get("cpu_0_index")) if fields.get("cpu_0_index") is not None else None,
+                "ram_used": float(fields.get("ram_used")) if fields.get("ram_used") is not None else None,
+                "ram_free": float(fields.get("ram_free")) if fields.get("ram_free") is not None else None,
                 "timestamp": timestamp,
             }
             if any(v is not None for v in filtered.values()):
@@ -53,10 +53,10 @@ def parse_telegraf_output(output):
 
         elif measurement == "interfaces" and "ifDescr" in tags:
             filtered = {
-                "ifInOctets": fields.get("ifInOctets"),
-                "ifOutOctets": fields.get("ifOutOctets"),
-                "ifInErrors": fields.get("ifInErrors"),
-                "ifOutErrors": fields.get("ifOutErrors"),
+                "ifInOctets": float(fields.get("ifInOctets")) if fields.get("ifInOctets") is not None else None,
+                "ifOutOctets": float(fields.get("ifOutOctets")) if fields.get("ifOutOctets") is not None else None,
+                "ifInErrors": float(fields.get("ifInErrors")) if fields.get("ifInErrors") is not None else None,
+                "ifOutErrors": float(fields.get("ifOutErrors")) if fields.get("ifOutErrors") is not None else None,
                 "timestamp": timestamp,
             }
             results.append({
@@ -69,7 +69,7 @@ def parse_telegraf_output(output):
             results.append({
                 "measurement": "ping_latency",
                 "data": {
-                    "latency_ms": fields.get("value"),
+                    "latency_ms": float(fields.get("value")) if fields.get("value") is not None else None,
                     "timestamp": timestamp,
                 }
             })
@@ -78,9 +78,10 @@ def parse_telegraf_output(output):
             results.append({
                 "measurement": "cpu-total",
                 "data": {
-                    "usage_idle": fields.get("usage_idle"),
-                    "usage_user": fields.get("usage_user"),
-                    "usage_system": fields.get("usage_system"),
+                    "usage_percent": float(fields.get("usage_percent")) if fields.get("usage_percent") is not None else None,
+                    "usage_idle": float(fields.get("usage_idle")) if fields.get("usage_idle") is not None else None,
+                    "usage_user": float(fields.get("usage_user")) if fields.get("usage_user") is not None else None,
+                    "usage_system": float(fields.get("usage_system")) if fields.get("usage_system") is not None else None,
                     "timestamp": timestamp,
                 }
             })
@@ -89,18 +90,18 @@ def parse_telegraf_output(output):
             results.append({
                 "measurement": "mem",
                 "data": {
-                    "used": fields.get("used"),
-                    "free": fields.get("free"),
-                    "used_percent": fields.get("used_percent"),
+                    "used": float(fields.get("used")) if fields.get("used") is not None else None,
+                    "free": float(fields.get("free")) if fields.get("free") is not None else None,
+                    "used_percent": float(fields.get("used_percent")) if fields.get("used_percent") is not None else None,
                     "timestamp": timestamp,
                 }
             })
 
         elif measurement == "system":
             filtered = {
-                "n_users": fields.get("n_users"),
-                "load1": fields.get("load1"),
-                "uptime": fields.get("uptime"),
+                "n_users": float(fields.get("n_users")) if fields.get("n_users") is not None else None,
+                "load1": float(fields.get("load1")) if fields.get("load1") is not None else None,
+                "uptime": float(fields.get("uptime")) if fields.get("uptime") is not None else None,
                 "timestamp": timestamp,
             }
             if any(v is not None for v in [filtered["n_users"], filtered["load1"], filtered["uptime"]]):

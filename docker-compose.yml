@@ -20,12 +20,17 @@ services:
       - INFLUXDB_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
       - INFLUXDB_ORG=telecom-sudparis
       - INFLUXDB_BUCKET=router-metrics
+      - AUTO_MIGRATE=true
+      - AUTO_SUPERUSER=true
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media
       - ./telegraf/sample_metrics:/tmp/metrics:rw
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/"]
       interval: 30s
@@ -55,6 +60,12 @@ services:
       POSTGRES_DB: routerdb
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d routerdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   pgadmin:
     image: dpage/pgadmin4

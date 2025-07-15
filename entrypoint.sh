@@ -103,21 +103,61 @@ chmod -R 755 /code/static /code/media /tmp/metrics
 touch /code/router_supervisor/src/__init__.py
 
 # Initialize database with robust error handling
-echo "Running database initialization script..."
-if [ -f /code/scripts/init_database.sh ]; then
-    /code/scripts/init_database.sh
-else
-    # Fallback to old method if script is missing
-    echo "Database initialization script not found, using fallback method..."
-    echo "Making migrations..."
+echo "🔄 Initialisation automatique de la base de données..."
+
+# Fonction pour gérer les migrations automatiquement
+handle_migrations() {
+    echo "📦 Vérification et création des migrations..."
+    
+    # Nettoyer les anciennes migrations si nécessaire
+    echo "🧹 Nettoyage des anciennes migrations..."
+    cd /code && python3 router_supervisor/manage.py migrate --fake-initial || echo "Note: fake-initial migration failed (normal for first run)"
+    
+    # Créer les migrations pour chaque app
+    echo "📝 Création des migrations pour core_models..."
+    cd /code && python3 router_supervisor/manage.py makemigrations core_models
+    
+    echo "📝 Création des migrations pour dashboard_app..."
+    cd /code && python3 router_supervisor/manage.py makemigrations dashboard_app
+    
+    echo "📝 Création des migrations pour settings_app..."
+    cd /code && python3 router_supervisor/manage.py makemigrations settings_app
+    
+    echo "📝 Création des migrations pour thresholds_app..."
+    cd /code && python3 router_supervisor/manage.py makemigrations thresholds_app
+    
+    echo "📝 Création des migrations pour alerts_app..."
+    cd /code && python3 router_supervisor/manage.py makemigrations alerts_app
+    
+    # Créer les migrations générales
+    echo "📝 Création des migrations générales..."
     cd /code && python3 router_supervisor/manage.py makemigrations
     
-    echo "Applying migrations..."
+    echo "🚀 Application des migrations..."
     cd /code && python3 router_supervisor/manage.py migrate
     
-    echo "Creating superuser..."
-    cd /code && python3 router_supervisor/manage.py shell < router_supervisor/create_superuser.py || echo "Warning: superuser creation failed"
+    echo "✅ Migrations terminées avec succès!"
+}
+
+# Exécuter la fonction de migration
+if [ -f /code/scripts/init_database.sh ]; then
+    echo "📄 Utilisation du script d'initialisation personnalisé..."
+    /code/scripts/init_database.sh
+else
+    echo "📄 Utilisation du système d'initialisation automatique..."
+    handle_migrations
 fi
+
+# Créer un superutilisateur automatiquement
+echo "👤 Création du superutilisateur..."
+cd /code && python3 router_supervisor/manage.py shell -c "
+from django.contrib.auth.models import User
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+    print('✅ Superutilisateur créé: admin/admin123')
+else:
+    print('ℹ️  Superutilisateur déjà existant')
+" || echo "⚠️  Attention: création du superutilisateur échouée"
 
 # Collecte des fichiers statiques
 echo "Collecting static files..."

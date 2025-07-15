@@ -32,7 +32,7 @@ Ce projet permet de surveiller et d'afficher les métriques d'un routeur Cisco. 
 └─────────────────┘──────────────┘
 ```
 
-## 🚀 Modes de déploiement
+## Modes de déploiement
 
 ### 1. **Mode Développement** (Recommandé pour tests)
 - Docker Compose avec hot-reload
@@ -46,13 +46,139 @@ Ce projet permet de surveiller et d'afficher les métriques d'un routeur Cisco. 
 - Logs structurés
 - Health checks
 
-## 📋 Prérequis
+## Prérequis
 
 - **Docker & Docker Compose** (obligatoire)
 - **Python 3.9+** (pour développement local uniquement)
 - **Accès réseau** au routeur Cisco à superviser
 
-## 🔧 Installation et Déploiement
+## Installation locale rapide
+
+### **Prérequis :**
+- Docker & Docker Compose installés
+- Git pour cloner le repository
+- Accès réseau au routeur Cisco (optionnel pour les tests)
+
+### **Installation en 4 étapes :**
+
+1. **Cloner le projet :**
+   ```bash
+   git clone https://github.com/TerminatordeTSP/supervision-routeur-cisco.git
+   cd supervision-routeur-cisco
+   ```
+
+2. **Démarrer tous les services :**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+3. **Attendre que tous les conteneurs soient prêts (30-60 secondes) :**
+   ```bash
+   docker-compose ps
+   ```
+
+4. **[Optionnel] Créer un utilisateur administrateur Django :**
+   ```bash
+   docker-compose exec router_django python3 router_supervisor/manage.py createsuperuser
+   ```
+
+### **Accès aux services :**
+- **Application Django** : http://localhost:8080
+- **pgAdmin** : http://localhost:5050 
+- **InfluxDB** : http://localhost:8086
+
+### **Logins par défaut :**
+
+| Service | URL | Login | Mot de passe |
+|---------|-----|-------|--------------|
+| **Django Admin** | http://localhost:8080/admin/ | admin | projetinfo1A |
+| **pgAdmin** | http://localhost:5050 | admin@telecom-sudparis.eu | admin |
+| **InfluxDB** | http://localhost:8086 | admin | admin123456 |
+
+> **Note :** Le login Django `admin/projetinfo1A` est configuré par défaut pour toute nouvelle base de données.
+
+## Roadmap - État du Projet
+
+### **Ce qui fonctionne déjà :**
+
+#### **Infrastructure & Déploiement**
+- Architecture complète Docker Compose 
+- Base de données PostgreSQL avec pgAdmin
+- Base de données InfluxDB pour métriques temporelles
+- Reverse proxy Caddy avec SSL automatique
+- Health checks et monitoring des conteneurs
+- Configuration automatique des services
+
+#### **Collecte et Stockage de Données**
+- Collecteur Telegraf SNMP fonctionnel
+- Intégration InfluxDB pour métriques temporelles
+- Pipeline de traitement des données
+- Générateur de données de test pour développement
+- API REST complète pour accès aux métriques
+
+#### **Interface Utilisateur**
+- Dashboard Django avec authentification
+- Visualisation temps réel des métriques routeur
+- Interface d'administration complète
+- Gestion des utilisateurs et permissions
+- API REST documentée
+
+#### **Métriques Supportées**
+CPU utilization, Mémoire RAM (ratio utilisée/libre), Uptime du routeur, Statistiques interfaces réseau (trafic, erreurs, statut), tests de connectivité ping sur la VM.
+
+#### **🔧 Administration**
+- Interface d'administration Django avec gestion des seuils d'alerte par utilisateur, configuration des routeurs supervisés, logs structurés et rotation automatique
+
+### **Ce qu'il reste à faire :**
+
+#### **Système d'Alertes Avancé**
+- Intégration de solutions de communication (basées sur Matrix pour rester sur un projet opensource)
+- Escalade des alertes selon la criticité
+- Webhook personnalisables
+
+#### **Visualisations Avancées**
+- Graphiques historiques interactifs
+- Dashboard personnalisable par utilisateur
+- Export de rapports PDF/Excel
+- Cartes de chaleur des performances
+- Prédictions basées sur l'IA
+
+#### **Fonctionnalités Métier**
+- Multi-tenancy (gestion de plusieurs clients)
+- SLA monitoring et reporting
+- Analyse de tendances automatique
+- Corrélation d'événements
+- Maintenance planifiée
+
+#### **Sécurité et Conformité**
+- Authentification LDAP/Active Directory
+- Audit trail complet
+- Chiffrement des données au repos
+- Politique de rétention avancée
+- Conformité RGPD complète
+
+#### **Performance et Scalabilité**
+- Clustering InfluxDB
+- Load balancing Django avec Redis
+- Optimisation des requêtes base de données
+- Cache Redis pour métriques fréquentes
+- Support Kubernetes
+
+#### **Intégrations**
+- API GraphQL en plus de REST
+- Intégration Grafana native
+- Support Prometheus metrics
+- Webhook entrants pour événements externes
+- Intégration ITSM (ServiceNow, Jira)
+
+#### **Mobile et Accessibilité**
+- Application mobile native
+- Progressive Web App (PWA)
+- Interface accessible (WCAG 2.1)
+- Mode hors-ligne partiel
+
+
+## Installation et Déploiement
 
 ### **Option A : Déploiement Development (Docker Compose)**
 
@@ -92,7 +218,7 @@ Ce projet permet de surveiller et d'afficher les métriques d'un routeur Cisco. 
    - **Caddy (HTTP)** : http://localhost:80
    - **Caddy (HTTPS)** : https://localhost:443
 
-## 🗃️ Base de Données PostgreSQL
+## Base de Données PostgreSQL
 
 ### **Configuration automatique**
 L'application détecte automatiquement l'environnement :
@@ -106,7 +232,7 @@ L'application détecte automatiquement l'environnement :
 | **Port** | `5432` | Port PostgreSQL standard |
 | **Database** | `routerdb` | Base de données principale |
 | **Username** | `user` | Utilisateur PostgreSQL |
-| **Password** | `password` | Mot de passe (⚠️ À changer en production) |
+| **Password** | `password` | Mot de passe (**À changer en production**) |
 
 ### **Migrations Django :**
 ```bash
@@ -120,7 +246,7 @@ docker-compose exec router_django python3 router_supervisor/manage.py makemigrat
 docker-compose exec router_django python3 router_supervisor/manage.py showmigrations
 ```
 
-## 🔧 Administration avec pgAdmin
+## Administration avec pgAdmin
 
 ### **Accès à pgAdmin :**
 - **URL** : http://localhost:5050
@@ -141,9 +267,9 @@ docker-compose exec router_django python3 router_supervisor/manage.py showmigrat
    - **Maintenance database** : `routerdb`
    - **Username** : `user`
    - **Password** : `password`
-   - ✅ **Save password** : Coché
+   - **Save password** : Coché
 
-## 📊 Monitoring et Métriques
+## Monitoring et Métriques
 
 ### **InfluxDB (Métriques temporelles) :**
 - **URL** : http://localhost:8086
@@ -155,7 +281,7 @@ docker-compose exec router_django python3 router_supervisor/manage.py showmigrat
 - **Port d'écoute** : `57500`
 - **Configuration** : `telegraf/telegraf.conf`
 - **Processeurs** : `telegraf/processors.conf`
-## 🧪 Tests et Validation
+## Tests et Validation
 
 ### **Vérifier la santé des services :**
 ```bash
@@ -190,7 +316,7 @@ docker-compose exec postgres psql -U user -d routerdb
 docker-compose exec postgres pg_dump -U user routerdb > backup_$(date +%Y%m%d).sql
 ```
 
-## 📁 Structure du Projet
+## Structure du Projet
 
 ```
 supervision-routeur-cisco/
@@ -219,7 +345,7 @@ supervision-routeur-cisco/
 └── 📁 logs/                       # Logs applicatifs
 ```
 
-## 🔧 Variables d'Environnement
+## Variables d'Environnement
 
 ### **Django (router_django) :**
 | Variable | Valeur | Description |
@@ -256,7 +382,7 @@ supervision-routeur-cisco/
 | `DOCKER_INFLUXDB_INIT_BUCKET` | `router-metrics` | Bucket de données |
 | `DOCKER_INFLUXDB_INIT_ADMIN_TOKEN` | `my-super-secret-auth-token` | Token d'API |
 
-## 🛠️ Dépannage
+## Dépannage
 
 ### **Problèmes courants**
 
@@ -272,9 +398,9 @@ docker-compose up -d db
 ```
 
 #### **Erreur de connexion pgAdmin → PostgreSQL :**
-- ✅ Utiliser `db` comme host (pas `localhost`)
-- ✅ Port `5432` (pas `5050`)
-- ✅ Vérifier que les conteneurs sont sur le même réseau
+- Utiliser `db` comme host (pas `localhost`)
+- Port `5432` (pas `5050`)
+- Vérifier que les conteneurs sont sur le même réseau
 
 #### **Django ne se connecte pas à PostgreSQL :**
 ```bash
@@ -320,7 +446,7 @@ docker volume ls
 docker volume inspect supervision-routeur-cisco_pgdata
 ```
 
-## 🔒 Sécurité en Production
+## Sécurité en Production
 
 ### **⚠️ À MODIFIER AVANT LA PRODUCTION :**
 
@@ -347,7 +473,7 @@ docker volume inspect supervision-routeur-cisco_pgdata
    # PostgreSQL (5432) : Pas d'exposition publique
    ```
 
-## 📚 Ressources Supplémentaires
+## Ressources Supplémentaires
 
 ### **Documentation technique :**
 - [Django Documentation](https://docs.djangoproject.com/)
@@ -388,10 +514,10 @@ docker system df -v
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+Ce projet est sous licence [MIT](https://mit-license.org/).
 
 ---
 
-**Développé par l'équipe Telecom SudParis** 🎓  
+**Développé par le groupe 4 des FISA LIMA Telecom SudParis** 🎓  
 **Version:** 2.0 - PostgreSQL Edition  
 **Dernière mise à jour:** Juillet 2025

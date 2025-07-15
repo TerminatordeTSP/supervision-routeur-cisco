@@ -55,7 +55,7 @@ def index(request):
         'user': user,
         'preferences': preferences,
     }
-    return render(request, "settings/base.html", context)
+    return render(request, "settings/index.html", context)
 @login_required
 def user_info(request):
     """Vue pour modifier les informations personnelles de l'utilisateur connecté"""

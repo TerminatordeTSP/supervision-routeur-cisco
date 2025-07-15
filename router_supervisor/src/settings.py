@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'router_supervisor.src.middleware.DatabaseErrorMiddleware',  # Custom database error handling
 ]
 
 ROOT_URLCONF = 'src.urls'

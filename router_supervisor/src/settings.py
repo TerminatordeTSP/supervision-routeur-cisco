@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'router_supervisor.settings_app',
     'router_supervisor.dashboard_app',
     'router_supervisor.thresholds_app',
-    'alerts_app',
+    'router_supervisor.alerts_app.apps.AlertsAppConfig',
     'router_supervisor.api_app',
 ]
 

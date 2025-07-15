@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sync Alert Rules{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>Sync Alert Rules from Thresholds</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Rules
+            </a>
+        </div>
+    </div>
+
+    <!-- Information Card -->
+    <div class="alert-card">
+        <div class="alert-card-header">
+            <h3><i class="fas fa-info-circle"></i> Synchronization Information</h3>
+        </div>
+        
+        <div class="alert-card-body">
+            <p>This action will synchronize alert rules with your existing threshold configurations.</p>
+            
+            <div class="sync-info">
+                <h4>What will happen:</h4>
+                <ul>
+                    <li><i class="fas fa-check"></i> Alert rules will be created/updated from existing thresholds</li>
+                    <li><i class="fas fa-check"></i> Each threshold metric (CPU, RAM, Traffic) will become an alert rule</li>
+                    <li><i class="fas fa-check"></i> Existing rules will be updated to match threshold values</li>
+                    <li><i class="fas fa-check"></i> No existing alert data will be lost</li>
+                </ul>
+            </div>
+
+            <div class="threshold-summary">
+                <h4>Current Thresholds:</h4>
+                {% if thresholds %}
+                <div class="thresholds-list">
+                    {% for threshold in thresholds %}
+                    <div class="threshold-item">
+                        <span class="threshold-name">{{ threshold.name }}</span>
+                        <div class="threshold-values">
+                            {% if threshold.cpu > 0 %}
+                                <span class="threshold-value">CPU: {{ threshold.cpu }}%</span>
+                            {% endif %}
+                            {% if threshold.ram > 0 %}
+                                <span class="threshold-value">RAM: {{ threshold.ram }}%</span>
+                            {% endif %}
+                            {% if threshold.traffic > 0 %}
+                                <span class="threshold-value">Traffic: {{ threshold.traffic }}%</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="summary-text">
+                    <strong>{{ threshold_count }}</strong> threshold(s) found. 
+                    This will create/update approximately {{ estimated_rules }} alert rules.
+                </p>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>No thresholds found. Please configure thresholds first in the Thresholds section.</p>
+                    <a href="/thresholds/" class="btn btn-primary">
+                        <i class="fas fa-cog"></i> Configure Thresholds
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    {% if thresholds %}
+    <div class="alert-card">
+        <div class="alert-card-header">
+            <h3><i class="fas fa-sync"></i> Confirm Synchronization</h3>
+        </div>
+        
+        <div class="alert-card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> Sync Alert Rules
+                    </button>
+                    <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.sync-info ul {
+    margin: 15px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.sync-info li {
+    margin: 8px 0;
+    color: #fff;
+}
+
+.sync-info li i {
+    color: var(--alert-success);
+    margin-right: 8px;
+}
+
+.threshold-summary {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #3a2a20;
+}
+
+.thresholds-list {
+    margin: 15px 0;
+}
+
+.threshold-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: #3a2a20;
+    border-radius: 5px;
+}
+
+.threshold-name {
+    font-weight: bold;
+    color: var(--main-orange);
+}
+
+.threshold-values {
+    display: flex;
+    gap: 15px;
+}
+
+.threshold-value {
+    background: #2a1a15;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #fff;
+}
+
+.summary-text {
+    margin-top: 15px;
+    padding: 10px;
+    background: #2a4a2a;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.form-actions .btn {
+    min-width: 150px;
+}
+</style>
+{% endblock content %}

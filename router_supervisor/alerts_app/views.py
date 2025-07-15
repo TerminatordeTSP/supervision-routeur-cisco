@@ -143,64 +143,58 @@ def rules_index(request):
 
 
 @login_required
-def rule_create(request):
-    """Create a new alert rule"""
-    if request.method == 'POST':
-        form = AlertRuleForm(request.POST)
-        if form.is_valid():
-            rule = form.save()
-            messages.success(request, f'Alert rule "{rule.name}" created successfully.')
-            return redirect('alerts:rules_index')
-    else:
-        form = AlertRuleForm()
-    
-    context = {
-        'form': form,
-        'action': 'Create'
-    }
-    
-    return render(request, 'alerts_app/rule_form.html', context)
-
-
-@login_required
-def rule_edit(request, rule_id):
-    """Edit an alert rule"""
+def rule_detail(request, rule_id):
+    """View details of an alert rule (read-only)"""
     rule = get_object_or_404(AlertRule, id=rule_id)
     
-    if request.method == 'POST':
-        form = AlertRuleForm(request.POST, instance=rule)
-        if form.is_valid():
-            rule = form.save()
-            messages.success(request, f'Alert rule "{rule.name}" updated successfully.')
-            return redirect('alerts:rules_index')
-    else:
-        form = AlertRuleForm(instance=rule)
+    # Get rule statistics
+    rule.alert_count = rule.alert_instances.count()
+    rule.active_alerts = rule.alert_instances.filter(status='active').count()
+    rule.recent_alerts = rule.alert_instances.order_by('-triggered_at')[:10]
     
     context = {
-        'form': form,
         'rule': rule,
-        'action': 'Edit'
     }
     
-    return render(request, 'alerts_app/rule_form.html', context)
+    return render(request, 'alerts_app/rule_detail.html', context)
 
 
 @login_required
-def rule_delete(request, rule_id):
-    """Delete an alert rule"""
-    rule = get_object_or_404(AlertRule, id=rule_id)
-    
+def sync_rules_from_thresholds(request):
+    """Synchronize alert rules from existing thresholds"""
     if request.method == 'POST':
-        rule_name = rule.name
-        rule.delete()
-        messages.success(request, f'Alert rule "{rule_name}" deleted successfully.')
+        from django.core.management import call_command
+        from io import StringIO
+        
+        # Capture the command output
+        output = StringIO()
+        try:
+            call_command('sync_threshold_rules', stdout=output)
+            messages.success(request, 'Alert rules synchronized successfully with thresholds.')
+            
+            # Show detailed output in debug mode
+            if hasattr(request, 'user') and request.user.is_superuser:
+                output_content = output.getvalue()
+                if output_content:
+                    messages.info(request, f"Sync details: {output_content}")
+                    
+        except Exception as e:
+            messages.error(request, f'Failed to sync rules: {str(e)}')
+        
         return redirect('alerts:rules_index')
     
+    # Show confirmation page
+    from router_supervisor.core_models.models import Threshold
+    thresholds = Threshold.objects.all()
+    threshold_count = thresholds.count()
+    
     context = {
-        'rule': rule,
+        'thresholds': thresholds,
+        'threshold_count': threshold_count,
+        'estimated_rules': threshold_count * 3,  # Each threshold creates 3 rules
     }
     
-    return render(request, 'alerts_app/rule_delete.html', context)
+    return render(request, 'alerts_app/sync_confirm.html', context)
 
 
 @login_required

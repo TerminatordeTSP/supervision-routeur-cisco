@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rule: {{ rule.name }}{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>Alert Rule Details</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Rules
+            </a>
+        </div>
+    </div>
+
+    <!-- Rule Information Card -->
+    <div class="alert-card">
+        <div class="alert-card-header">
+            <h3>{{ rule.name }}</h3>
+            <span class="badge badge-{{ rule.severity }}">{{ rule.get_severity_display }}</span>
+        </div>
+        
+        <div class="alert-card-body">
+            <div class="rule-details">
+                <div class="detail-row">
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value">{{ rule.description|default:"No description" }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Metric:</span>
+                    <span class="detail-value">{{ rule.get_metric_display }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Condition:</span>
+                    <span class="detail-value">{{ rule.get_condition_display }} {{ rule.threshold_value }}%</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">
+                        {% if rule.is_active %}
+                            <i class="fas fa-check-circle" style="color: var(--alert-success);"></i> Active
+                        {% else %}
+                            <i class="fas fa-pause-circle" style="color: var(--alert-warning);"></i> Inactive
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Email Notifications:</span>
+                    <span class="detail-value">
+                        {% if rule.email_enabled %}
+                            <i class="fas fa-check-circle" style="color: var(--alert-success);"></i> Enabled
+                        {% else %}
+                            <i class="fas fa-times-circle" style="color: var(--alert-critical);"></i> Disabled
+                        {% endif %}
+                    </span>
+                </div>
+                
+                {% if rule.email_recipients %}
+                <div class="detail-row">
+                    <span class="detail-label">Email Recipients:</span>
+                    <span class="detail-value">{{ rule.email_recipients }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="detail-row">
+                    <span class="detail-label">Created:</span>
+                    <span class="detail-value">{{ rule.created_at }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Card -->
+    <div class="alert-card">
+        <div class="alert-card-header">
+            <h3>Statistics</h3>
+        </div>
+        
+        <div class="alert-card-body">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">{{ rule.alert_count }}</span>
+                    <span class="stat-label">Total Alerts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number alert-warning">{{ rule.active_alerts }}</span>
+                    <span class="stat-label">Active Alerts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    {% if rule.recent_alerts %}
+    <div class="alert-card">
+        <div class="alert-card-header">
+            <h3>Recent Alerts</h3>
+        </div>
+        
+        <div class="alert-card-body">
+            <div class="recent-alerts">
+                {% for alert in rule.recent_alerts %}
+                <div class="recent-alert-item">
+                    <div class="alert-info">
+                        <span class="alert-router">{{ alert.router.name }}</span>
+                        <span class="alert-time">{{ alert.triggered_at }}</span>
+                    </div>
+                    <div class="alert-status">
+                        <span class="badge badge-{{ alert.severity }}">{{ alert.get_severity_display }}</span>
+                        <span class="badge badge-{{ alert.status }}">{{ alert.get_status_display }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.rule-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #3a2a20;
+}
+
+.detail-label {
+    font-weight: bold;
+    min-width: 150px;
+    color: var(--main-orange);
+}
+
+.detail-value {
+    flex: 1;
+    color: #fff;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--main-orange);
+}
+
+.stat-label {
+    display: block;
+    margin-top: 5px;
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+.recent-alerts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recent-alert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #3a2a20;
+    border-radius: 5px;
+}
+
+.alert-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.alert-router {
+    font-weight: bold;
+    color: #fff;
+}
+
+.alert-time {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+.alert-status {
+    display: flex;
+    gap: 5px;
+}
+</style>
+{% endblock content %}

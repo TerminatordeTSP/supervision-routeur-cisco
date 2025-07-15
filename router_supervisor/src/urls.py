@@ -41,7 +41,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('settings/', include("settings_app.urls")),
     path('thresholds/', include('thresholds_app.urls')),
-    path('alerts/', include('alerts_app.urls')),
+    path('alerts/', include('router_supervisor.alerts_app.urls')),
     path('api/', include('api_app.urls')),
     path('health/', health_check, name='health_check'),
     path('test-static-direct/', test_static_direct, name='test_static_direct'),

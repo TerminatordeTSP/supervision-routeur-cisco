@@ -16,6 +16,10 @@ services:
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
       - DEBUG=True
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
+      - INFLUXDB_ORG=telecom-sudparis
+      - INFLUXDB_BUCKET=router-metrics
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media

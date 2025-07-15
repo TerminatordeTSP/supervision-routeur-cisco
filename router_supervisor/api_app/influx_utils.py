@@ -3,8 +3,8 @@ from influxdb_client import InfluxDBClient
 
 class InfluxDBDashboard:
     def __init__(self):
-        self.url = os.getenv('INFLUXDB_URL', 'http://localhost:8086')
-        self.token = os.getenv('INFLUXDB_TOKEN', 'my-super-secret-auth-token')
+        self.url = os.getenv('INFLUXDB_URL', 'http://influxdb:8086')
+        self.token = os.getenv('INFLUXDB_TOKEN', 'BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==')
         self.org = os.getenv('INFLUXDB_ORG', 'telecom-sudparis')
         self.bucket = os.getenv('INFLUXDB_BUCKET', 'router-metrics')
         self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
@@ -46,3 +46,13 @@ class InfluxDBDashboard:
 
     def close(self):
         self.client.close()
+
+def get_influx_dashboard_context():
+    # Get the latest data from InfluxDB for the dashboard
+    influx = InfluxDBDashboard()
+    interfaces_stats = influx.get_interfaces_mbps()
+    influx.close()
+    
+    return {
+        "interfaces": interfaces_stats
+    }

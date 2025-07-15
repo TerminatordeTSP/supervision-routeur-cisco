@@ -16,6 +16,10 @@ services:
       - SQL_DATABASE=routerdb
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
       - DEBUG=True
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
+      - INFLUXDB_ORG=telecom-sudparis
+      - INFLUXDB_BUCKET=router-metrics
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media
@@ -28,6 +32,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    command : /start 
 
   caddy:
     image: caddy:2
@@ -35,7 +40,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./caddy:/etc/caddy
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - static_volume:/srv/static
       - media_volume:/srv/media
     depends_on:

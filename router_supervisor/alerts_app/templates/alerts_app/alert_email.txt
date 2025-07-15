@@ -1,0 +1,24 @@
+ALERT: {{ alert.rule.name }} - {{ alert.router.name }}
+
+An alert has been triggered on your router monitoring system.
+
+Alert Details:
+- Rule: {{ alert.rule.name }}
+- Router: {{ alert.router.name }}
+- Metric: {{ alert.rule.get_metric_display }}
+- Current Value: {{ alert.metric_value }}%
+- Threshold: {{ alert.threshold_value }}%
+- Severity: {{ alert.get_severity_display }}
+- Triggered At: {{ alert.triggered_at|date:"F d, Y H:i:s" }}
+
+Message: {{ alert.message }}
+
+{% if alert.rule.description %}
+Rule Description: {{ alert.rule.description }}
+{% endif %}
+
+Please check your monitoring dashboard for more details and take appropriate action.
+
+---
+Router Supervision System
+Telecom SudParis

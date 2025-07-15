@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alert Rules{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>Alert Rules</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:sync_rules' %}" class="btn btn-primary">
+                <i class="fas fa-sync"></i> Sync from Thresholds
+            </a>
+            <a href="{% url 'alerts:alerts_index' %}" class="btn btn-secondary">
+                <i class="fas fa-bell"></i> View Alerts
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Rules Table -->
+    <div class="alerts-table-container">
+        {% if rules %}
+        <table class="alerts-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Metric</th>
+                    <th>Condition</th>
+                    <th>Threshold</th>
+                    <th>Status</th>
+                    <th>Total Alerts</th>
+                    <th>Active Alerts</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule in rules %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--main-orange);">{{ rule.name }}</strong>
+                        {% if rule.description %}
+                        <br><small style="color: #999;">{{ rule.description|truncatechars:50 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ rule.get_metric_display }}</td>
+                    <td>{{ rule.get_condition_display }}</td>
+                    <td>{{ rule.threshold_value }}%</td>
+                    <td>
+                        {% if rule.is_active %}
+                            <span class="status-badge status-active">Active</span>
+                        {% else %}
+                            <span class="status-badge" style="background: #6c757d;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ rule.alert_count }}</td>
+                    <td>
+                        {% if rule.active_alerts > 0 %}
+                            <span style="color: var(--alert-critical); font-weight: bold;">{{ rule.active_alerts }}</span>
+                        {% else %}
+                            {{ rule.active_alerts }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rule.email_enabled %}
+                            <i class="fas fa-check" style="color: var(--alert-success);"></i>
+                        {% else %}
+                            <i class="fas fa-times" style="color: var(--alert-critical);"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <a href="{% url 'alerts:rule_detail' rule.id %}" class="btn btn-secondary" style="font-size: 0.8em; padding: 4px 8px;">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-cog"></i>
+            <h3>No alert rules configured</h3>
+            <p>Sync alert rules from existing thresholds to start monitoring.</p>
+            <a href="{% url 'alerts:sync_rules' %}" class="btn btn-primary">
+                <i class="fas fa-sync"></i> Sync from Thresholds
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

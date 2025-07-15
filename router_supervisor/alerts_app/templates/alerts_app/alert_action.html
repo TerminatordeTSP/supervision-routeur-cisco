@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Alert{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>{{ action }} Alert</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:alert_detail' alert.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Alert
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Summary -->
+    <div class="alert-detail-container" style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div>
+                <h3 style="color: var(--main-orange); margin: 0;">{{ alert.rule.name }}</h3>
+                <p style="color: #ccc; margin: 5px 0 0 0;">{{ alert.router.name }}</p>
+            </div>
+            <span class="severity-badge severity-{{ alert.severity }}">
+                {{ alert.get_severity_display }}
+            </span>
+        </div>
+        <p style="color: #fff; margin: 0;">{{ alert.message }}</p>
+    </div>
+
+    <!-- Action Form -->
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_comment">
+                    {% if action == 'acknowledge' %}
+                        Acknowledgment Comment (Optional)
+                    {% else %}
+                        Resolution Comment (Optional)
+                    {% endif %}
+                </label>
+                {{ form.comment }}
+                <small style="color: #999; display: block; margin-top: 5px;">
+                    {% if action == 'acknowledge' %}
+                        Add a note about why you're acknowledging this alert.
+                    {% else %}
+                        Describe how this alert was resolved.
+                    {% endif %}
+                </small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn {% if action == 'acknowledge' %}btn-secondary{% else %}btn-success{% endif %}">
+                    <i class="fas fa-{% if action == 'acknowledge' %}check{% else %}times{% endif %}"></i>
+                    {{ action|title }} Alert
+                </button>
+                <a href="{% url 'alerts:alert_detail' alert.id %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

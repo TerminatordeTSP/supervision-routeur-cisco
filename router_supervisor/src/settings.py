@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'router_supervisor.settings_app',
     'router_supervisor.dashboard_app',
     'router_supervisor.thresholds_app',
+    'router_supervisor.alerts_app.apps.AlertsAppConfig',
     'router_supervisor.api_app',
 ]
 
@@ -171,4 +172,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ryan.zerhouni@telecom-sudparis.eu'
 EMAIL_HOST_PASSWORD = 'Azertyuiop007**'
+DEFAULT_FROM_EMAIL = 'alerts@telecom-sudparis.eu'
 DEFAULT_FROM_EMAIL = 'admin@telecom-sudparis.eu'

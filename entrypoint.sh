@@ -109,18 +109,14 @@ if [ -f /code/scripts/init_database.sh ]; then
 else
     # Fallback to old method if script is missing
     echo "Database initialization script not found, using fallback method..."
-    cd /code && python3 router_supervisor/manage.py initialize_db --max-retries=30
+    echo "Making migrations..."
+    cd /code && python3 router_supervisor/manage.py makemigrations
     
-    # Additional fallback: try manual migration if initialize_db command fails
-    if [ $? -ne 0 ]; then
-        echo "initialize_db command failed, trying manual migration..."
-        
-        echo "Checking for missing migrations..."
-        cd /code && python3 router_supervisor/manage.py makemigrations --no-input || echo "Warning: makemigrations failed"
-        
-        echo "Applying migrations..."
-        cd /code && python3 router_supervisor/manage.py migrate --noinput || echo "Warning: migration failed"
-    fi
+    echo "Applying migrations..."
+    cd /code && python3 router_supervisor/manage.py migrate
+    
+    echo "Creating superuser..."
+    cd /code && python3 router_supervisor/manage.py shell < router_supervisor/create_superuser.py || echo "Warning: superuser creation failed"
 fi
 
 # Collecte des fichiers statiques

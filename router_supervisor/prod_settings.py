@@ -13,6 +13,22 @@ DATABASES = {
     }
 }
 
+# Override INSTALLED_APPS to ensure alerts_app is properly configured
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'router_supervisor.core_models.apps.CoreModelsConfig',
+    'router_supervisor.settings_app',
+    'router_supervisor.dashboard_app',
+    'router_supervisor.thresholds_app',
+    'router_supervisor.alerts_app.apps.AlertsAppConfig',
+    'router_supervisor.api_app',
+]
+
 # Configuration des fichiers statiques
 STATIC_ROOT = '/code/static'
 STATIC_URL = '/static/'

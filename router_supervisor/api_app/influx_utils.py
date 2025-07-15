@@ -1,6 +1,23 @@
 import os
 from influxdb_client import InfluxDBClient
 
+# Constants for InfluxDB configuration
+INFLUXDB_URL = os.getenv('INFLUXDB_URL', 'http://influxdb:8086')
+INFLUXDB_TOKEN = os.getenv('INFLUXDB_TOKEN', 'BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==')
+INFLUXDB_ORG = os.getenv('INFLUXDB_ORG', 'telecom-sudparis')
+INFLUXDB_BUCKET = os.getenv('INFLUXDB_BUCKET', 'router-metrics')
+
+def get_influx_client():
+    """Get an InfluxDB client instance"""
+    try:
+        client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
+        # Test the connection
+        client.ping()
+        return client
+    except Exception as e:
+        print(f"Failed to connect to InfluxDB: {e}")
+        return None
+
 class InfluxDBDashboard:
     def __init__(self):
         self.url = os.getenv('INFLUXDB_URL', 'http://influxdb:8086')

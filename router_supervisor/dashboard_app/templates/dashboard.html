@@ -8,8 +8,14 @@
         background-color: #1A1111 !important;
     }
     .dashboard-container {
-        margin: 20px;
-        color: #fff;
+        margilet lastKnownValues = {
+    cpu: 0,
+    ram: 0,
+    latency: 0,
+    uptime: 0,
+    router_name: 'Cisco-Router-Main',
+    last_updated: new Date().toISOString()
+};       color: #fff;
         font-family: 'Segoe UI', Arial, sans-serif;
     }
     h2, .main-title, .router-info > span {
@@ -205,22 +211,14 @@
             <span class="big-number" id="router_uptime">0</span> <span class="unit">h</span>
         </div>
         <div class="card">
-            <span>SYSTEM CPU</span>
-            <span class="big-number" id="system_cpu">0</span> <span class="unit">%</span>
+            <span>RAM USAGE</span>
+            <span class="big-number" id="ram_usage">0</span> <span class="unit">%</span>
         </div>
     </div>
     <div class="mid-cards">
         <div class="card">
             <span>LATENCY</span>
             <span class="big-number" id="latency">0</span> <span class="unit">ms</span>
-        </div>
-        <div class="card">
-            <span>SYSTEM LOAD</span>
-            <span class="big-number" id="system_load">0</span>
-        </div>
-        <div class="card">
-            <span>RAM USAGE</span>
-            <span class="big-number" id="ram_usage">0</span> <span class="unit">%</span>
         </div>
     </div>
     <div class="charts-row">
@@ -264,8 +262,6 @@ let lastKnownValues = {
     ram: 0,
     latency: 0,
     uptime: 0,
-    sys_cpu: 0,
-    sys_load: 0,
     router_name: 'pod4-cat8kv',
     last_updated: new Date().toISOString()
 };
@@ -305,8 +301,6 @@ function updateDisplay(values) {
     try {
         // Animer les valeurs numériques
         animateValue('router_cpu', values.cpu, '');
-        animateValue('system_cpu', values.sys_cpu, '');
-        animateValue('system_load', values.sys_load, '');
         animateValue('latency', values.latency, '');
         animateValue('ram_usage', values.ram, '');
         
@@ -404,14 +398,6 @@ function fetchMetrics() {
             
             if (data.uptime !== undefined && data.uptime !== null) {
                 newValues.uptime = data.uptime;
-            }
-            
-            if (data.system_cpu !== undefined && data.system_cpu !== null) {
-                newValues.sys_cpu = data.system_cpu;
-            }
-            
-            if (data.load1 !== undefined && data.load1 !== null) {
-                newValues.sys_load = data.load1;
             }
             
             if (data.router_name !== undefined && data.router_name !== null) {

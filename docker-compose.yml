@@ -11,15 +11,15 @@ services:
       - DATABASE=postgres
       - SQL_HOST=db
       - SQL_PORT=5432
-      - SQL_USER=user
-      - SQL_PASSWORD=password
-      - SQL_DATABASE=routerdb
+      - SQL_USER=${POSTGRES_USER:-user}
+      - SQL_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - SQL_DATABASE=${POSTGRES_DB:-routerdb}
       - DJANGO_SETTINGS_MODULE=router_supervisor.prod_settings
       - DEBUG=True
       - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
-      - INFLUXDB_ORG=telecom-sudparis
-      - INFLUXDB_BUCKET=router-metrics
+      - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG:-telecom-sudparis}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET:-router-metrics}
     volumes:
       - static_volume:/code/static
       - media_volume:/code/media
@@ -38,7 +38,7 @@ services:
     image: caddy:2
     container_name: caddy
     ports:
-      - "80:80"
+      - "${CADDY_PORT:-8080}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - static_volume:/srv/static
@@ -50,9 +50,9 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: routerdb
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-routerdb}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -63,7 +63,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@telecom-sudparis.eu
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
@@ -73,14 +73,14 @@ services:
     image: influxdb:2.7
     container_name: influxdb
     ports:
-      - "8086:8086"
+      - "${INFLUXDB_PORT:-8086}:8086"
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=admin123456
-      - DOCKER_INFLUXDB_INIT_ORG=telecom-sudparis
-      - DOCKER_INFLUXDB_INIT_BUCKET=router-metrics
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=BQSixul3bdmN-KtFDG_BPfUgSDGc1ZIntJ-QYa2fiIQjA_2psFN2z21AOmxD2s8fpStGlj8YWyvTCckOeCrFJA==
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG:-telecom-sudparis}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET:-router-metrics}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
@@ -118,7 +118,7 @@ services:
       - router_django
       - influxdb
     ports:
-      - "57500:57500"
+      - "${TELEGRAF_PORT:-57500}:57500"
     environment:
       - HOST_PROC=/host/proc
       - HOST_SYS=/host/sys

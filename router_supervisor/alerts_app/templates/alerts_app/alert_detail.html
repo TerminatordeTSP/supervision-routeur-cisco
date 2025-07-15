@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alert Details{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>Alert Details</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:alerts_index' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Alerts
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Alert Details -->
+    <div class="alert-detail-container">
+        <div class="alert-detail-header">
+            <div>
+                <h3 class="alert-title">{{ alert.rule.name }}</h3>
+                <p style="color: #ccc; margin: 5px 0 0 0;">{{ alert.message }}</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: start;">
+                <span class="severity-badge severity-{{ alert.severity }}">
+                    {{ alert.get_severity_display }}
+                </span>
+                <span class="status-badge status-{{ alert.status }}">
+                    {{ alert.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Alert Metadata -->
+        <div class="alert-meta">
+            <div class="meta-item">
+                <div class="meta-label">Router</div>
+                <div class="meta-value">{{ alert.router.name }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Metric</div>
+                <div class="meta-value">{{ alert.rule.get_metric_display }}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Current Value</div>
+                <div class="meta-value">{{ alert.metric_value }}%</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Threshold</div>
+                <div class="meta-value">{{ alert.threshold_value }}%</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Triggered At</div>
+                <div class="meta-value">{{ alert.triggered_at|date:"M d, Y H:i:s" }}</div>
+            </div>
+            {% if alert.acknowledged_at %}
+            <div class="meta-item">
+                <div class="meta-label">Acknowledged At</div>
+                <div class="meta-value">{{ alert.acknowledged_at|date:"M d, Y H:i:s" }}</div>
+            </div>
+            {% endif %}
+            {% if alert.resolved_at %}
+            <div class="meta-item">
+                <div class="meta-label">Resolved At</div>
+                <div class="meta-value">{{ alert.resolved_at|date:"M d, Y H:i:s" }}</div>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <div class="meta-label">Email Sent</div>
+                <div class="meta-value">
+                    {% if alert.email_sent %}
+                        <i class="fas fa-check" style="color: var(--alert-success);"></i> 
+                        Yes ({{ alert.email_sent_at|date:"M d, Y H:i" }})
+                    {% else %}
+                        <i class="fas fa-times" style="color: var(--alert-critical);"></i> No
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            {% if alert.status == 'active' %}
+            <a href="{% url 'alerts:alert_acknowledge' alert.id %}" class="btn btn-secondary">
+                <i class="fas fa-check"></i> Acknowledge
+            </a>
+            <a href="{% url 'alerts:alert_resolve' alert.id %}" class="btn btn-success">
+                <i class="fas fa-times"></i> Resolve
+            </a>
+            {% elif alert.status == 'acknowledged' %}
+            <a href="{% url 'alerts:alert_resolve' alert.id %}" class="btn btn-success">
+                <i class="fas fa-times"></i> Resolve
+            </a>
+            {% endif %}
+            
+            {% if not alert.email_sent or alert.email_sent %}
+            <form method="post" action="{% url 'alerts:alert_resend_email' alert.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i> 
+                    {% if alert.email_sent %}Resend{% else %}Send{% endif %} Email
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Rule Details -->
+        <div style="margin-top: 30px; padding: 20px; background: rgba(255, 107, 53, 0.1); border-radius: 8px; border-left: 4px solid var(--main-orange);">
+            <h4 style="color: var(--main-orange); margin: 0 0 15px 0;">Rule Configuration</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div>
+                    <strong style="color: var(--main-orange);">Condition:</strong><br>
+                    {{ alert.rule.get_metric_display }} {{ alert.rule.get_condition_display }} {{ alert.rule.threshold_value }}%
+                </div>
+                <div>
+                    <strong style="color: var(--main-orange);">Email Enabled:</strong><br>
+                    {% if alert.rule.email_enabled %}Yes{% else %}No{% endif %}
+                </div>
+                {% if alert.rule.description %}
+                <div style="grid-column: 1 / -1;">
+                    <strong style="color: var(--main-orange);">Description:</strong><br>
+                    {{ alert.rule.description }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- History -->
+        {% if history %}
+        <div class="history-timeline">
+            <h4 style="color: var(--main-orange); margin: 0 0 20px 0;">
+                <i class="fas fa-history"></i> Alert History
+            </h4>
+            {% for entry in history %}
+            <div class="timeline-item">
+                <div class="timeline-header">
+                    <div>
+                        <span class="timeline-action">
+                            {{ entry.old_status|title }} → {{ entry.new_status|title }}
+                        </span>
+                        <span class="timeline-user">by {{ entry.changed_by.first_name }} {{ entry.changed_by.last_name }}</span>
+                    </div>
+                    <span class="timeline-date">{{ entry.changed_at|date:"M d, Y H:i:s" }}</span>
+                </div>
+                {% if entry.comment %}
+                <div class="timeline-comment">
+                    "{{ entry.comment }}"
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

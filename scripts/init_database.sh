@@ -50,7 +50,7 @@ initialize_database() {
     echo -e "${YELLOW}Initializing database...${NC}"
     
     # Try the custom initialize_db command first
-    if run_django_command "initialize_db --max-retries=30" "Database initialization"; then
+    if run_django_command "initialize_db --max-retries 30" "Database initialization"; then
         return 0
     fi
     
@@ -58,10 +58,10 @@ initialize_database() {
     echo -e "${YELLOW}Falling back to manual migration...${NC}"
     
     # Create migrations if needed
-    run_django_command "makemigrations --no-input" "Creating migrations" || true
+    run_django_command "makemigrations" "Creating migrations" || true
     
     # Apply migrations
-    if run_django_command "migrate --no-input" "Applying migrations"; then
+    if run_django_command "migrate" "Applying migrations"; then
         return 0
     else
         echo -e "${RED}Database initialization failed completely${NC}"
@@ -89,7 +89,7 @@ main() {
     run_django_command "dbhealth" "Final database health check" || true
     
     # Collect static files
-    run_django_command "collectstatic --no-input" "Collecting static files" || true
+    run_django_command "collectstatic --noinput" "Collecting static files" || true
     
     echo -e "${GREEN}Database setup completed successfully!${NC}"
 }

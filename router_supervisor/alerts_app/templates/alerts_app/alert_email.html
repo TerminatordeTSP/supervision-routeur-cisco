@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Alert: {{ alert.rule.name }}</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        .header { 
+            background: #ff6b35; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px 8px 0 0; 
+            text-align: center;
+        }
+        .content { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border: 1px solid #dee2e6; 
+            border-radius: 0 0 8px 8px;
+        }
+        .alert-box { 
+            background: #fff; 
+            border: 1px solid #dee2e6; 
+            border-radius: 6px; 
+            padding: 15px; 
+            margin: 15px 0;
+        }
+        .severity-critical {
+            border-left: 4px solid #dc3545;
+        }
+        .severity-high {
+            border-left: 4px solid #fd7e14;
+        }
+        .severity-medium {
+            border-left: 4px solid #ffc107;
+        }
+        .severity-low {
+            border-left: 4px solid #6c757d;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .meta-item {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #ff6b35;
+            font-size: 0.9em;
+        }
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚨 Alert Triggered</h1>
+        <h2>{{ alert.rule.name }}</h2>
+    </div>
+    
+    <div class="content">
+        <div class="alert-box severity-{{ alert.severity }}">
+            <h3 style="margin-top: 0; color: #ff6b35;">Alert Summary</h3>
+            <p><strong>{{ alert.message }}</strong></p>
+            
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Router</div>
+                    <div>{{ alert.router.name }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Metric</div>
+                    <div>{{ alert.rule.get_metric_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Current Value</div>
+                    <div>{{ alert.metric_value }}%</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Threshold</div>
+                    <div>{{ alert.threshold_value }}%</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Severity</div>
+                    <div style="font-weight: bold; color: #dc3545;">
+                        {% if alert.severity == 'critical' %}Critical
+                        {% elif alert.severity == 'high' %}High
+                        {% elif alert.severity == 'medium' %}Medium
+                        {% else %}Low{% endif %}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Triggered At</div>
+                    <div>{{ alert.triggered_at|date:"F d, Y H:i:s" }}</div>
+                </div>
+            </div>
+            
+            {% if alert.rule.description %}
+            <div style="margin-top: 15px; padding: 10px; background: #e7f3ff; border-radius: 4px;">
+                <div class="meta-label">Rule Description</div>
+                <div>{{ alert.rule.description }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <p>Please check your monitoring dashboard for more details and take appropriate action.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Router Supervision System<br>Telecom SudParis</p>
+    </div>
+</body>
+</html>

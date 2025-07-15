@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Alert Rule{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>{{ action }} Alert Rule</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Rules
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_name">Rule Name *</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_description">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                        {{ form.description.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="id_metric">Metric *</label>
+                    {{ form.metric }}
+                    {% if form.metric.errors %}
+                        <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                            {{ form.metric.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_condition">Condition *</label>
+                    {{ form.condition }}
+                    {% if form.condition.errors %}
+                        <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                            {{ form.condition.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_threshold_value">Threshold Value * (%)</label>
+                    {{ form.threshold_value }}
+                    {% if form.threshold_value.errors %}
+                        <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                            {{ form.threshold_value.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        {{ form.is_active }}
+                        Rule is Active
+                    </label>
+                    <small style="color: #999; display: block; margin-top: 5px;">
+                        Inactive rules won't trigger new alerts
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        {{ form.email_enabled }}
+                        Email Notifications
+                    </label>
+                    <small style="color: #999; display: block; margin-top: 5px;">
+                        Send emails when this rule triggers alerts
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email_recipients">Email Recipients</label>
+                {{ form.email_recipients }}
+                <small style="color: #999; display: block; margin-top: 5px;">
+                    Enter email addresses separated by commas. Leave empty to send to router users only.
+                </small>
+                {% if form.email_recipients.errors %}
+                    <div style="color: var(--alert-critical); font-size: 0.9em; margin-top: 5px;">
+                        {{ form.email_recipients.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {{ action }} Rule
+                </button>
+                <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Text -->
+    <div style="margin-top: 30px; padding: 20px; background: rgba(255, 107, 53, 0.1); border-radius: 8px; border-left: 4px solid var(--main-orange);">
+        <h4 style="color: var(--main-orange); margin: 0 0 15px 0;">
+            <i class="fas fa-info-circle"></i> How Alert Rules Work
+        </h4>
+        <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+            <li>Rules check metrics against thresholds every few minutes</li>
+            <li>When a threshold is exceeded, an alert is created</li>
+            <li>Only one active alert per rule/router combination</li>
+            <li>Emails are sent automatically if enabled</li>
+            <li>Use "Greater than" for metrics where high values are problematic (CPU, RAM)</li>
+            <li>Use "Less than" for metrics where low values indicate issues</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Show/hide email recipients based on email enabled checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    const emailEnabledCheckbox = document.getElementById('id_email_enabled');
+    const emailRecipientsGroup = document.querySelector('label[for="id_email_recipients"]').closest('.form-group');
+    
+    function toggleEmailRecipients() {
+        if (emailEnabledCheckbox.checked) {
+            emailRecipientsGroup.style.display = 'block';
+        } else {
+            emailRecipientsGroup.style.display = 'none';
+        }
+    }
+    
+    emailEnabledCheckbox.addEventListener('change', toggleEmailRecipients);
+    toggleEmailRecipients(); // Initial state
+});
+</script>
+{% endblock content %}

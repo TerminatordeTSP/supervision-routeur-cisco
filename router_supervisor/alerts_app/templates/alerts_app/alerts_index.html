@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alerts Dashboard{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'alerts_app/style.css' %}">
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h2>Alerts Dashboard</h2>
+        <div class="header-actions">
+            <a href="{% url 'alerts:rules_index' %}" class="btn btn-secondary">
+                <i class="fas fa-cog"></i> Manage Rules
+            </a>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Statistics -->
+    <div class="alerts-stats">
+        <div class="stat-card">
+            <h3>Total Alerts</h3>
+            <div class="stat-number total">{{ stats.total }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Active</h3>
+            <div class="stat-number active">{{ stats.active }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Acknowledged</h3>
+            <div class="stat-number acknowledged">{{ stats.acknowledged }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Resolved</h3>
+            <div class="stat-number resolved">{{ stats.resolved }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Critical</h3>
+            <div class="stat-number critical">{{ stats.critical }}</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="alerts-filters">
+        <form method="get" class="filters-form">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="acknowledged" {% if status_filter == 'acknowledged' %}selected{% endif %}>Acknowledged</option>
+                        <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="severity">Severity</label>
+                    <select name="severity" id="severity" class="form-control">
+                        <option value="all" {% if severity_filter == 'all' %}selected{% endif %}>All</option>
+                        <option value="critical" {% if severity_filter == 'critical' %}selected{% endif %}>Critical</option>
+                        <option value="high" {% if severity_filter == 'high' %}selected{% endif %}>High</option>
+                        <option value="medium" {% if severity_filter == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="low" {% if severity_filter == 'low' %}selected{% endif %}>Low</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="search">Search</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Search alerts..." value="{{ search }}">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <a href="{% url 'alerts:alerts_index' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Alerts Table -->
+    <div class="alerts-table-container">
+        {% if page_obj %}
+        <table class="alerts-table">
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Router</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Value</th>
+                    <th>Threshold</th>
+                    <th>Triggered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alert in page_obj %}
+                <tr>
+                    <td>
+                        <a href="{% url 'alerts:alert_detail' alert.id %}" style="color: var(--main-orange); text-decoration: none;">
+                            {{ alert.rule.name }}
+                        </a>
+                    </td>
+                    <td>{{ alert.router.name }}</td>
+                    <td>
+                        <span class="severity-badge severity-{{ alert.severity }}">
+                            {{ alert.get_severity_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ alert.status }}">
+                            {{ alert.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ alert.metric_value }}%</td>
+                    <td>{{ alert.threshold_value }}%</td>
+                    <td>{{ alert.triggered_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            {% if alert.status == 'active' %}
+                            <a href="{% url 'alerts:alert_acknowledge' alert.id %}" class="btn btn-secondary" style="font-size: 0.8em; padding: 4px 8px;">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="{% url 'alerts:alert_resolve' alert.id %}" class="btn btn-success" style="font-size: 0.8em; padding: 4px 8px;">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% elif alert.status == 'acknowledged' %}
+                            <a href="{% url 'alerts:alert_resolve' alert.id %}" class="btn btn-success" style="font-size: 0.8em; padding: 4px 8px;">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <div>
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No alerts found</h3>
+                            <p>There are no alerts matching your criteria.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if severity_filter != 'all' %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if severity_filter != 'all' %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">&lsaquo; Previous</a>
+            {% endif %}
+            
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if severity_filter != 'all' %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Next &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if severity_filter != 'all' %}&severity={{ severity_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Last &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h3>No alerts yet</h3>
+            <p>When alerts are triggered by threshold violations, they will appear here.</p>
+            <a href="{% url 'alerts:rules_index' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Alert Rules
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Auto-submit form on filter change
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.getElementById('status');
+    const severitySelect = document.getElementById('severity');
+    
+    statusSelect.addEventListener('change', function() {
+        this.form.submit();
+    });
+    
+    severitySelect.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+</script>
+{% endblock content %}
